@@ -1,0 +1,15 @@
+set bell-style none
+set skip-completed-text on
+set expand-tilde on
+set history-size 100000
+set match-hidden-files off
+"\e[1;3D": backward-word
+"\e[1;3C": forward-word
+"\e[1;5D": vi-bWord
+"\e[1;5C": vi-fWord
+"\e@": possible-hostname-completions
+"\ej": menu-complete -> navigue dans les choix de completion en commençant par le premier choix
+"\ek": menu-complete-backward -> pareil dans l'autre sens
+"\e[5~": history-search-backward
+"\e[6~": history-search-forward
+"\e[9;3~": backward-kill-word
