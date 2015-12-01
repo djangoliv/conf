@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 
-bashrc => export PYTHONSTARTUP="/home/giorgis/.pythonrc.py"
+bashrc => export PYTHONSTARTUP="/home/user/.pythonrc.py"
 
 This file is executed when the Python interactive shell is started if
 $PYTHONSTARTUP is in your environment and points to this file. It's just

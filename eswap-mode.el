@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Djangoliv'
 
 ;; Author: Djangoliv <djangoliv@mailoo.com>
-;; URL:  https://github.com/
+;; URL:  https://github.com/djangoliv/conf
 ;; Version: 0.1
 ;; Keywords: project, toggle
 
