@@ -5,7 +5,7 @@
 ;; Author: Djangoliv <djangoliv@mailoo.com>
 ;; URL:  https://github.com/djangoliv/conf
 ;; Version: 0.1
-;; Keywords: project, toggle
+;; Keywords: project, toggle, src
 
 ;; This file is NOT part of GNU Emacs.
 
