@@ -1,0 +1,510 @@
+(require 'cl)
+
+;; path
+(add-to-list 'load-path "~/.emacs.d/lisp")
+
+;; desactive message de depart
+(setq inhibit-startup-message t)
+
+;; Enlever le temps d'attente au demarage
+(modify-frame-parameters nil '((wait-for-wm . nil)) )
+
+;; nom de la frame
+(setq-default frame-title-format `( "%f [%m]"))
+
+;; pas de Bip
+(setq ring-bell-function 'ignore)
+
+;; taille et position
+(set-frame-width (selected-frame) 240)
+(set-frame-position (selected-frame) 1 1)
+
+;; historique minibuffer entre les sessions
+(setq savehist-additional-variables    
+	  '(search-ring regexp-search-ring compile-history) 
+	  savehist-file "~/.emacs.d/savehist-term")
+(setq-default history-length 1000)
+(savehist-mode t)  
+
+;; enlever la barre d'outil
+(tool-bar-mode -1)
+(custom-set-variables '(toolbar-visible-p nil))
+(menu-bar-mode -1)
+
+;; pwd
+(setq default-directory (concat (getenv "HOME") "/"))
+
+;; Colorisation syntaxique maximale dans tous les modes
+(global-font-lock-mode t)
+(setq font-lock-maximum-decoration t)
+
+;; Recherche automatique des fermetures et ouvertures des parenthššses
+(show-paren-mode 1)
+
+;; baisser la frequence du garbage collector 
+(setq gc-cons-threshold 20000000)
+;; Allow font-lock-mode to do background parsing
+(setq jit-lock-stealth-time 1
+      jit-lock-stealth-load 100
+      jit-lock-chunk-size 1000
+      jit-lock-defer-time 0.01)
+
+
+;; Change les couleurs
+(cond (window-system
+       (set-foreground-color "black")
+       (set-background-color "whiteSmoke")
+       (set-cursor-color "black")
+       (set-mouse-color "black")
+       (set-face-foreground 'menu "wheat")
+       (set-face-background 'menu "whiteSmoke")
+       (set-face-background 'fringe "whiteSmoke")
+       (set-face-foreground 'region "black")
+       (set-face-background 'region "SteelBlue")))
+       (set-face-background 'tool-bar "whiteSmoke")
+
+(add-to-list 'auto-mode-alist '("\\.emacs-terms\\'" . lisp-mode))
+
+;; Afficher le numero de colonne et de ligne
+(column-number-mode 1)
+;;(global-linum-mode 1)
+(setq linum-format "%05d")
+
+;; Pour ne pas avoir a taper en entier la reponse yes/no
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;;persistance
+;; save history between sessions
+(setq savehist-additional-variables    
+	  '(search-ring regexp-search-ring compile-history) 
+	  savehist-file "~/.emacs.d/savehist-term")
+(setq-default history-length 1000)
+(savehist-mode t)  
+
+(defun byte-compile-current-file ()
+  "Interactive command for byte compiling current file."
+  (interactive)
+  (byte-compile-file (buffer-file-name)))
+(global-set-key  (kbd "s-b") 'byte-compile-current-file)
+
+;; copie sans couper
+(defun copy-line (&optional arg)
+  (interactive "P")
+  (toggle-read-only 1)
+  (kill-line arg)
+  (toggle-read-only 0))
+(setq-default kill-read-only-ok t)
+
+;; Mettre tous les fichiers de sauvegarde dans un seul repertoire
+ (setq backup-directory-alist
+       '(("." . "~/.emacs-backup-terms-files/")))
+ (setq auto-save-file-name-transforms
+           `((".*" ,"~/.emacs-autosave-terms-files/" t)))
+(set-register ?e '(file . "~/.emacs-terms"))
+
+;; copier-coller application externe
+(setq x-select-enable-clipboard t)
+(setq x-select-enable-primary t)
+;; pour que le colle de la souris soit de la kill-ring
+(setq x-select-enable-clipboard nil)
+(setq x-select-enable-primary t)
+(setq select-active-regions nil)
+(setq mouse-drag-copy-region t)
+(global-set-key [mouse-2] 'mouse-yank-at-click)
+
+;; Ecraser la zone selectionne
+(delete-selection-mode 1)
+
+;; Pour que la recherche soit visible.
+(setq-default search-highlight t)
+(copy-face 'highlight 'isearch)
+
+;; Curseur non clignotant
+(blink-cursor-mode 0)
+
+;; FFAP ouvre sans confirm
+;; remplace TRAVAIL par DEBUG ou KEEP si necessaire
+;; lit le numero de ligne (si present) apres le signe :
+(defun open-file-at-cursor-replace ()
+  (interactive)
+  (setq line-number (and (string-match ":[0-9]+" (thing-at-point 'line))
+               (substring (thing-at-point 'line) (1+ (match-beginning 0)) (match-end 0))))
+  (if (equal line-number nil)
+      (setq line-number (and (string-match "line [0-9]+" (thing-at-point 'line))
+               (substring (thing-at-point 'line) (+ 5 (match-beginning 0)) (match-end 0)))))
+  (if (equal line-number nil)
+      (setq line-number "0"))
+  (let ( (path (if (region-active-p)
+                   (buffer-substring-no-properties (region-beginning) (region-end))
+                 (thing-at-point 'filename) ) ))
+    (if (string-match-p "\\`https?://" path)
+        (browse-url path)
+      (progn ; not starting “http://”
+	(if (file-exists-p (replace-regexp-in-string "elc" "el" path ))
+	    (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "elc" "el" path )))
+	  (if (file-exists-p (substitute-in-file-name path))
+	      (auto-send-2-server (concat "+" line-number " " (substitute-in-file-name path)))
+	    (if (file-exists-p (concat path ".el"))
+		(auto-send-2-server (concat "+" line-number " " path ".el"))
+              (if (file-exists-p (replace-regexp-in-string ":" "" path ))
+                  (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string ":" "" path )))
+		(if (file-exists-p (replace-regexp-in-string ":.*" "" path ))
+		    (auto-send-2-server (replace-regexp-in-string ":.*" "" path ))
+		  (if (file-exists-p (replace-regexp-in-string "TRAVAIL" "DEBUG" path ))
+		      (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "TRAVAIL" "DEBUG" path )))
+		    (if (file-exists-p (replace-regexp-in-string "TRAVAIL" "DEBUG" path ))
+			(auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "TRAVAIL" "KEEP" path )))
+		      (if (file-exists-p (replace-regexp-in-string "$i" "0" path ))
+			  (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "$i" "0" path )))
+			(if (file-exists-p (concat "~/workspaces/PROJ1/trunk/" path))
+			    (auto-send-2-server (concat "+" line-number " ~/workspaces/PROJ1/trunk/" path))
+			  (if (file-exists-p (concat "~//workspaces/LAI/" path))
+			      (auto-send-2-server (concat "+" line-number " ~//workspaces/LAI/" path))
+			    (when (y-or-n-p (format "file doesn't exist: 「%s」. Create?" path) )
+			      (auto-send-2-server path )))))))))))))))
+)
+(global-set-key [(control f1)] 'open-file-at-cursor-replace)
+
+; envoyer le buffer dans emacs client
+(defun auto-send-2-server(fileName)
+  (shell-command 
+   (concat "emacsclient -n " fileName))
+)
+(defun send-2-server()
+  (interactive)
+  (message buffer-file-name)
+  (setq lineNb (count-lines 1 (point)))
+  (shell-command 
+    (concat "emacsclient -n +" (int-to-string (+ lineNb 1)) " " buffer-file-name))
+)
+(global-set-key [f5] 'send-2-server)
+
+(defun open-in-server(filename)
+  (interactive "fOpen To Client: ")
+  (setq bufferName (buffer-name))
+  (switch-to-buffer "*Messages*")
+  (auto-send-2-server filename)
+  (switch-to-buffer bufferName))
+(global-set-key (kbd "C-x C-f") 'open-in-server)
+(global-set-key (kbd "C-x f") 'find-file)
+
+;; term buffer (illimite)
+(setq term-buffer-maximum-size 0)
+
+;;;;;;;;; tabbar
+(require 'tabbar)
+(load-file "~/.emacs.d/lisp/tabbar-more.elc")
+(assq-delete-all 'tabbar-mode minor-mode-map-alist) ;; pour que le C-c fonctionne
+
+;; permet de ne pas afficher les buffers non pertinents (comme *scratch* par exemple):
+(when (require 'tabbar nil t)
+  (setq tabbar-buffer-groups-function
+	(lambda () (list "All Buffers")))
+   (setq tabbar-buffer-list-function
+	 (lambda ()
+           (remove-if
+            (lambda(buffer)
+              (or (string-equal "TAGS" (buffer-name buffer))
+                   (find (aref (buffer-name buffer) 0) " *" )))
+            (buffer-list))))
+   (tabbar-mode))
+
+;; raccourcis
+(global-set-key [C-next] 'tabbar-forward-tab)
+(global-set-key [C-prior] 'tabbar-backward-tab)
+
+;; tabbar group
+(defun tabbar-buffer-groups ()
+    (list
+     (cond 
+      ((eq major-mode 'dired-mode)
+       "Dired"
+       )
+      ((eq major-mode 'org-mode)
+       "Dired"
+       )
+      ((string-equal "." (substring (buffer-name) 0 1)) "Conf Buffer")
+      (t
+       "User Buffer"
+       )
+      )))
+(setq tabbar-buffer-groups-function 'tabbar-buffer-groups)
+
+(global-set-key "\M-+" 'tabbar-backward-group)
+(global-set-key "\M--" 'tabbar-forward-group)
+
+;; tabbar custom color
+(setq tabbar-background-color "whiteSmoke") ;; the color of the tabbar background
+(set-face-attribute
+ 'tabbar-unselected nil
+ :foreground "black")
+(setq tabbar-tab-label-function (lambda (tab) (format " %s " (car tab)))) ; ajoute des espaces autours des labels
+
+;; paste du clipboard
+(global-set-key (kbd "C-M-y") 'x-clipboard-yank)
+
+;; tramp completion
+(require 'tramp)
+(setq my-tramp-ssh-completions
+      '((tramp-parse-sconfig "~/.ssh/config")
+        (tramp-parse-shosts "~/.ssh/known_hosts")))
+(mapc (lambda (method)
+        (tramp-set-completion-function method my-tramp-ssh-completions))
+      '("fcp" "rsync" "scp" "scpc" "scpx" "sftp" "ssh"))
+
+(defun term-toggle-mode ()
+  (interactive)
+  (if (term-in-line-mode) 
+      (term-char-mode)
+    (term-line-mode)))
+(global-set-key (kbd "C-x t") 'term-toggle-mode)
+
+(setq term-buffer-maximum-size 100000)
+(setq term-program "/bin/bash")
+
+(require 'multi-term)
+;; Permet d'avoir un term dans une tab de tabbar
+(defun my-run-term ()
+  "Lance le terminal dans la fenetre courante nom 'Term #', donc il est possible de lancer plusieurs terminaux"
+  (interactive)
+  (command-execute 'multi-term)
+  (setq-default truncate-lines nil)
+  (if (not (boundp 'term-number))
+      (defvar term-number 1 "term index in the current emacs session") )
+  (rename-buffer (concat "Term " (int-to-string term-number)))
+  (setq term-number (+ 1 term-number)))
+(global-set-key "\M-&" 'my-run-term) ;; mappe sur M-&
+(global-set-key (kbd "C-S-t") 'my-run-term) ;; mappe sur C-T
+
+;; fermer un terminal
+(global-set-key [(control f4)] 'kill-this-buffer);; mappe sur C-F4
+
+;; ssh
+(defun my-ssh-term (args)
+  "Connect to a remote host by SSH."
+  (interactive (list
+    (completing-read "sssh " '("machine02" "djangoliv@machine02" "user@machine02" "proj1@machine02" )))
+	       (insert args))
+  (let ((switches (split-string-and-unquote args)))
+    (set-buffer (apply 'make-term "ssh" "ssh" nil "-X" switches))
+    (setq-default truncate-lines nil)
+    (if (not (boundp 'term-ssh-number))
+      (defvar term-ssh-number 1 "term index in the current emacs session") )
+    (rename-buffer (concat "Term " args " " (int-to-string term-ssh-number)))
+    (term-mode)
+    (term-char-mode)
+    (switch-to-buffer (concat "Term " args " " (int-to-string term-ssh-number)) )
+    (setq term-ssh-number (+ 1 term-ssh-number))))
+(global-set-key (kbd "C-M-&") 'my-ssh-term) ;; mappe sur M-&
+
+;; Permet de recuperer la derniere sortie
+;; si arg => avant derniere
+(defun getLastOutput (arg)
+  (interactive "P")
+  (term-line-mode)
+  (save-excursion
+    (beginning-of-line 1)
+    (setq prompt (substring (thing-at-point 'line) 0 4 ))
+    (message prompt)
+    (while (equal prompt (substring (thing-at-point 'line) 0 4 ))
+      (previous-line)
+      (beginning-of-line)
+      (copy-line))
+    (if (not (equal arg nil))
+	(progn
+	  (previous-line)
+	  (beginning-of-line)
+	  (copy-line)
+	  (while (equal prompt (substring (thing-at-point 'line) 0 4 ))
+	    (message "ppp")
+	    (previous-line)
+	    (beginning-of-line)
+	    (copy-line)))))
+  (yank)
+  (term-char-mode))
+
+;; completion dans u terminal (C-/)
+(setq dabbrev-abbrev-skip-leading-regexp "[<>=\"/]")
+(defun term-dabbrev-expand (arg)
+  (interactive "*P")
+  (if (equal major-mode 'term-mode)
+      (progn
+	(let ((beg (point)))
+	  (dabbrev-expand nil)
+	  (kill-region beg (point)))
+	(term-send-raw-string (substring-no-properties (current-kill 0))))
+    (dabbrev-expand arg)))
+;; yank in term (kill-ing)
+(defun term-yank-kill-ring ()
+  (interactive)
+  (flet ((insert-for-yank (string) (term-send-raw-string string)))
+    (yank)))
+;; yank-pop un term (kill-ring)
+(defun term-yank-pop-kill-ring ()
+  (interactive)
+  (dotimes (i (- (point) (mark t)))
+    (term-send-backspace)
+    )
+  (process-send-string
+   (get-buffer-process (current-buffer))
+   (current-kill 1))
+  )
+
+;; yank-pop (terminal fonction (not kill-ring))
+(defun term-yank-pop ()
+  (interactive)
+  (term-send-raw-string "\ey"))
+
+;; path selection
+(modify-syntax-entry ?\/ "w" term-mode-syntax-table)
+(modify-syntax-entry ?. "w" term-mode-syntax-table)
+(modify-syntax-entry ?- "w" term-mode-syntax-table)
+(modify-syntax-entry ?~ "w" term-mode-syntax-table)
+(modify-syntax-entry ?$ "(^" term-mode-syntax-table)
+(modify-syntax-entry ?_ "w" term-mode-syntax-table)
+(modify-syntax-entry ?[ "w" term-mode-syntax-table)
+(modify-syntax-entry ?] "w" term-mode-syntax-table)
+
+;; sudo + ssh
+;; C-x C-f /sudo:djangoliv@machine02:/COTS/torque/
+(set-default 'tramp-default-proxies-alist (quote (("machine02" "djangoliv" "/ssh:%h:"))))
+
+;; exit term whit C-d
+(defun delete-char-or-kill-terminal-buffer (N &optional killflag)
+  (interactive "p\nP")
+  (if (string-match "Term " (buffer-name))
+      (kill-buffer (current-buffer))
+    (delete-char N killflag)))
+(global-set-key (kbd "C-d") 'delete-char-or-kill-terminal-buffer)
+
+;; deplacement
+;; pour ces fonctions il faut ajouter dans le fichier .readline-bindings
+;; "\e[1;3D": backward-word
+;; "\e[1;3C": forward-word
+;; "\e[1;5D": vi-bWord
+;; "\e[1;5C": vi-fWord
+;;"\e[9;3~": backward-kill-word
+;; Et dans le bashrc
+;;if [ -f ~/.readline-bindings ] ; then
+;;bind -f ~/.readline-bindings
+;;fi
+(defun term-send-forward-word ()
+  "Move forward word in term mode."
+  (interactive)
+  (term-send-raw-string "\ef"))
+(defun term-send-backward-word ()
+  "Move backward word in term mode."
+  (interactive)
+  (term-send-raw-string "\eb"))
+(defun term-send-forward-big-word ()
+  "Move forward big word in term mode."
+  (interactive)
+  (term-send-raw-string "\e[1;5C"))
+(defun term-send-backward-big-word ()
+  "Move forward big word in term mode."
+  (interactive)
+  (term-send-raw-string "\e[1;5D"))
+(defun term-kill-word ()
+  (interactive)
+  (term-send-raw-string "\e[9;3~")) 
+;; Retour chario dans le terminal
+(defun toggle-hard-newline ()
+  (interactive)
+  (if (eq term-suppress-hard-newline nil)
+      (setq term-suppress-hard-newline t)
+    (setq term-suppress-hard-newline nil)))
+;;(toggle-hard-newline)
+(defun backward-kill-to-slash ()
+  "Delete / to /"
+  (interactive)
+  (set-mark-command t)
+  (search-backward "/")
+  (kill-region)
+)
+(global-set-key [M-backspace] 'backward-kill-to-slash)
+
+"Change le nom du terminal"
+(defun term-rename (name)
+  (interactive "sterminal name: ")
+  (rename-buffer name t))
+
+;; unbind keys 
+(setq term-unbind-key-list '("<ESC>" "C-h" "C-s" "C-r"))
+
+;;term moves in char-mode
+(setq term-bind-key-alist
+      '(("C-p" . term-send-raw)
+        ("C-n" . term-send-raw)
+        ("C-r" . term-send-raw)
+        ("C-s" . term-send-raw)
+        ("C-m" . term-send-raw)
+        ("M-y" . term-yank-pop)
+	("C-x C-y" . term-yank-kill-ring)
+	("C-x M-y" . term-yank-pop-kill-ring)
+        ("C-_" . term-send-raw)
+        ("C-M-h" . term-send-backward-kill-semi-word)
+        ("M-f" . term-send-forward-word)
+        ("M-b" . term-send-backward-word)
+        ("M-K" . term-send-kill-line)
+        ("M-p" . previous-line)
+        ("M-n" . next-line)
+	("C-." . getLastOutput)
+	("C-/" . term-dabbrev-expand)
+	("M-<right>" . term-send-forward-word)    
+	("M-<left>" . term-send-backward-word)  
+	("C-<right>" . term-send-forward-big-word)
+	("C-<left>" . term-send-backward-big-word)
+	("C-<backspace>" . term-send-backward-kill-word)
+	("M-<backspace>" . term-kill-word)
+	("s-l" . toggle-hard-newline)
+	("S-<up>" . previous-line)
+	("S-<down>" . next-line)		
+	("S-<right>" . right-char)
+	("S-<left>" . left-char)		
+	("S-<end>" . move-end-of-line)
+	("S-<home>" . move-beginning-of-line)
+	("M-:" . term-send-raw-meta)
+	("M-l" . term-send-raw-meta) ;; NEW
+        ("M-u" . term-send-raw-meta)
+        ("M-c" . term-send-raw-meta)
+        ("M-." . term-send-raw-meta)))
+(define-key term-raw-map (kbd "C-S-y") 'term-paste)
+
+;; compile-shell-minor-mode
+(global-set-key (kbd "s-c") 'compilation-shell-minor-mode)
+
+(add-hook 'term-mode-hook
+              '(lambda ()
+	      (term-set-escape-char ?\C-x)
+	      (global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
+	      ))
+
+(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+  (flet ((process-list ())) ad-do-it))
+
+;; demarage de 3 terminaux
+(my-run-term)
+(my-run-term)
+(my-run-term)
+(switch-to-buffer "Term 1")
+
+;; C-c
+(global-set-key (kbd "C-c") 'term-send-raw)
+;; Envoyer un Echap au terminal
+(global-set-key (kbd "C-<escape>") 'term-send-M-x)
+
+;; Disable killing and yanking in char mode (term-raw-map).
+(eval-after-load "term"
+  '(progn
+     (mapc
+      (lambda (func)
+        (eval `(define-key term-raw-map [remap ,func]
+                 (lambda () (interactive) (ding)))))
+      '(backward-kill-paragraph
+        backward-kill-sentence backward-kill-sexp backward-kill-word
+        bookmark-kill-line kill-backward-chars kill-backward-up-list
+        kill-forward-chars kill-line kill-paragraph kill-rectangle
+        kill-region kill-sentence kill-sexp kill-visual-line
+        kill-whole-line kill-word subword-backward-kill subword-kill
+        yank yank-pop yank-rectangle))))
