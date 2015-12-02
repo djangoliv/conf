@@ -3193,7 +3193,7 @@ C-. => goto definition
 ** Server start
 #+BEGIN_SRC emacs-lisp
   ;; start page
-  (dired-jump)
+  (setq initial-buffer-choice "~/workspaces")
   ;; server
   (server-start)
   ;; declare cette frame comme la princiale (pour emacsclient)
