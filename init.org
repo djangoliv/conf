@@ -556,7 +556,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 ** Org-Mode
 *** init
-*dépendances*: [[http://orgmode.org/][org-mode]]  [[https://github.com/sabof/org-bullets][org-bullets.el]]
+*dépendances*: [[http://orgmode.org/][org-mode]]  [[https://github.com/sabof/org-bullets][org-bullets.el]] [[http://ditaa.sourceforge.net/][ditaa]]
 #+BEGIN_SRC emacs-lisp
   ;; initialisation
   (setq org-ellipsis " ••• ")
@@ -592,9 +592,11 @@ Avoir des tabs (et surtout des groupes)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((sh . t)
+     (latex . t)
      (emacs-lisp . nil)
-     (python . t)
-     ))
+     (python . t)))
+  ;; dita
+  (setq org-ditaa-jar-path "~/Outils/ditaa/ditaa0_9.jar")
 #+END_SRC
 *** export
 *dépendances* [[https://github.com/kinjo/org-impress-js.el][org-impress.el]]
