@@ -568,6 +568,7 @@ Avoir des tabs (et surtout des groupes)
   (setq org-src-fontify-natively t)   ;; fontify code in code blocks
   (setq org-src-tab-acts-natively t)   ;; indentation des block sources
   (modify-coding-system-alist 'file "\\.org\\'" 'utf-8)
+  (setq org-cycle-separator-lines 0)
   ;; theme+
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
@@ -576,7 +577,7 @@ Avoir des tabs (et surtout des groupes)
                              (defadvice org-open-at-point (around org-open-at-point-choose-browser activate)
                                (let ((browse-url-browser-function 'browse-url-generic))
                                  ad-do-it))
-                             (setq-local indent-tabs-mode nil)
+                             (setq indent-tabs-mode nil)
                              (setq-local ac-auto-start 8)
                              (setq-local line-spacing '0.1)
                              (setq-local company-minimum-prefix-length 5)))
@@ -594,9 +595,22 @@ Avoir des tabs (et surtout des groupes)
    '((sh . t)
      (latex . t)
      (emacs-lisp . nil)
+     (ditaa . t)
+     (dot . t)
+     (plantuml . t)
      (python . t)))
   ;; dita
   (setq org-ditaa-jar-path "~/Outils/ditaa/ditaa0_9.jar")
+  (defun my-org-confirm-babel-evaluate (lang body)
+    (not (string= lang "ditaa")))  ; don't ask for ditaa
+  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+  ;; graphviz (dot)
+  (defun my-org-confirm-babel-evaluate (lang body)
+    (not (string= lang "dot")))  ; don't ask for dot
+  ;; plantuml
+  (setq org-plantuml-jar-path "~/.emacs.d/plantuml/plantuml.jar")
+  (defun my-org-confirm-babel-evaluate (lang body)
+    (not (string= lang "plantuml")))  ; don't ask for plantuml
 #+END_SRC
 *** export
 *dépendances* [[https://github.com/kinjo/org-impress-js.el][org-impress.el]]
@@ -735,6 +749,7 @@ Avoir des tabs (et surtout des groupes)
 *dépendances*: [[https://github.com/ppareit/graphviz-dot-mode][graphviz-dot-mode.el]]
 #+BEGIN_SRC emacs-lisp
    (autoload 'graphviz-dot-mode "graphviz-dot-mode" "" t)
+   (add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
  #+END_SRC
 ** ps2pdf
 *dépendances*: [[http://www.emacswiki.org/emacs/ps2pdf.el][ps2pdf.el]]
