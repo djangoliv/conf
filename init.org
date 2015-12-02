@@ -1588,6 +1588,7 @@ Avoir des tabs (et surtout des groupes)
         '((tramp-parse-sconfig "~/.ssh/config")
           (tramp-parse-shosts "~/.ssh/known_hosts")))
   (setq tramp-auto-save-directory "~/.emacs-autosave-tramp-files/")
+  (setq tramp-backup-directory-alist backup-directory-alist)
   ;; se souviens du mot de passe ~/.authinfo.gpg
   (setq password-cache-expiry nil)        
   ;; conection to machine02
