@@ -18,7 +18,7 @@
 (custom-set-faces
  `(fringe ((t (:background "#1f4f4f"))))
  `(isearch ((t (:foreground "white" :background "SteelBlue"))))
- `(lazy-highlight ((t (:background "darkslategray4"))))
+ `(lazy-highlight ((t (:background "DarkSlateGray4"))))
  `(cua-rectangle ((t (:background "CornflowerBlue" :foreground "white"))))
  `(header-line ((t (:foreground "white" :background "#0e3f4e" :box (:line-width -1 :style released-button))))))
 ;;;;; tabbar
@@ -28,26 +28,28 @@
  '(dired-filetype-common ((t (:foreground "White"))))
  '(dired-filetype-compress ((t (:foreground "thistle"))))
  '(dired-filetype-image ((t (:foreground "plum"))))
- '(dired-filetype-plain ((t (:foreground "light gray"))))
- '(dired-filetype-xml ((t (:foreground "white smoke"))))
+ '(dired-filetype-plain ((t (:foreground "lightgray"))))
+ '(dired-filetype-xml ((t (:foreground "whitesmoke"))))
 ;;;; org-mode
  '(org-level-1 ((t (:inherit variable-pitch :height 1.11 :foreground "#00cbcd"))))
- '(org-level-2 ((t (:inherit outline-2 :height 1.03 :foreground "deep sky blue"))))
- '(org-level-3 ((t (:inherit outline-3 :height 1.02 :foreground "light sky blue"))))
- '(org-level-4 ((t (:inherit outline-4 :height 1.01 :foreground "light blue"))))
- '(org-level-5 ((t (:inherit outline-5 :height 1.00 :foreground "light steel blue"))))
+ '(org-level-2 ((t (:inherit outline-2 :height 1.03 :foreground "deepskyblue"))))
+ '(org-level-3 ((t (:inherit outline-3 :height 1.02 :foreground "lightskyblue"))))
+ '(org-level-4 ((t (:inherit outline-4 :height 1.01 :foreground "lightblue"))))
+ '(org-level-5 ((t (:inherit outline-5 :height 1.00 :foreground "lightsteelblue"))))
  '(org-level-6 ((t (:inherit outline-6 :height 1.00 :foreground "thistle"))))
- '(org-level-7 ((t (:inherit outline-7 :height 1.00 :foreground "gray90"))))
+ '(org-level-7 ((t (:inherit outline-7 :height 1.00 :foreground "Gray90"))))
  '(org-level-8 ((t (:inherit outline-8 :height 1.00 :foreground "white"))))
- '(org-table ((t (:foreground "whiteSmoke"))))
+ '(org-table ((t (:foreground "whitesmoke"))))
  '(org-archived ((t (:foreground "#008f80"))))
- '(org-link ((t (:foreground "cyan1" :underline t :background "#2e3436")))))
+ '(org-link ((t (:foreground "Cyan" :underline t :background "#2e3436")))))
 ;; org-priority
 (setq org-priority-faces '((?A . (:foreground "OrangeRed" :weight "bold" :background "#271363936393"))
                            (?B . (:foreground "orange" :background "#271363936393"))
                            (?C . (:foreground "gold" :background "#271363936393"))))
 ;; whitespace-mode
 ;;(setq whitespace-style (quote (spaces tabs newline space-mark tab-mark newline-mark space-before-tab space-after-tab)))
+(custom-set-faces
+ '(trailing-whitespace ((t (:background "#0e3f4e")))))
 (setq whitespace-display-mappings '(
 									(space-mark 32 [183] [46])
 									(newline-mark 10 [182 10])
@@ -59,10 +61,10 @@
  '(rainbow-delimiters-depth-1-face ((t (:foreground "wheat"))))
  '(rainbow-delimiters-depth-2-face ((t (:foreground "wheat"))))
  '(rainbow-delimiters-depth-3-face ((t (:foreground "burlywood"))))
- '(rainbow-delimiters-depth-4-face ((t (:foreground "tan2"))))
- '(rainbow-delimiters-depth-5-face ((t (:foreground "tan3"))))
- '(rainbow-delimiters-depth-6-face ((t (:foreground "sienna2"))))
- '(rainbow-delimiters-depth-7-face ((t (:foreground "coral2"))))
+ '(rainbow-delimiters-depth-4-face ((t (:foreground "Tan2"))))
+ '(rainbow-delimiters-depth-5-face ((t (:foreground "Tan3"))))
+ '(rainbow-delimiters-depth-6-face ((t (:foreground "Sienna2"))))
+ '(rainbow-delimiters-depth-7-face ((t (:foreground "Coral2"))))
  '(rainbow-delimiters-depth-8-face ((t (:foreground "tomato"))))
  '(rainbow-delimiters-depth-9-face ((t (:foreground "firebrick"))))
  '(rainbow-delimiters-unmatched-face ((t (:foreground "red")))))
@@ -158,7 +160,7 @@
 									 'mode-line-dired-face)))
 				" "
 				(:eval (propertize "(admin)" 'face (if (string-match "^/su\\(do\\)?:" default-directory)
-													   '(:background "dark red" :foreground "white")
+													   '(:background "darkred" :foreground "white")
 													 '(:foreground "#1f4f4f"))))
 				;; narrow [default -- keep?]
 				" %n "
@@ -210,7 +212,7 @@
 					:inherit 'mode-line-face)
 (set-face-attribute 'mode-line-filename-face nil
 					:inherit 'mode-line-face
-					:foreground "whiteSmoke")
+					:foreground "whitesmoke")
 (set-face-attribute 'mode-line-dired-face nil ;; permet de rendre le filename invisible sous dired
 					:inherit 'mode-line-face
 					:foreground "#1f4f4f")
@@ -219,19 +221,19 @@
 					:weight 'bold :foreground "black")
 (set-face-attribute 'mode-line-mode-face nil
 					:inherit 'mode-line-face
-					:foreground "mediumBlue")
+					:foreground "mediumblue")
 (set-face-attribute 'mode-line-80col-face nil
 					:inherit 'mode-line-black-face
-					:foreground "black" :background "gray50")
+					:foreground "black" :background "Gray50")
 (set-face-attribute 'mode-line-col-face nil
 					:inherit 'mode-line-face
-					:foreground "cadetBlue")
+					:foreground "cadetblue")
 ;; defaut
 (set-face-attribute 'mode-line nil
-					:foreground "gray60" :background "#1f4f4f"
+					:foreground "Gray60" :background "#1f4f4f"
 					:inverse-video nil)
 (set-face-attribute 'mode-line-inactive nil
-					:foreground "gray60" :background "DarkSlateGray"
+					:foreground "Gray60" :background "DarkSlateGray"
 					:inverse-video nil)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Fin mode line

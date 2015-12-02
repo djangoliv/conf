@@ -2100,10 +2100,25 @@ Avoir des tabs (et surtout des groupes)
                               (files ("*.zip" "*~" "*.pyc"))))
   (global-set-key (kbd "C-c f") 'fiplr-find-file)
 #+END_SRC
-*** color-idenrifier
+*** whitespace
+#+BEGIN_SRC emacs-lisp
+  (require 'whitespace)
+  (setq-default show-trailing-whitespace t)
+#+END_SRC
+*** color-identifier
 *dépendances* [[https://github.com/ankurdave/color-identifiers-mode][color-idenrifier-mode]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'color-identifiers-mode "color-identifiers-mode" "" t)
+#+END_SRC
+*** couleurs
+*dépendances*: [[http://www.emacswiki.org/emacs/mon-css-color.el][mon-css-color]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'css-color-mode "mon-css-color" "" t)
+  (defun color-mode ()
+    (interactive)
+    (if css-color-mode
+        (css-color-mode -1)
+      (css-color-mode)))
 #+END_SRC
 ** flycheck
 *dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]]
