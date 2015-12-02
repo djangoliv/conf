@@ -1217,6 +1217,7 @@ Avoir des tabs (et surtout des groupes)
 *dépendances*: [[https://github.com/laysakura/doc-view-fit-to-page][doc-view-fit-page.el]]
 #+BEGIN_SRC emacs-lisp
   ;; new search c-u c-s (c-t pour le tool-tip)
+  (setq doc-view-continuous t)
   (add-hook 'doc-view-mode-hook (lambda ()
                                   (require 'doc-view-fit-page)
                                   (define-key doc-view-mode (kbd "f") 'doc-view-fit-page)
@@ -2257,6 +2258,10 @@ Avoir des tabs (et surtout des groupes)
 			(remove-text-properties p1 (1- (point)) '(invisible nil))
 			)))
       date)))
+  ; optimisation
+  (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
+  (setq magit-diff-options '("-b")) ;; ignore whitespace
+  (setq magit-push-always-verify nil)
   ;; fichier de conf
   (require 'gitconfig-mode)
   (require 'gitignore-mode)
