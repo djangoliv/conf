@@ -17,7 +17,7 @@ Configuration Minimal (sans librairies externes)
   ;; message de depart desactive
   (setq inhibit-startup-message t)
   ;; menu-bar desactive
-  (menu-bar-mode -1) 
+  (menu-bar-mode -1)
   ;; Enlever le temps d'attente au demarage
   (modify-frame-parameters nil '((wait-for-wm . nil)) )
   ;; Bip en mode visuel
@@ -129,7 +129,7 @@ Configuration Minimal (sans librairies externes)
   (setq version-control t      ;; activation
         delete-old-versions t  ;; nettoyage silencieux
         kept-new-versions 3
-        kept-old-versions 1) 
+        kept-old-versions 1)
   ;; Faire aussi des backups des fichiers sous control de version
   (setq vc-make-backup-files t)
 #+END_SRC
@@ -137,10 +137,10 @@ Configuration Minimal (sans librairies externes)
 *dépendances*: [[https://github.com/tkf/savekill-el][savekill.el]]
 #+BEGIN_SRC emacs-lisp
   ;; savegarde de l'historique entre les sessions
-  (setq savehist-additional-variables    
-        '(search-ring regexp-search-ring compile-history) 
+  (setq savehist-additional-variables
+        '(search-ring regexp-search-ring compile-history)
         savehist-file "~/.emacs.d/savehist")
-  (savehist-mode t)  
+  (savehist-mode t)
   ;; sauvegarde de la kill-ring
   (require 'savekill)
 #+END_SRC
@@ -204,7 +204,7 @@ Configuration Minimal (sans librairies externes)
 #+END_SRC
 ** isearch
 #+BEGIN_SRC emacs-lisp
-  ;; sensible a la casse 
+  ;; sensible a la casse
   (setq-default case-fold-search t)
   (define-key isearch-mode-map (kbd "C-c") 'isearch-toggle-case-fold)
   ;; tolerer les espaces
@@ -273,7 +273,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-<prior>") 'tabbar-backward-tab)
   (global-set-key (kbd "C-c C-t") 'tabbar-local-mode) ;; switch tabbar (header-line)
  #+END_SRC
-** apparences 
+** apparences
 #+BEGIN_SRC emacs-lisp
   ;; Apparence tabbar custom color
   (setq tabbar-background-color "DarkSlateGray") ;; the color of the tabbar background
@@ -287,7 +287,7 @@ Avoir des tabs (et surtout des groupes)
   ;; tabbar group
   (defun tabbar-buffer-groups ()
     (list
-     (cond 
+     (cond
       ((eq major-mode 'dired-mode)
        "Dired"
        )
@@ -337,7 +337,7 @@ Avoir des tabs (et surtout des groupes)
                 (if (buffer-live-p (car e))
                     (tabbar-set-group-name (car e) (cdr e))))
               entry)))
-  (global-set-key (kbd "C-x k") '(lambda () 
+  (global-set-key (kbd "C-x k") '(lambda ()
                        (interactive)
                        (tabbar-backward-tab) ; petite feinte pour rester dans le meme tabset
                        (tabbar-forward-tab)
@@ -353,7 +353,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "s-k") 'kill-all-other-buffers)
  #+END_SRC
 ** Terminal dans des tabs
-*dépendances*: [[https://github.com/emacsmirror/multi-term][multi-term.el]] 
+*dépendances*: [[https://github.com/emacsmirror/multi-term][multi-term.el]]
 #+BEGIN_SRC emacs-lisp
   ;; Permet d'avoir un term dans une tab de tabbar
   (defun my-run-term ()
@@ -402,35 +402,38 @@ Avoir des tabs (et surtout des groupes)
   ;; couleur par type de fichier
   (setq dired-filetype-plain-regexp "^  .*\\.\\(TXT\\|txt\\|Txt\\|ini\\|INI\\|lrc\\|org\\|log\\|conf\\|CFG\\|cfg\\|properties\\|config\\|diff\\|patch\\|ebuild\\|inf\\|cnf\\|example\\|sample\\|default\\|m4\\|PARAM\\)$")
   (setq dired-filetype-xml-regexp "^  .*\\.\\(html?\\|HTML?\\|xml\\|XML\\|xsl\\|xsd\\|rng\\|dtd\\|mht\\|jsp\\|asp\\|js\\|xaml\\|gml\\|GML\\|XSD\\|kml\\|KML\\)$")
+  ;; récursivité
+  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'always)
  #+END_SRC
 *** tris dans Dired
 #+BEGIN_SRC emacs-lisp
   (defvar dired-sort-map (make-sparse-keymap))
   (define-key dired-mode-map "s" dired-sort-map)
   (defun dired-sort-by-size (arg)
-    "sort by Size" 
+    "sort by Size"
     (interactive "P")
     (if (equal arg nil)
         (setq params " -S")
       (setq params " -Sr"))
     (dired-sort-other (concat dired-listing-switches params)))
   (defun dired-sort-by-extension (arg)
-    "sort by eXtension" 
-    (interactive "P") 
+    "sort by eXtension"
+    (interactive "P")
     (if (equal arg nil)
         (setq params " -X")
       (setq params " -Xr"))
     (dired-sort-other (concat dired-listing-switches params)))
   (defun dired-sort-by-time (arg)
-    "sort by Time" 
-    (interactive "P") 
+    "sort by Time"
+    (interactive "P")
     (if (equal arg nil)
         (setq params " -t")
       (setq params " -tr"))
     (dired-sort-other (concat dired-listing-switches params)))
   (defun dired-sort-by-Name (arg)
-    "sort by Name" 
-    (interactive "P") 
+    "sort by Name"
+    (interactive "P")
     (if (equal arg nil)
         (setq params " -N")
       (setq params " -Nr"))
@@ -573,6 +576,7 @@ Avoir des tabs (et surtout des groupes)
                              (defadvice org-open-at-point (around org-open-at-point-choose-browser activate)
                                (let ((browse-url-browser-function 'browse-url-generic))
                                  ad-do-it))
+                             (setq-local indent-tabs-mode nil)
                              (setq-local ac-auto-start 8)
                              (setq-local line-spacing '0.1)
                              (setq-local company-minimum-prefix-length 5)))
@@ -616,7 +620,7 @@ Avoir des tabs (et surtout des groupes)
   ;; export pied de page
   (setq org-html-validation-link nil)
   (setq org-html-postamble t)
-  (setq org-html-postamble-format 
+  (setq org-html-postamble-format
         '(("en" "<p class=\"author\">Author: %a (%e)</p>\n<p class=\"date\">Date: %T</p>")))
   ;; export presentation (org-reveal)
   (eval-after-load "org"
@@ -668,7 +672,7 @@ Avoir des tabs (et surtout des groupes)
 
   ;;bind to key
   (define-key org-mode-map (kbd "C-<") 'org-begin-template)
-  #+END_SRC 
+  #+END_SRC
 ** Calendrier/Agenda
 *dépendances*: [[https://github.com/matthieucan/dotfiles/blob/master/emacs/.emacs.d/french-holidays.el][french-holidays.el]]
 #+BEGIN_SRC emacs-lisp
@@ -830,7 +834,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key [S-mouse-3] 'ffap-at-mouse)
 #+END_SRC
 ** hungry-backspace
- #+BEGIN_SRC emacs-lisp          
+ #+BEGIN_SRC emacs-lisp
    (defun hungry-backspace (arg)
      "Deletes preceding character or all whitespaces."
      (interactive "*P")
@@ -937,7 +941,7 @@ Avoir des tabs (et surtout des groupes)
         (if isearch-other-end (goto-char isearch-other-end))
         (isearch-search)
         (isearch-push-state)
-        (isearch-update)) 
+        (isearch-update))
       (define-key isearch-mode-map (kbd "<backspace>") 'isearch-delete-something)
    #+END_SRC
 *** zap-to-char
@@ -1035,7 +1039,7 @@ Avoir des tabs (et surtout des groupes)
       (message "Refreshed open files."))
     (global-set-key (kbd "S-<f12>") 'revert-all-buffers)
     (defun revert-buffer-no-confirm ()
-      (interactive) 
+      (interactive)
       (revert-buffer t t))
     (global-set-key (kbd "<f12>") 'revert-buffer-no-confirm)
  #+END_SRC
@@ -1082,7 +1086,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** ibuffer
  #+BEGIN_SRC emacs-lisp
-   ;; ibuffer 
+   ;; ibuffer
    (defalias 'list-buffers 'ibuffer) ;; ibuffer par defaut
    ;; ibbuffer groups
    (setq ibuffer-saved-filter-groups
@@ -1092,7 +1096,7 @@ Avoir des tabs (et surtout des groupes)
                     (name . "^\\*Calendar\\*$")
                     (name . "^diary$")
                     (mode . org-mode)))
-                  ("Main" 
+                  ("Main"
                    (or
                     (mode . c-mode)
                     (mode . shell-mode)
@@ -1174,9 +1178,9 @@ Avoir des tabs (et surtout des groupes)
                  (minibuffer-complete))))
   (define-key minibuffer-local-completion-map (kbd "&") 'shortway-in-minibuffer)
 #+END_SRC
-*** history completion 
+*** history completion
 #+BEGIN_SRC emacs-lisp
-  ;; historique completion 
+  ;; historique completion
   (define-key minibuffer-local-completion-map (kbd "<prior>") 'previous-complete-history-element)
   (define-key minibuffer-local-completion-map (kbd "<next>") 'next-complete-history-element)
 #+END_SRC
@@ -1258,7 +1262,7 @@ Avoir des tabs (et surtout des groupes)
   (define-trivial-mode "pdf" "\\.PDF$" "xpdf")
 #+END_SRC
 ** Gestion Fenetres
-*** taille 
+*** taille
 #+BEGIN_SRC emacs-lisp
   ;; window manager
   (global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
@@ -1266,7 +1270,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "S-C-<down>") 'shrink-window)
   (global-set-key (kbd "S-C-<up>") 'enlarge-window)
 #+END_SRC
-*** selection 
+*** selection
 #+BEGIN_SRC emacs-lisp
   ;; windmove
   (global-set-key (kbd "s-<left>") 'windmove-left)
@@ -1277,9 +1281,9 @@ Avoir des tabs (et surtout des groupes)
 *** Echanger les fenetres
 #+BEGIN_SRC emacs-lisp
   (defun swap-windows ()
-    "If you have 2 windows, it swaps them." 
-    (interactive) 
-    (cond ((not (= (count-windows) 2)) 
+    "If you have 2 windows, it swaps them."
+    (interactive)
+    (cond ((not (= (count-windows) 2))
            (message "You need exactly 2 windows to do this."))
           (t
            (let* ((w1 (first (window-list)))
@@ -1505,9 +1509,9 @@ Avoir des tabs (et surtout des groupes)
             try-expand-dabbrev-from-kill
             try-complete-file-name-partially
             try-complete-file-name
-            try-expand-all-abbrevs 
-            try-expand-list 
-            try-expand-line 
+            try-expand-all-abbrevs
+            try-expand-list
+            try-expand-line
             try-expand-whole-kill
             try-my-dabbrev-substring
             ;;senator-try-expand-semantic
@@ -1541,7 +1545,7 @@ Avoir des tabs (et surtout des groupes)
           (if (he-string-member result he-tried-table t)
               (setq result nil)))     ; ignore if bad prefix or already in table
         result))
-    ;; completion case sensitive 
+    ;; completion case sensitive
     (setq completion-ignore-case nil)
   #+END_SRC
 ** Docker
@@ -1590,7 +1594,7 @@ Avoir des tabs (et surtout des groupes)
   (setq tramp-auto-save-directory "~/.emacs-autosave-tramp-files/")
   (setq tramp-backup-directory-alist backup-directory-alist)
   ;; se souviens du mot de passe ~/.authinfo.gpg
-  (setq password-cache-expiry nil)        
+  (setq password-cache-expiry nil)
   ;; conection to machine02
   (defun connect-nachine02 ()
     (interactive)
@@ -1704,7 +1708,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** Smart home bouton
 #+BEGIN_SRC emacs-lisp
-  ;; home va au debut de la ligne puis à l'indentation 
+  ;; home va au debut de la ligne puis à l'indentation
   (defun smarter-move-beginning-of-line (arg)
     "Début de ligne puis début d'indentation (cycle)"
     (interactive "^p")
@@ -1761,7 +1765,7 @@ Avoir des tabs (et surtout des groupes)
   (defun save-macro-to-dot-emacs (name)
     (interactive "SSave Macro as: ")
     (name-last-kbd-macro name)
-    (save-excursion 
+    (save-excursion
       (find-file-literally "~/.emacs")
       (goto-char (point-max))
       (insert "\n\n;; Saved macro\n")
@@ -1810,7 +1814,7 @@ Avoir des tabs (et surtout des groupes)
           (replace-match incremented-string)))))
   ;; incrementer/decrementer un chiffre
   (autoload 'evil-numbers/inc-at-pt "evil-numbers" nil t)
-  (autoload 'evil-numbers/dec-at-pt "evil-numbers" nil t)  
+  (autoload 'evil-numbers/dec-at-pt "evil-numbers" nil t)
   (global-set-key (kbd "M-<kp-add>") 'evil-numbers/inc-at-pt)
   (global-set-key (kbd "M-<kp-subtract>") 'evil-numbers/dec-at-pt)
 #+END_SRC
@@ -1821,7 +1825,7 @@ Avoir des tabs (et surtout des groupes)
   (set-face-background 'highlight-current-line-face "#1f4f4f")
   ;; pas de highlight-current-line sur quelques modes
   (add-hook 'after-change-major-mode-hook
-            '(lambda () 
+            '(lambda ()
                (highlight-current-line-minor-mode (if (or (equal major-mode 'text-mode) (equal major-mode 'term-mode) (equal major-mode 'palette-mode) (equal major-mode 'help-mode)) 0 1))))
   ;; changer la couleur
   (defun toggle-highlight-color ()
@@ -1902,7 +1906,7 @@ Avoir des tabs (et surtout des groupes)
 *** vlfi (View Large Files)
 *dépendances*: [[https://github.com/m00natic/vlfi][vlfi]]
 #+BEGIN_SRC emacs-lisp
-;;  C-c C-v prefix 
+;;  C-c C-v prefix
 (add-to-list 'load-path "~/.emacs.d/vlfi-master")
 (require 'vlf-setup)
 #+END_SRC
@@ -1955,7 +1959,7 @@ Avoir des tabs (et surtout des groupes)
   ;; cloc sur un repertoire
   (defun cloc-dir (dir)
     (interactive "Ddir: ")
-    (shell-command 
+    (shell-command
      (format (concat "cloc " dir))))
   ;; annotation
   (load-file "~/.emacs.d/lisp/highlights.elc")
@@ -1968,14 +1972,14 @@ Avoir des tabs (et surtout des groupes)
 *** Conf-mode
  #+BEGIN_SRC emacs-lisp
    ;; fichier en conf-mode
-   (add-to-list 'auto-mode-alist '("\\.orderedproperties\\'" . conf-mode)) 
-   (add-to-list 'auto-mode-alist '("\\.properties\\'" . conf-mode)) 
-   (add-to-list 'auto-mode-alist '("sudoers" . conf-mode)) 
- #+END_SRC 
+   (add-to-list 'auto-mode-alist '("\\.orderedproperties\\'" . conf-mode))
+   (add-to-list 'auto-mode-alist '("\\.properties\\'" . conf-mode))
+   (add-to-list 'auto-mode-alist '("sudoers" . conf-mode))
+ #+END_SRC
 *** MakeFile-mode
  #+BEGIN_SRC emacs-lisp
    ;; fichier en makefile-mode
-   (add-to-list 'auto-mode-alist '("\\makefile.*" . makefile-mode)) 
+   (add-to-list 'auto-mode-alist '("\\makefile.*" . makefile-mode))
  #+END_SRC
 *** Yasnippet
 *dépendances:* [[https://github.com/capitaomorte/yasnippet][yasnippet.el]] [[https://github.com/tuhdo/yasnippet-snippets][yasnippet-snippets]]
@@ -2033,7 +2037,7 @@ Avoir des tabs (et surtout des groupes)
   (setq minimap-window-location 'right)
   (define-prefix-command 'mini-map) ;; prefix key
   (global-set-key (kbd "C-x m") 'mini-map)
-  (global-set-key (kbd "C-x m k") 'minimap-kill) 
+  (global-set-key (kbd "C-x m k") 'minimap-kill)
   (global-set-key (kbd "C-x m t") 'minimap-toggle)
   (global-set-key (kbd "C-x m c") 'minimap-create)
  #+END_SRC
@@ -2154,7 +2158,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-S-<iso-lefttab>") 'ac-complete-dictionary)
   ;; pour la completion plus lisible
   (defun completion-hook ()
-    (setq ac-max-width 0.5) 
+    (setq ac-max-width 0.5)
     ;; Show 1.8 second later
     (setq ac-auto-start 1.8)
     (setq ac-auto-show-menu 1))
@@ -2185,7 +2189,7 @@ Avoir des tabs (et surtout des groupes)
   ;; liste les fichiers modifiés entre deux releases
   (defun svn-diff-releases(release1 release2)
     (interactive "sRelease1: \nsRelease2: ")
-    (shell-command 
+    (shell-command
      (format "svn diff --summarize -r %s:%s" release1 release2)))
   ;; => svn revert C-x v u
   (defun revert-svn()
@@ -2212,7 +2216,7 @@ Avoir des tabs (et surtout des groupes)
           (git--update-all-state-marks)))
 	;; revisions
 	(autoload 'git-timemachine "git-timemachine" "" nil)
-	(global-set-key (kbd "C-x g t") 'git-timemachine) 
+	(global-set-key (kbd "C-x g t") 'git-timemachine)
 	;; git-svn
 	(eval-after-load "magit"
       '(progn
@@ -2225,10 +2229,10 @@ Avoir des tabs (et surtout des groupes)
 	;; remote editor
 	(add-hook 'term-mode-hook 'with-editor-export-editor)
 	;; raccourcis
-	(setq magit-keyboard-prefix (kbd "C-x g")) 
+	(setq magit-keyboard-prefix (kbd "C-x g"))
 	(global-set-key (kbd "C-x g g") 'magit-status) ;; niveau de details => M-1, M-2, M-3, and M-4 ; l pour les logs
-	(global-set-key (kbd "C-x g l") 'magit-log-buffer-file) 
-	(global-set-key (kbd "C-x g b") 'vc-annotate) 
+	(global-set-key (kbd "C-x g l") 'magit-log-buffer-file)
+	(global-set-key (kbd "C-x g b") 'vc-annotate)
 	(global-set-key (kbd "C-x g s") 'magit-stash)
 	(global-set-key (kbd "C-x g p") 'magit-stash-pop)
 	(global-set-key (kbd "C-x g =") 'ediff-revision)
@@ -2267,7 +2271,7 @@ Avoir des tabs (et surtout des groupes)
   (defadvice svn-status-update-modeline (after svn-update-diff-hl activate)
     (diff-hl-update))
   ;; pour git
-  (add-hook 'magit-refresh-file-buffer-hook 'diff-hl-update) 
+  (add-hook 'magit-refresh-file-buffer-hook 'diff-hl-update)
  #+END_SRC
 ** XML
 *** nxml-mode
@@ -2292,7 +2296,7 @@ Avoir des tabs (et surtout des groupes)
 **** Folding
 #+BEGIN_SRC emacs-lisp
   ;; XML folding
-  (add-hook 'nxml-mode-hook 
+  (add-hook 'nxml-mode-hook
             (lambda ()
               (require 'sgml-mode)
               (add-to-list 'hs-special-modes-alist
@@ -2320,7 +2324,7 @@ Avoir des tabs (et surtout des groupes)
           (while (condition-case nil
                      (progn
                        (nxml-backward-up-element) ; always returns nil
-                       t)       
+                       t)
                    (error nil))
             (setq path (cons (xmltok-start-tag-local-name) path)))
           (message "/%s" (mapconcat 'identity path "/"))
@@ -2341,14 +2345,14 @@ Avoir des tabs (et surtout des groupes)
   ;; controle des xml par xsd
   (defun xsd-validation (xsd)
     (interactive "f xsd: ")
-    (shell-command 
+    (shell-command
      (format "xmllint --noout %s --schema %s" (buffer-file-name) xsd)))
   ;; visualisation des xsd (en svg)
   (defun xsd-show ()
     (interactive)
     (shell-command
      (format "cd /tmp; java -jar ~/Outils/XSDVi/lib/xsdvi.jar  %s" (buffer-file-name)))
-    (shell-command 
+    (shell-command
      (format "firefox /tmp/%s" (concat (substring (file-name-nondirectory (buffer-file-name)) 0 -3) "svg"))))
   #+END_SRC
 ** YAML
@@ -2363,10 +2367,10 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'csv-mode "csv-mode" "Major mode for editing comma-separated value files." t)
   (add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
   (add-to-list 'auto-mode-alist '("\\.dat\\'" . csv-mode))
-  ;; affichage 
+  ;; affichage
   (defun csv-pretty ()
     (interactive)
-    (if (not (equal major-mode 'csv-mode)) 
+    (if (not (equal major-mode 'csv-mode))
         (csv-mode))
     (csv-align-fields nil (point-min) (point-max))
     (toggle-truncate-lines t))
@@ -2378,9 +2382,9 @@ Avoir des tabs (et surtout des groupes)
     (let* ((separator (or separator ?\t))
            (n (count-matches (string separator) (point-at-bol) (point-at-eol)))
            (colors (loop for i from 0 to 1.0 by (/ 2.0 n)
-                         collect (apply #'color-rgb-to-hex 
+                         collect (apply #'color-rgb-to-hex
                                         (color-hsl-to-rgb i 0.3 0.5)))))
-      (loop for i from 2 to n by 2 
+      (loop for i from 2 to n by 2
             for c in colors
             for r = (format "^\\([^%c\n]+%c\\)\\{%d\\}" separator separator i)
             do (font-lock-add-keywords nil `((,r (1 '(face (:foreground ,c)))))))))
@@ -2480,7 +2484,7 @@ Avoir des tabs (et surtout des groupes)
 *dépendances* [[https://github.com/tkf/emacs-jedi][jedi]] [[https://github.com/kiwanami/emacs-deferred][deferred]] [[https://github.com/tkf/emacs-python-environment][python-environment]]
 C-. => goto definition
  C-, => back
- s-? => Afficher la signature de la methode 
+ s-? => Afficher la signature de la methode
  C-c d => jedi:show-doc
  Pour typer un parametre dans la doc
  """
@@ -2511,7 +2515,7 @@ C-. => goto definition
 		  (t   definition t  )
 		  (nil nil        t  )
 		  (t   nil        t  )))
-  ;; Afficher la signature de la methode 
+  ;; Afficher la signature de la methode
   (add-hook 'python-mode-hook
 			(lambda ()
 			  (define-key python-mode-map (kbd "s-?") 'jedi:get-in-function-call)))
@@ -2546,7 +2550,7 @@ C-. => goto definition
 **** PDB
 #+BEGIN_SRC emacs-lisp
   (setq gud-pdb-command-name "~/Outils/pdb/pdb.py")
-  ;; Surligne les mots temporaires pdb, ipdb, 
+  ;; Surligne les mots temporaires pdb, ipdb,
   (defun annotate-pdb ()
 	(interactive)
 	(highlight-lines-matching-regexp "import ipdb")
@@ -2582,7 +2586,7 @@ C-. => goto definition
   ##
   # =============================================================
   #
-  # PROJET  : 
+  # PROJET  :
   #
   # Author  : THALES SERVICES
   #
@@ -2631,7 +2635,7 @@ C-. => goto definition
 			(progn
               ;; si ligne non vide et indentation de niveau superieur
               (if (and (not (= (length (trim-string theLine)) 0)) (> col (current-column)))
-                  (progn 
+                  (progn
 					(setq way (concat theLine way))
 					(setq col (current-column))
 					;; cas du else (ou elif) on affiche le if correspondant
@@ -2693,7 +2697,7 @@ C-. => goto definition
       (if (/= (length (chomp (car params))) 0)
           (progn
 			(if (not (equal (chomp (car params)) "self"))
-				(progn 
+				(progn
                   (insert "\t# @param ")
                   (insert (chomp (car params)))
                   (insert ": \n")))
@@ -2844,7 +2848,7 @@ C-. => goto definition
      ;; deplacement de function en function
      (global-set-key (kbd "M-s-<left>") 'senator-previous-tag)
      (global-set-key (kbd "M-s-<right>") 'senator-next-tag)
-     (setq c-hungry-delete-key t) 
+     (setq c-hungry-delete-key t)
      (global-set-key (kbd "s-;") 'semantic-symref)
      (global-set-key (kbd "s-:") 'semantic-symref-symbol)
      ;; folding
@@ -2889,11 +2893,11 @@ C-. => goto definition
 **** helpers
 *dépendances*: [[https://github.com/hrehfeld/emacs-member-functions][member-function.el]]
 #+BEGIN_SRC emacs-lisp
-  ;; Ferme la fenetre de compil si pas d'erreur 
+  ;; Ferme la fenetre de compil si pas d'erreur
   (defun compilation-exit-autoclose (status code msg)
     ;; If M-x compile exists with a 0
     (if (and (eq status 'exit) (zerop code))
-        (progn 
+        (progn
           ;; then bury the *compilation* buffer, so that C-x b doesn't go there
           (bury-buffer)
           ;; and delete the *compilation* window
@@ -2938,7 +2942,7 @@ C-. => goto definition
   (setq auto-mode-alist (append '(("\\.java\\'" . jdee-mode)) auto-mode-alist))
   (setq jde-complete-add-space-after-method t)
   (setq jdee-server-dir "~/Outils/emacs/jdee/jdee-server-master/target/")
-  (add-hook 'jdee-mode-hook 
+  (add-hook 'jdee-mode-hook
             (lambda()
               ;; autocomplete
               (add-to-list 'ac-modes 'jdee-mode)
@@ -3001,7 +3005,7 @@ C-. => goto definition
   (add-to-list 'auto-mode-alist '("\\.sce\\'" . scilab-mode))
 #+END_SRC
 *** Visual basic
-*dépendances*: [[https://github.com/emacsmirror/visual-basic-mode][visual-basic-mode.el]] 
+*dépendances*: [[https://github.com/emacsmirror/visual-basic-mode][visual-basic-mode.el]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'visual-basic-mode "visual-basic-mode" "Visual Basic mode." t)
   (setq auto-mode-alist (append '(("\\.\\(vb\\)$" . visual-basic-mode)) auto-mode-alist))
@@ -3018,14 +3022,14 @@ C-. => goto definition
   (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-  (setq web-mode-auto-close-style 1) 
+  (setq web-mode-auto-close-style 1)
   (setq web-mode-tag-auto-close-style t)
   (setq web-mode-enable-auto-pairing t)
   (setq web-mode-enable-auto-indentation t)
   (setq web-mode-enable-indent-cycle t)
   ;;(setq web-mode-enable-html-entities-fontification t)
   ;; hook
-  (add-hook 'web-mode-hook (lambda () 
+  (add-hook 'web-mode-hook (lambda ()
 							 ;; indentation
 							 (setq indent-tabs-mode nil)
 							 (setq web-mode-markup-indent-offset 4)
@@ -3038,8 +3042,8 @@ C-. => goto definition
 							 (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
 							 ))
   ;; auto complete
-  (setq web-mode-ac-sources-alist 
-		'(("css" . (ac-source-css-property)) 
+  (setq web-mode-ac-sources-alist
+		'(("css" . (ac-source-css-property))
 		  ("php" . (ac-source-php-auto-yasnippets ac-source-yasnippet))
 		  ("html" . (ac-source-abbrev))))
   ;; force django engine
@@ -3057,12 +3061,12 @@ C-. => goto definition
 #+BEGIN_SRC emacs-lisp
   ;; emmet
   (eval-after-load "web-mode"
-    '(progn 
+    '(progn
        (autoload 'emmet-expand-line "emmet-mode" "" t)
        (setq emmet-move-cursor-between-quotes t) ;; deplacement curseur apres expension
        (define-key web-mode-map (kbd "<C-tab>") 'emmet-expand-line-web-mode)))
   ;; css emmet dans le web-mode
-  (defun emmet-expand-line-web-mode () 
+  (defun emmet-expand-line-web-mode ()
     (interactive)
     (let ((web-mode-cur-language (web-mode-language-at-pos)))
       (if (string= web-mode-cur-language "css")
@@ -3094,7 +3098,7 @@ C-. => goto definition
     (load-file "~/.emacs.d/lisp/angular-mode.elc")
     (load-file "~/.emacs.d/lisp/angular-html-mode.elc"))
   ;; Reformater un fichier json
-  (defun pretty-json () 
+  (defun pretty-json ()
     (interactive)
     (let ((b (if mark-active (min (point) (mark)) (point-min)))
           (e (if mark-active (max (point) (mark)) (point-max))))
