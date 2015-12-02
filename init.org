@@ -1944,6 +1944,18 @@ Avoir des tabs (et surtout des groupes)
   (require 'yascroll)
   (global-yascroll-bar-mode)
 #+END_SRC
+*** duckduckgo
+#+BEGIN_SRC emacs-lisp
+(defun duckduckgo ()
+  "duckduckgo a query or region if any."
+  (interactive)
+  (browse-url
+   (concat
+    "https://duckduckgo.com/?q="
+    (if mark-active
+        (buffer-substring (region-beginning) (region-end))
+      (read-string "Search: ")))))
+#+END_SRC
 * Developpement
 ** Common
 *** insert un shebang
