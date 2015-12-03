@@ -2591,10 +2591,7 @@ C-. => goto definition
 	(highlight-lines-matching-regexp "import pdb")
 	(highlight-lines-matching-regexp "set_trace()")
 	(highlight-regexp "TODO")
-	(highlight-regexp "oliv")
-	(highlight-regexp "OLIV"))
   (add-hook 'python-mode-hook 'annotate-pdb)
-  (add-hook 'c-mode-common-hook 'annotate-pdb)
 #+END_SRC
 **** python shell
 #+BEGIN_SRC emacs-lisp
@@ -2855,11 +2852,6 @@ C-. => goto definition
 *dépendances*: [[http://cedet.sourceforge.net/][cedet]] (voir init au dessus)
  #+BEGIN_SRC emacs-lisp
    (defun my-cedet-hook ()
-     ;; helpers
-     (require 'eassist) ;; M-o M-m
-     (add-to-list 'load-path "~/Outils/emacs/cedet/function-args-master")
-     (require 'function-args)
-     (fa-config-default)  ;; M-i M-j
      ;; indentation
      (setq c++-tab-always-indent t)
      ;;(setq c-basic-offset 4)                  ;; Default is 2
@@ -2904,10 +2896,16 @@ C-. => goto definition
    (semanticdb-enable-gnu-global-databases 'c-mode t)
    (semanticdb-enable-gnu-global-databases 'c++-mode t)
    #+END_SRC
-**** eassist/xcscope
+**** eassist/xcscope/function-args
 *dépendances*:  [[http://cedet.sourceforge.net/][cedet]] [[https://github.com/dkogan/xcscope.el][xcscope.el]]
 #+BEGIN_SRC emacs-lisp
   (defun my-c-mode-common-hook ()
+       ;; eassist
+       (require 'eassist) ;; M-o M-m
+       (add-to-list 'load-path "~/Outils/emacs/cedet/function-args-master")
+       ;; function-args
+       (require 'function-args)
+       (fa-config-default)  ;; M-i M-j
        (setq eassist-header-switches '(("h" . ("cpp" "cc" "c" "cxx"))
                                        ("hpp" . ("cpp" "cc" "cxx"))
                                        ("cpp" . ("h" "hpp"))
@@ -2917,8 +2915,8 @@ C-. => goto definition
                                        ("H" . ("C" "CPP" "CC" "CXX"))
                                        ("cc" . ("h" "hpp"))))
        ;; eassist
-       (define-key c-mode-base-map (kbd "M-o") 'eassist-switch-h-cpp)
-       (define-key c-mode-base-map (kbd "M-m") 'eassist-list-methods)
+       (define-key function-args-mode-map (kbd "M-o") 'eassist-switch-h-cpp)
+       (define-key function-args-mode-map (kbd "M-m") 'eassist-list-methods)
     (require 'xcscope)
     (cscope-setup)
     (setq cscope-initial-directory "~/workspaces/proj3/cscope"))
