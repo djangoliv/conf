@@ -380,9 +380,9 @@ Avoir des tabs (et surtout des groupes)
 ** Text-mode
  #+BEGIN_SRC emacs-lisp
    ;; fichier en text-mode
-   (add-to-list 'auto-mode-alist '("TODO" . text-mode))
-   (add-to-list 'auto-mode-alist '("README" . text-mode))
-   (add-to-list 'auto-mode-alist '("Readme" . text-mode))
+   (add-to-list 'auto-mode-alist '("TODO\\'" . text-mode))
+   (add-to-list 'auto-mode-alist '("README\\'" . text-mode))
+   (add-to-list 'auto-mode-alist '("Readme\\'" . text-mode))
    ;; underscore ne separe pas les mots
    (modify-syntax-entry ?_ "w" text-mode-syntax-table)
  #+END_SRC
@@ -589,6 +589,9 @@ Avoir des tabs (et surtout des groupes)
        (define-key org-mode-map (kbd "C-c s") 'org-goto)
        (define-key org-mode-map (kbd "M-s-<up>") 'drag-stuff-up)
        (define-key org-mode-map (kbd "M-s-<down>") 'drag-stuff-down)))
+#+END_SRC
+*** babel
+#+BEGIN_SRC emacs-lisp
   ;; execution
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -601,16 +604,15 @@ Avoir des tabs (et surtout des groupes)
      (python . t)))
   ;; dita
   (setq org-ditaa-jar-path "~/Outils/ditaa/ditaa0_9.jar")
-  (defun my-org-confirm-babel-evaluate (lang body)
-    (not (string= lang "ditaa")))  ; don't ask for ditaa
-  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-  ;; graphviz (dot)
-  (defun my-org-confirm-babel-evaluate (lang body)
-    (not (string= lang "dot")))  ; don't ask for dot
   ;; plantuml
   (setq org-plantuml-jar-path "~/.emacs.d/plantuml/plantuml.jar")
-  (defun my-org-confirm-babel-evaluate (lang body)
-    (not (string= lang "plantuml")))  ; don't ask for plantuml
+  ;; ipython
+  (add-to-list 'load-path "/home/giorgis/Outils/emacs/ob-ipython-master")
+  (require 'ob-ipython)
+  ;; don't prompt me to confirm everytime I want to evaluate a block
+  (setq org-confirm-babel-evaluate nil)   
+  ;; display/update images in the buffer after I evaluate
+  (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
 #+END_SRC
 *** export
 *dépendances* [[https://github.com/kinjo/org-impress-js.el][org-impress.el]]
