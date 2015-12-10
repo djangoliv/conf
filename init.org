@@ -101,7 +101,7 @@ Configuration Minimal (sans librairies externes)
   (exec-path-from-shell-initialize)
 #+END_SRC
 ** Theme (couleurs, modeline)
-*dépendances*: monTheme.el
+*dépendances*: [[https://github.com/djangoliv/conf][monTheme.el]]
 #+BEGIN_SRC emacs-lisp
   ;; modification de la modeLine
   (load-file "~/.emacs.d/lisp/monTheme.elc")
@@ -372,7 +372,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "M-&") 'my-run-term) ;; mappe sur M-&
  #+END_SRC
 ** tabbar more
-*dépendances*: tabbar-more.el
+*dépendances*: [[https://github.com/djangoliv/conf][tabbar-more.el]]
 #+BEGIN_SRC emacs-lisp
   ;; possibilité de reorganiser les tabs
   ;;(defun tabbar-add-sort ()
@@ -2150,9 +2150,9 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'color-identifiers-mode "color-identifiers-mode" "" t)
 #+END_SRC
 *** couleurs
-*dépendances*: [[http://www.emacswiki.org/emacs/mon-css-color.el][mon-css-color]]
+*dépendances*: [[https://github.com/djangoliv/conf][my-css-color]]
 #+BEGIN_SRC emacs-lisp
-  (autoload 'css-color-mode "mon-css-color" "" t)
+  (autoload 'css-color-mode "my-css-color" "" t)
   (defun color-mode ()
     (interactive)
     (if css-color-mode
