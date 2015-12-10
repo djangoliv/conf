@@ -14,13 +14,15 @@
 	   (set-face-foreground 'region "white")
 	   (set-face-background 'region "SteelBlue")
 	   (set-face-background 'tool-bar "DarkSlateGray")))
-
 (custom-set-faces
  `(fringe ((t (:background "#1f4f4f"))))
  `(isearch ((t (:foreground "white" :background "SteelBlue"))))
  `(lazy-highlight ((t (:background "DarkSlateGray4"))))
  `(cua-rectangle ((t (:background "CornflowerBlue" :foreground "white"))))
  `(header-line ((t (:foreground "white" :background "#0e3f4e" :box (:line-width -1 :style released-button))))))
+;;;;; frame
+(add-to-list 'default-frame-alist '(background-color . "darkslategray"))
+(add-to-list 'default-frame-alist '(foreground-color . "wheat"))
 ;;;;; tabbar
 (setq tabbar-background-color "DarkSlateGray") ;; the color of the tabbar background
 ;;;; dired
