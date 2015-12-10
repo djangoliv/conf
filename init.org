@@ -90,6 +90,9 @@ Configuration Minimal (sans librairies externes)
   (global-set-key (kbd "C-<return>") 'rectangle-mark-mode) ;; rectangle
   ;; pwd
   (setq default-directory "~/")
+  ;; indentation
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
  #+END_SRC
 ** source du bashrc au démarrage
 *dépendances*: [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
@@ -2313,11 +2316,9 @@ Avoir des tabs (et surtout des groupes)
 *** nxml-mode
 #+BEGIN_SRC emacs-lisp
   ;; for xml files, use nxml-mode instead of sgml-mode
-  (add-to-list 'auto-mode-alist '("\\.xml\\'" . nxml-mode))
-  (add-to-list 'auto-mode-alist '("\\.XML\\'" . nxml-mode))
-  (add-to-list 'auto-mode-alist '("\\.xsd\\'" . nxml-mode))
-  (add-to-list 'auto-mode-alist '("\\.XSD\\'" . nxml-mode))
-  (add-to-list 'auto-mode-alist '("\\.xsl$" . nxml-mode))
+  (setq auto-mode-alist
+        (cons '("\\.\\(xml\\|XML\\|xsd\\|XSD\\|xsl\\|rng\\|xhtml\\)\\'" . nxml-mode)
+              auto-mode-alist))
   (defun my-nxml-hook ()
     (load-file "~/.emacs.d/lisp/smart-tabs-mode.elc")
     (setq-default tab-width 4)    ;; taille TAB
@@ -2791,15 +2792,13 @@ C-. => goto definition
 **** Initialisation
 #+BEGIN_SRC emacs-lisp
   ;; indentation
-    (c-set-offset 'innamespace 0)
-        (setq-default tab-width 4
-                        indent-tabs-mode t)
-    ;; ajouter un point virgule a la fin de la phrase
-    (defun add-semicolon-at-end ()
-      (interactive)
-      (save-excursion
-        (end-of-line)
-        (insert ";")))
+  (c-set-offset 'innamespace 0)
+  ;; ajouter un point virgule a la fin de la phrase
+  (defun add-semicolon-at-end ()
+    (interactive)
+    (save-excursion
+      (end-of-line)
+      (insert ";")))
   (global-set-key (kbd "C-<end>") 'add-semicolon-at-end)
   #+END_SRC
 **** GGTAGS

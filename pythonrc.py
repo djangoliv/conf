@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 
-bashrc => export PYTHONSTARTUP="/home/user/.pythonrc.py"
+bashrc => export PYTHONSTARTUP="/home/giorgis/.pythonrc.py"
 
 This file is executed when the Python interactive shell is started if
 $PYTHONSTARTUP is in your environment and points to this file. It's just
@@ -40,22 +40,24 @@ def savehist():
 
 atexit.register(savehist)
 
-try:
-    import readline, rlcompleter
-    readline.parse_and_bind("tab: complete")
-    readline.parse_and_bind('bind ^I rl_complete')
-    # class MyCompleter(rlcompleter.Completer):
-    #     def complete(self, text, state):
-    #         if text.lstrip() == '':
-    #             if state == 0:
-    #                 return text + '\t'
-    #             else:
-    #                 return None
-    #         else:
-    #             return rlcompleter.Completer.complete(self, text, state)
-    # readline.set_completer(MyCompleter().complete)
-except ImportError:
-    print("Readline is not installed either. No tab completion is enabled.")
+readline.parse_and_bind("tab: complete")
+
+# try:
+#     import readline, rlcompleter
+#     readline.parse_and_bind("tab: complete")
+#     readline.parse_and_bind('bind ^I rl_complete')
+#     # class MyCompleter(rlcompleter.Completer):
+#     #     def complete(self, text, state):
+#     #         if text.lstrip() == '':
+#     #             if state == 0:
+#     #                 return text + '\t'
+#     #             else:
+#     #                 return None
+#     #         else:
+#     #             return rlcompleter.Completer.complete(self, text, state)
+#     # readline.set_completer(MyCompleter().complete)
+# except ImportError:
+#     print("Readline is not installed either. No tab completion is enabled.")
 
 
 # Enable Color Prompts
@@ -128,8 +130,6 @@ class EditableBufferInteractiveConsole(InteractiveConsole):
 
 c = EditableBufferInteractiveConsole(locals=locals())
 c.interact(banner=WELCOME)
-
-
 
 # Exit the Python shell on exiting the InteractiveConsole
 sys.exit()
