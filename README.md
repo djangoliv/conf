@@ -1,16 +1,16 @@
-# conf
+# *Description*
 
-## My configuration files:
+## configuration files:
 * bashrc
 * inputrc
 * pythonrc.py
 
-## My emacs files:
+## emacs files:
 * dotemacs
 * dotemacs-term
 * init.org
 * custom.el
-* lisp
+* lisp/
   * eswap-mode.el: toggling between source and target files
   * monTheme.el: My Emacs skin
   * my-css-color.el: lib for adding colors in buffers
