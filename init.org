@@ -2540,11 +2540,10 @@ C-. => goto definition
   (autoload 'jedi:setup "jedi" nil t)
   (add-hook 'python-mode-hook 'jedi:setup)
   (setq jedi:setup-keys t)
-  ;; (setq jedi:complete-on-dot t)
-  ;; (setq jedi:get-in-function-call-delay 100) => Pb ?
+  (setq jedi:complete-on-dot t)
   ;; goto-definition
   (setq jedi:goto-definition-config
-		'((nil definition nil)
+	    '((nil definition nil)
 		  (t   definition nil)
 		  (nil nil        nil)
 		  (t   nil        nil)
@@ -2554,7 +2553,7 @@ C-. => goto definition
 		  (t   nil        t  )))
   ;; Afficher la signature de la methode
   (add-hook 'python-mode-hook
-			(lambda ()
+		    (lambda ()
 			  (define-key python-mode-map (kbd "s-?") 'jedi:get-in-function-call)))
 #+END_SRC
 **** doc (pydoc)
