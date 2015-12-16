@@ -2556,6 +2556,13 @@ C-. => goto definition
 		    (lambda ()
 			  (define-key python-mode-map (kbd "s-?") 'jedi:get-in-function-call)))
 #+END_SRC
+**** docstring
+*dépendances* [[https://github.com/glyph/python-docstring-mode][python-docstring-mode]]
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/Outils/emacs/python/python-docstring-mode-master")
+  (require 'python-docstring)
+  (add-hook 'python-mode-hook (lambda () (python-docstring-mode t)))
+#+END_SRC
 **** doc (pydoc)
 *dépendances*: [[https://github.com/statmobile/pydoc][pydoc]] [[https://github.com/tsgates/pylookup][pylookup-lookup]] [[https://github.com/gennad/My-.emacs.d/tree/master/pydoc-info][pydoc-info]]
 #+BEGIN_SRC emacs-lisp
