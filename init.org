@@ -1976,6 +1976,11 @@ Avoir des tabs (et surtout des groupes)
         (buffer-substring (region-beginning) (region-end))
       (read-string "Search: ")))))
 #+END_SRC
+*** diffview
+*dépendances* [[https://github.com/emacsmirror/diffview][diffview]]
+#+BEGIN_SRC emacs-lisp
+  (require 'diffview)
+#+END_SRC
 * Developpement
 ** Common
 *** insert un shebang
