@@ -2805,6 +2805,11 @@ C-. => goto definition
 			   (autoload 'python-auto-import "python-auto-import" nil t)
 			   (define-key python-mode-map (kbd "C-c i") 'python-auto-import)))
 #+END_SRC
+**** pip requirements
+*dépendances* [[https://github.com/emacsmirror/pip-requirements][pip-requirements]]
+#+BEGIN_SRC emacs-lisp
+  (require 'pip-requirements)
+#+END_SRC
 *** C++
 **** Initialisation
 #+BEGIN_SRC emacs-lisp
