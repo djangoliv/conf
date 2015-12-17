@@ -3257,10 +3257,26 @@ C-. => goto definition
          (search-forward week)
          (org-cycle))
        (define-key org-mode-map (kbd "s-<end>") 'gotoday)))
+#+END_SRC
+** Sort helper
+#+BEGIN_SRC emacs-lisp
   ;; tri avec respect des accents et majuscules
-  (defun my-sort-lines ()
+  (defun my-sort-lines-buffer ()
     (interactive)
     (shell-command-on-region (point-min) (point-max) "LC_COLLATE=en_US.UTF-8 sort" (buffer-name) t ))
+  (defun my-sort-lines-region (start end) 
+    (interactive "r") 
+    (shell-command-on-region start end "LC_COLLATE=en_US.UTF-8 sort" (buffer-name) t))
+  (defun my-sort-lines-region-or-buffer ()
+    (interactive)
+    (save-excursion
+      (if (region-active-p)
+          (progn
+            (my-sort-lines-region (region-beginning) (region-end))
+            (message "Sorted selected region"))
+        (progn
+          (my-sort-lines-buffer)
+          (message "Sorted buffer")))))
 #+END_SRC
 * Final
 ** Custum file
