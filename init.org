@@ -1981,6 +1981,12 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   (require 'diffview)
 #+END_SRC
+*** logview
+*dépendances* [[https://github.com/emacsmirror/logview][logview]]
+#+BEGIN_SRC emacs-lisp
+  (require 'logview)
+  (add-to-list 'auto-mode-alist '("message" . logview-mode) t)
+#+END_SRC
 * Developpement
 ** Common
 *** insert un shebang
