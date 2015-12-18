@@ -1987,6 +1987,11 @@ Avoir des tabs (et surtout des groupes)
   (require 'logview)
   (add-to-list 'auto-mode-alist '("message" . logview-mode) t)
 #+END_SRC
+*** unaccent
+*dépendances* [[https://github.com/emacsmirror/unaccent][unaccent]]
+#+BEGIN_SRC emacs-lisp
+  (require 'unaccent)
+#+END_SRC
 * Developpement
 ** Common
 *** insert un shebang
