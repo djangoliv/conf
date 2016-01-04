@@ -48,6 +48,9 @@
 (setq org-priority-faces '((?A . (:foreground "OrangeRed" :weight "bold" :background "#271363936393"))
                            (?B . (:foreground "orange" :background "#271363936393"))
                            (?C . (:foreground "gold" :background "#271363936393"))))
+;; term
+(custom-set-faces
+ '(term-color-blue ((t (:foreground "DeepSkyBlue")))))
 ;; whitespace-mode
 ;;(setq whitespace-style (quote (spaces tabs newline space-mark tab-mark newline-mark space-before-tab space-after-tab)))
 (custom-set-faces
