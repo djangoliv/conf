@@ -15,10 +15,6 @@
 ;; pas de Bip
 (setq ring-bell-function 'ignore)
 
-;; taille et position
-(set-frame-width (selected-frame) 240)
-(set-frame-position (selected-frame) 1 1)
-
 ;; historique minibuffer entre les sessions
 (setq savehist-additional-variables    
 	  '(search-ring regexp-search-ring compile-history) 
@@ -33,6 +29,19 @@
 
 ;; pwd
 (setq default-directory (concat (getenv "HOME") "/"))
+
+;; Change les couleurs
+(cond (window-system
+       (set-foreground-color "black")
+       (set-background-color "#F0DDF0DDF0DD")
+       (set-cursor-color "black")
+       (set-mouse-color "black")
+       (set-face-foreground 'menu "wheat")
+       (set-face-background 'menu "#F0DDF0DDF0DD")
+       (set-face-background 'fringe "#F0DDF0DDF0DD")
+       (set-face-foreground 'region "black")
+       (set-face-background 'region "SteelBlue")))
+       (set-face-background 'tool-bar "#F0DDF0DDF0DD")
 
 ;; Colorisation syntaxique maximale dans tous les modes
 (global-font-lock-mode t)
@@ -49,20 +58,7 @@
       jit-lock-chunk-size 1000
       jit-lock-defer-time 0.01)
 
-
-;; Change les couleurs
-(cond (window-system
-       (set-foreground-color "black")
-       (set-background-color "whiteSmoke")
-       (set-cursor-color "black")
-       (set-mouse-color "black")
-       (set-face-foreground 'menu "wheat")
-       (set-face-background 'menu "whiteSmoke")
-       (set-face-background 'fringe "whiteSmoke")
-       (set-face-foreground 'region "black")
-       (set-face-background 'region "SteelBlue")))
-       (set-face-background 'tool-bar "whiteSmoke")
-
+;; fichier de conf
 (add-to-list 'auto-mode-alist '("\\.emacs-terms\\'" . lisp-mode))
 
 ;; Afficher le numero de colonne et de ligne
@@ -234,7 +230,7 @@
 (global-set-key "\M--" 'tabbar-forward-group)
 
 ;; tabbar custom color
-(setq tabbar-background-color "whiteSmoke") ;; the color of the tabbar background
+(setq tabbar-background-color "#F0DDF0DDF0DD") ;; the color of the tabbar background
 (set-face-attribute
  'tabbar-unselected nil
  :foreground "black")
@@ -482,6 +478,10 @@
 (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
   "Prevent annoying \"Active processes exist\" query when you quit Emacs."
   (flet ((process-list ())) ad-do-it))
+
+;; taille et position
+(set-frame-width (selected-frame) 240)
+(set-frame-position (selected-frame) 1 1)
 
 ;; demarage de 3 terminaux
 (my-run-term)
