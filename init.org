@@ -3090,31 +3090,35 @@ C-. => goto definition
   ;;(setq web-mode-enable-html-entities-fontification t)
   ;; hook
   (add-hook 'web-mode-hook (lambda ()
-							 ;; indentation
-							 (setq indent-tabs-mode nil)
-							 (setq web-mode-markup-indent-offset 4)
-							 (setq web-mode-css-indent-offset 4)
-							 (setq web-mode-code-indent-offset 4)
-							 (setq web-mode-indent-style 4)
-							 ;; raccourcis
-							 (define-key web-mode-map (kbd "M-;") 'web-mode-comment-or-uncomment)
-							 (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
-							 (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
-							 ))
+                             ;; indentation
+                             (setq indent-tabs-mode nil)
+                             (setq web-mode-markup-indent-offset 4)
+                             (setq web-mode-css-indent-offset 4)
+                             (setq web-mode-code-indent-offset 4)
+                             (setq web-mode-indent-style 4)
+                             ;; raccourcis
+                             (define-key web-mode-map (kbd "M-;") 'web-mode-comment-or-uncomment)
+                             (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
+                             (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
+                             ))
   ;; auto complete
   (setq web-mode-ac-sources-alist
-		'(("css" . (ac-source-css-property))
-		  ("php" . (ac-source-php-auto-yasnippets ac-source-yasnippet))
-		  ("html" . (ac-source-abbrev))))
-  ;; force django engine
+        '(("css" . (ac-source-css-property))
+          ("php" . (ac-source-php-auto-yasnippets ac-source-yasnippet))
+          ("html" . (ac-source-abbrev))))
+  ;; force django engine for html
+  (setq web-mode-engines-alist
+        '(("django"    . "\\.html\\'"))
+        )
+  ;; force django engine (manual)
   (defun django ()
-	(interactive)
-	(web-mode-set-engine "django"))
+    (interactive)
+    (web-mode-set-engine "django"))
   (global-set-key (kbd "s-%") 'django)
-  ;; force angular engine
+  ;; force angular engine (manual)
   (defun angularJs ()
-	(interactive)
-	(web-mode-set-engine "angular"))
+    (interactive)
+    (web-mode-set-engine "angular"))
   #+END_SRC
 **** Emmet
 *dépendances*: [[https://github.com/smihica/emmet-mode][emmet.el]]
