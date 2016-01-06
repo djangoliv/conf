@@ -50,7 +50,10 @@
                            (?C . (:foreground "gold" :background "#271363936393"))))
 ;; term
 (custom-set-faces
- '(term-color-blue ((t (:foreground "DeepSkyBlue")))))
+ '(term-color-blue ((t (:foreground "DeepSkyBlue"))))
+ '(term-color-green  ((t (:foreground "green" :background "darkgreen")))))
+;; minibuffer
+(set-face-foreground 'minibuffer-prompt "lightBlue")
 ;; whitespace-mode
 ;;(setq whitespace-style (quote (spaces tabs newline space-mark tab-mark newline-mark space-before-tab space-after-tab)))
 (custom-set-faces
