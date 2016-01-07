@@ -1451,6 +1451,17 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'verbiste-conjugate "verbiste" nil t)
   (global-set-key (kbd "s-v") 'verbiste-conjugate)
  #+END_SRC
+*** traduction
+*dépendances* [[https://github.com/atykhonov/google-translate][google-translate]]
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/Outils/emacs/google-translate-master")
+  (require 'google-translate)
+  (require 'google-translate-smooth-ui)
+  (global-set-key "\C-ct" 'google-translate-smooth-translate)
+  (setq google-translate-translation-directions-alist
+      '(("fr" . "en") ("en" . "fr") ("de" . "fr")))
+  (setq google-translate-default-target-language "fr")
+#+END_SRC
 ** multiple cursor
 *dépendances*: [[https://github.com/magnars/multiple-cursors.el][multiple-cursors.el]]
 #+BEGIN_SRC emacs-lisp
@@ -2278,7 +2289,7 @@ Avoir des tabs (et surtout des groupes)
 	(setq git-messenger:show-detail t)
 	(global-set-key (kbd "C-x g m") 'git-messenger:popup-message)
 	;; remote editor
-	(add-hook 'term-mode-hook 'with-editor-export-editor)
+	;; (add-hook 'term-mode-hook 'with-editor-export-editor)
 	;; raccourcis
 	(setq magit-keyboard-prefix (kbd "C-x g"))
 	(global-set-key (kbd "C-x g g") 'magit-status) ;; niveau de details => M-1, M-2, M-3, and M-4 ; l pour les logs
@@ -2310,6 +2321,8 @@ Avoir des tabs (et surtout des groupes)
   (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
   (setq magit-diff-options '("-b")) ;; ignore whitespace
   (setq magit-push-always-verify nil)
+  (setq magit-commit-show-diff nil)
+  (setq magit-revert-buffers 1)
   ;; fichier de conf
   (require 'gitconfig-mode)
   (require 'gitignore-mode)
@@ -2441,6 +2454,7 @@ Avoir des tabs (et surtout des groupes)
             for c in colors
             for r = (format "^\\([^%c\n]+%c\\)\\{%d\\}" separator separator i)
             do (font-lock-add-keywords nil `((,r (1 '(face (:foreground ,c)))))))))
+  (global-set-key (kbd "C-c C-s") 'csv-pretty)
   ;; deplacement
   (global-set-key (kbd "s-<tab>") 'csv-forward-field)
   (global-set-key (kbd "s-<iso-lefttab>") 'csv-backward-field)
@@ -2995,13 +3009,14 @@ C-. => goto definition
 #+END_SRC
 *** Java
 **** Initialisation
-*dépendances*: [[https://github.com/jdee-emacs/jdee][jdee]]  [[http://cedet.sourceforge.net/][cedet]]
+*dépendances*: [[https://github.com/jdee-emacs/jdee][jdee]] [[https://github.com/jdee-emacs/jdee-server][jdee-server]] [[http://cedet.sourceforge.net/][cedet]]
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/Outils/emacs/jdee/jdee-master")
   (autoload 'jdee-mode "jdee" "" t)
   (setq auto-mode-alist (append '(("\\.java\\'" . jdee-mode)) auto-mode-alist))
   (setq jde-complete-add-space-after-method t)
   (setq jdee-server-dir "~/Outils/emacs/jdee/jdee-server-master/target/")
+  (setq jdee-enable-abbrev-mode t)
   (add-hook 'jdee-mode-hook
             (lambda()
               ;; autocomplete
