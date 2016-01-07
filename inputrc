@@ -12,4 +12,5 @@ set match-hidden-files off
 "\ek": menu-complete-backward -> pareil dans l'autre sens
 "\e[5~": history-search-backward
 "\e[6~": history-search-forward
-"\e[9;3~": backward-kill-word
+"\e[9;3~": unix-filename-rubout -> comme backward-kill-word mais de / en slash
+
