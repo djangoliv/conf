@@ -89,6 +89,7 @@ Configuration Minimal (sans librairies externes)
   (global-set-key (kbd "<f1>") 'find-file-literally)       ;; Ouvrir un fichier sans son mode majeur
   (global-set-key (kbd "C-<return>") 'rectangle-mark-mode) ;; rectangle
   (global-set-key (kbd "C-x *") 'calculator)
+  (global-set-key (kbd "C-* *") 'quick-calc)
   ;; pwd
   (setq default-directory "~/")
   ;; indentation
@@ -2171,6 +2172,7 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   (require 'whitespace)
   (setq-default show-trailing-whitespace t)
+  (add-hook 'term-mode-hook (lambda() (setq show-trailing-whitespace nil)))
 #+END_SRC
 *** color-identifier
 *dépendances* [[https://github.com/ankurdave/color-identifiers-mode][color-idenrifier-mode]]
