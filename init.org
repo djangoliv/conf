@@ -82,12 +82,13 @@ Configuration Minimal (sans librairies externes)
   ;; Pour que la fenêtre de compilation ne soit pas trop grande
   (setq compilation-window-height 10)
   ;; tronque les lignes lors d'un split window
-  (setq truncate-partial-width-windows 150)
+  ;;(setq truncate-partial-width-windows 150)
   ;; raccourcis supplémentaires
   (global-set-key (kbd "s-e") 'eval-region)                ;; lisp evaluation
   (global-set-key (kbd "M-SPC") 'cycle-spacing)            ;; cycle des espaces  init => 1 => 0 => init
   (global-set-key (kbd "<f1>") 'find-file-literally)       ;; Ouvrir un fichier sans son mode majeur
   (global-set-key (kbd "C-<return>") 'rectangle-mark-mode) ;; rectangle
+  (global-set-key (kbd "C-x *") 'calculator)
   ;; pwd
   (setq default-directory "~/")
   ;; indentation
