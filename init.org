@@ -3043,6 +3043,7 @@ C-. => goto definition
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/Outils/emacs/ant-mode-master")
   (autoload 'ant-mode "ant-mode" "Major mode for editing Ant build files." t)
+  (add-to-list 'auto-mode-alist '("build.xml" . ant-mode))
 #+END_SRC
 *** Fortran
 *dépendances* [[https://github.com/rosenbrockc/fortpy][fortpy]]
