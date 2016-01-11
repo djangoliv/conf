@@ -788,6 +788,19 @@ Avoir des tabs (et surtout des groupes)
   (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+  ;; preview in eww
+  (autoload 'eww-mode "eww" "" t)
+  (defun markdown-preview-buffer ()
+    (interactive)
+    (if (get-buffer "*html*")
+        (kill-buffer "*html*"))
+    (let* ((buf-this (buffer-name (current-buffer)))
+           (buf-html (get-buffer-create
+                      (format "*preview (%s)*" buf-this))))
+      (markdown-other-window (buffer-name buf-html))
+      (eww-mode)
+      (shr-render-buffer buf-html)
+      (kill-buffer buf-html)))
 #+END_SRC
 ** eimp (manipulation d'image)
 *dépendances*: [[https://github.com/AndreaCrotti/Emacs-configuration/blob/master/site-lisp/eimp.el][eimp.el]]
@@ -2173,6 +2186,7 @@ Avoir des tabs (et surtout des groupes)
   (require 'whitespace)
   (setq-default show-trailing-whitespace t)
   (add-hook 'term-mode-hook (lambda() (setq show-trailing-whitespace nil)))
+  (add-hook 'term-mode-hook (lambda() (setq show-trailing-whitespace nil)))
 #+END_SRC
 *** color-identifier
 *dépendances* [[https://github.com/ankurdave/color-identifiers-mode][color-idenrifier-mode]]
@@ -2746,7 +2760,7 @@ C-. => goto definition
 			(match-string 0 y)))
 	)
   (autoload 'thing-at-point "thingatpt" nil t) ;; build-in librairie
-  (defun generate-header()
+  (defun python-generate-header()
 	(interactive)
 	(setq p (get-parameters (thing-at-point 'sentence)))
 	(forward-line 1)
@@ -2762,21 +2776,6 @@ C-. => goto definition
 	(insert "\n\t\"\"\"\n\n")
 	)
   (global-set-key (kbd "<f9>") 'generate-header)
-  (defun generate-header-proj1()
-	(interactive)
-	(setq p (get-parameters (thing-at-point 'sentence)))
-	(setq params (split-string p "[?\,?\(?\)?\ ]"))
-	(while params
-      (if (/= (length (chomp (car params))) 0)
-          (progn
-			(if (not (equal (chomp (car params)) "self"))
-				(progn
-                  (insert "\t# @param ")
-                  (insert (chomp (car params)))
-                  (insert ": \n")))
-			))
-      (setq params (cdr params))))
-  (global-set-key (kbd "C-<f9>") 'generate-header-proj1)
   (defun chomp (str)
 	"Chomp leading and tailing whitespace from STR."
 	(let ((s (if (symbolp str) (symbol-name str) str)))
