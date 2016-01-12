@@ -2278,7 +2278,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-x v u") 'revert-svn)
  #+END_SRC
 *** Git
-*dépendances*: [[https://github.com/magit/magit][magit]] [[https://github.com/tsgates/git-emacs][git-emacs-master]] [[https://github.com/syohex/emacs-git-messenger][git-messenger.el]] [[https://github.com/pidu/git-timemachine][git-timemachine]] [[https://github.com/magit/magit-svn][magit-svn]] [[https://github.com/magit/git-modes][gitconfig-mode]]
+*dépendances*: [[https://github.com/magit/magit][magit]] [[https://github.com/tsgates/git-emacs][git-emacs-master]] [[https://github.com/syohex/emacs-git-messenger][git-messenger.el]] [[https://github.com/pidu/git-timemachine][git-timemachine]] [[https://github.com/magit/magit-svn][magit-svn]] [[https://github.com/magit/git-modes][gitconfig-mode]] [[https://github.com/jtatarik/magit-gitflow][magit-gitflow]]
 #+BEGIN_SRC emacs-lisp
 	(add-to-list 'load-path "~/.emacs.d/magit-master/lisp")
 	(autoload 'magit-status "magit" nil t)
@@ -2296,11 +2296,13 @@ Avoir des tabs (et surtout des groupes)
 	;; revisions
 	(autoload 'git-timemachine "git-timemachine" "" nil)
 	(global-set-key (kbd "C-x g t") 'git-timemachine)
-	;; git-svn
-	(eval-after-load "magit"
-      '(progn
-		 (require 'magit-svn)
-		 (add-hook 'magit-mode-hook 'magit-svn-mode)))
+  ;; git-svn / git-flow
+  (eval-after-load "magit"
+    '(progn
+       (require 'magit-svn)
+       (add-hook 'magit-mode-hook 'magit-svn-mode)
+       (require 'magit-gitflow)
+       (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)))
 	;; messages de commit
 	(require 'git-messenger)
 	(setq git-messenger:show-detail t)
