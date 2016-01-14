@@ -356,6 +356,15 @@ Avoir des tabs (et surtout des groupes)
     (interactive)
     (mapc 'kill-buffer (delq (current-buffer) (buffer-list))))
   (global-set-key (kbd "s-k") 'kill-all-other-buffers)
+  ;; kill all current major mode
+  (defun kill-current-major-mode-buffers ()
+    (interactive)
+    (setq current-mode  major-mode)
+    (mapc (lambda (buffer)
+            (when (eq current-mode (buffer-local-value 'major-mode buffer))
+              (kill-buffer buffer)))
+          (buffer-list)))
+  (global-set-key (kbd "C-c k") 'kill-current-major-mode-buffers)
  #+END_SRC
 ** Terminal dans des tabs
 *dépendances*: [[https://github.com/emacsmirror/multi-term][multi-term.el]]
