@@ -2351,6 +2351,7 @@ Avoir des tabs (et surtout des groupes)
   (setq magit-push-always-verify nil)
   (setq magit-commit-show-diff nil)
   (setq magit-revert-buffers 1)
+  (setq magit-refresh-verbose t)
   ;; fichier de conf
   (require 'gitconfig-mode)
   (require 'gitignore-mode)
