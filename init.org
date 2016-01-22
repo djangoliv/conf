@@ -300,19 +300,22 @@ Avoir des tabs (et surtout des groupes)
        "Image-Dired"
        )
       ((eq major-mode 'term-mode)
-       "Term"
+       "term"
        )
       ((eq major-mode 'org-mode)
-       "ORG"
+       "org"
        )
       ((eq major-mode 'nxml-mode)
-       "NXML"
+       "nXml"
+       )
+      ((eq major-mode 'image-mode)
+       "image"
        )
       ((eq major-mode 'csv-mode)
        "CSV"
        )
       ((eq major-mode 'text-mode)
-       "TEXT"
+       "text"
        )
       ((or (string-equal "." (substring (buffer-name) 0 1)) (eq major-mode 'emacs-lisp-mode))
        "Conf Buffer"
