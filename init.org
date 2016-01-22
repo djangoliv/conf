@@ -1557,7 +1557,7 @@ Avoir des tabs (et surtout des groupes)
  #+END_SRC
 ** Completion
   #+BEGIN_SRC emacs-lisp
-    ;; completion tunning
+    ;; completion tuning
     (setq dabbrev-abbrev-skip-leading-regexp "[<>=\"/\\:]")
     ;;(setq dabbrev-abbrev-skip-leading-regexp "[<>=\"/]" t)
     (global-set-key (kbd "s-/") 'dabbrev-expand)
