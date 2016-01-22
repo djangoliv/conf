@@ -632,7 +632,7 @@ Avoir des tabs (et surtout des groupes)
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
 #+END_SRC
 *** export
-*dépendances* [[https://github.com/kinjo/org-impress-js.el][org-impress.el]]
+*dépendances* [[https://github.com/kinjo/org-impress-js.el][org-impress.el]] [[https://github.com/marsmining/ox-twbs][ox-twbs]]
 #+BEGIN_SRC emacs-lisp
   ;; export HTML avec css ("~/.emacs.d/org-style.css")
   (defun my-org-inline-css-hook (exporter)
@@ -661,8 +661,12 @@ Avoir des tabs (et surtout des groupes)
   (eval-after-load "org"
     '(progn
        (add-to-list 'load-path "~/.emacs.d/org-impress-js.el")
-       (require 'ox-impress-js)
-       ))
+       (require 'ox-impress-js)))
+  ;; org ox-twbs
+  (eval-after-load "org"
+    '(progn
+       (require 'ox-twbs)
+       (defalias 'org-export 'org-twbs-export-to-html)))
 #+END_SRC
 *** bloc generation
 #+BEGIN_SRC emacs-lisp
