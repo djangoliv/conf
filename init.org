@@ -618,6 +618,7 @@ Avoir des tabs (et surtout des groupes)
      (ditaa . t)
      (dot . t)
      (plantuml . t)
+     (calc . t)
      (python . t)))
   ;; dita
   (setq org-ditaa-jar-path "~/Outils/ditaa/ditaa0_9.jar")
