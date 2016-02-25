@@ -2745,6 +2745,23 @@ C-. => goto definition
 	(message way))
   (global-set-key (kbd "s-w") 'py-where)
 #+END_SRC
+**** py-lines-to-list
+word1
+word2
+word3
+=> ["word1", "word2", "word3"]
+#+BEGIN_SRC emacs-lisp
+  (defun py-lines-to-list (point mark)
+    (interactive "r")
+    (let ((text (buffer-substring point mark)))
+      (delete-region point mark)
+      (insert "[")
+      (insert (mapconcat (lambda (line) (format "'%s'" line))
+                         (split-string text "\s*\n\s*")
+                         ", "))
+      (insert "]")))
+  (define-key python-mode-map (kbd "C-c C-l") #'py-lines-to-list)
+#+END_SRC
 **** Generation doc header
 #+BEGIN_SRC emacs-lisp
   ;; generation de doc function
