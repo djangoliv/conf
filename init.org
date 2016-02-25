@@ -320,6 +320,9 @@ Avoir des tabs (et surtout des groupes)
       ((or (string-equal "." (substring (buffer-name) 0 1)) (eq major-mode 'emacs-lisp-mode))
        "Conf Buffer"
        )
+      ((eq major-mode 'fundamental-mode)
+       "Unknown"
+       )
       (t
        "User Buffer"))))
   (setq tabbar-buffer-groups-function 'tabbar-buffer-groups)
@@ -1633,6 +1636,7 @@ Avoir des tabs (et surtout des groupes)
           (tramp-parse-shosts "~/.ssh/known_hosts")))
   (setq tramp-auto-save-directory "~/.emacs-autosave-tramp-files/")
   (setq tramp-backup-directory-alist backup-directory-alist)
+  (setq tramp-persistency-file-name "/tmp/.tramp")
   ;; se souviens du mot de passe ~/.authinfo.gpg
   (setq password-cache-expiry nil)
   ;; conection to machine02
@@ -1977,6 +1981,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-[ <up>") 'select-and-left) ;; ESC-up
 #+END_SRC
 *** scroll-bar
+*dépendances* [[https://github.com/m2ym/yascroll-el][yascroll]]
 #+BEGIN_SRC emacs-lisp
   (require 'yascroll)
   (global-yascroll-bar-mode)
