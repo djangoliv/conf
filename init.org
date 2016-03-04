@@ -1,4 +1,4 @@
-* Emacs Congfiguration             :noexport:ARCHIVE:
+* Emacs Congfiguration                                     :noexport:ARCHIVE:
 #+AUTHOR: Djangoliv'
 #+EMAIL: djangoliv@mailoo.org
 #+LANGUAGE:  fr
@@ -568,11 +568,18 @@ Avoir des tabs (et surtout des groupes)
   (define-key dired-mode-map (kbd "s-u") 'dired-unmark-backward)
 #+END_SRC
 *** subtree insert
+*dépendances*: [[https://github.com/Fuco1/dired-hacks][dired-hacks]]
 #+BEGIN_SRC emacs-lisp
   (require 'dired-subtree)
   (setq dired-subtree-use-backgrounds nil)
   (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
   (define-key dired-mode-map (kbd "I") 'dired-subtree-remove)
+#+END_SRC
+*** dired narrow
+*dépendances*: [[https://github.com/Fuco1/dired-hacks][dired-hacks]]
+#+BEGIN_SRC emacs-lisp
+  (require 'dired-narrow) https://github.com/Fuco1/dired-hacks
+  (define-key dired-mode-map (kbd "/") 'dired-narrow)
 #+END_SRC
 ** Org-Mode
 *** init
@@ -2532,7 +2539,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** Python
 **** Initialisation
-*dépendances* [[https://github.com/emacsmirror/fuzzy-format][fuzzy-format.el]] [[https://github.com/flycheck/flycheck][flycheck.el]] (init plus haut)
+*dépendances* [[https://github.com/gopar/django-manage][django-manage]] [[https://github.com/emacsmirror/fuzzy-format][fuzzy-format.el]] [[https://github.com/flycheck/flycheck][flycheck.el]] (init plus haut)
 #+BEGIN_SRC emacs-lisp
   ;; Use archive mode to open Python eggs
   (add-to-list 'auto-mode-alist '("\\.egg\\'" . archive-mode))
@@ -2606,7 +2613,7 @@ C-. => goto definition
 *dépendances* [[https://github.com/glyph/python-docstring-mode][python-docstring-mode]]
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/Outils/emacs/python/python-docstring-mode-master")
-  (require 'python-docstring)
+  (load-file "~/Outils/emacs/python/python-docstring-mode-master/python-docstring.el")
   (add-hook 'python-mode-hook (lambda () (python-docstring-mode t)))
 #+END_SRC
 **** doc (pydoc)
@@ -3191,6 +3198,8 @@ word3
   (autoload 'json-mode "json-mode" "" t)
   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
   (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
+  (eval-after-load "js2-mode" ;; doubleclick selection
+      '(progn (define-key js2-mode-map [mouse-1] 'mouse-set-point)))
   (defun angular-js ()
     (interactive)
     (load-file "~/.emacs.d/lisp/angular-mode.elc")
