@@ -581,6 +581,12 @@ Avoir des tabs (et surtout des groupes)
   (require 'dired-narrow) https://github.com/Fuco1/dired-hacks
   (define-key dired-mode-map (kbd "/") 'dired-narrow)
 #+END_SRC
+*** peep dired (preview)
+*dépendances* [[https://github.com/asok/peep-dired][peep-dired]]
+#+BEGIN_SRC emacs-lisp
+  (require 'peep-dired)
+  (define-key dired-mode-map (kbd "P") 'peep-dired)
+#+END_SRC
 ** Org-Mode
 *** init
 *dépendances*: [[http://orgmode.org/][org-mode]]  [[https://github.com/sabof/org-bullets][org-bullets.el]] [[http://ditaa.sourceforge.net/][ditaa]]
