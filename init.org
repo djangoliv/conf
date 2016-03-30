@@ -95,6 +95,8 @@ Configuration Minimal (sans librairies externes)
   ;; indentation
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 4)
+  ;; ne pas charger un ancien fichier compile
+  (setq load-prefer-newer t)
  #+END_SRC
 ** source du bashrc au démarrage
 *dépendances*: [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
@@ -488,6 +490,15 @@ Avoir des tabs (et surtout des groupes)
   (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
   (setq-default dired-omit-extensions '(".pyc" ".class" ".o" ".elc" "~"))
  #+END_SRC
+*** dired-k
+*dépendances* [[ttps://github.com/syohex/emacs-dired-k][dired-k]]
+#+BEGIN_SRC emacs-lisp
+(require 'dired-k)
+(setq dired-k-style 'git)
+(setq dired-k-human-readable t)
+;; always execute dired-k when dired buffer is opened
+(add-hook 'dired-initial-position-hook 'dired-k)
+#+END_SRC
 *** raccourcis
 #+BEGIN_SRC emacs-lisp
   (define-key dired-mode-map (kbd "<return>") 'dired-find-alternate-file)
@@ -1622,7 +1633,7 @@ Avoir des tabs (et surtout des groupes)
     (setq completion-ignore-case nil)
   #+END_SRC
 ** Docker
-*dépendances*: [[https://github.com/spotify/dockerfile-mode][dockerfile-mode.el]] [[https://github.com/Silex/docker.el][docker.el]]
+*dépendances*: [[https://github.com/spotify/dockerfile-mode][dockerfile-mode.el]] [[https://github.com/Silex/docker.el][docker.el]] [[https://github.com/Silex/tabulated-list-extensions][tle]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'dockerfile-mode "dockerfile-mode" nil t)
   (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
@@ -2193,7 +2204,7 @@ Avoir des tabs (et surtout des groupes)
   (setq tags-table-list (list "~/workspaces/proj1/" "~/workspaces/proj2"))
 #+END_SRC
 *** Rechercher dans le projet courant (fiplr)
-*dépendances* [[https://github.com/grizzl/fiplr][fiplr]] [[http://emacswiki.org/emacs/ifind-mode.el][ifind-mode.el]]
+*dépendances* [[https://github.com/grizzl/fiplr][fiplr]] [[https://github.com/emacsattic/ifind-mode][ifind-mode.el]]
 #+BEGIN_SRC emacs-lisp
   ;; i-find
   (defvar workspace-dir "~/workspaces/proj1/trunk ~/install/proj1")
@@ -2220,7 +2231,7 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'color-identifiers-mode "color-identifiers-mode" "" t)
 #+END_SRC
 *** couleurs
-*dépendances*: [[https://github.com/djangoliv/conf][my-css-color]]
+*dépendances*: [[https://github.com/djangoliv/conf/blob/master/lisp/my-css-color.el][my-css-color]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'css-color-mode "my-css-color" "" t)
   (defun color-mode ()

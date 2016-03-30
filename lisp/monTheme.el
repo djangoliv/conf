@@ -32,6 +32,11 @@
  '(dired-filetype-image ((t (:foreground "plum"))))
  '(dired-filetype-plain ((t (:foreground "lightgray"))))
  '(dired-filetype-xml ((t (:foreground "whitesmoke"))))
+ '(dired-header ((t (:foreground "#91ba8a"))))
+;;;; nxml
+ '(nxml-attribute-local-name ((t (:foreground "burlywood"))))
+ '(nxml-element-local-name ((t (:foreground "lightskyblue"))))
+ '(nxml-tag-delimiter ((t (:foreground "burlywood"))))
 ;;;; org-mode
  '(org-level-1 ((t (:inherit variable-pitch :height 1.11 :foreground "#00cbcd"))))
  '(org-level-2 ((t (:inherit outline-2 :height 1.03 :foreground "deepskyblue"))))
