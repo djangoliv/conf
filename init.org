@@ -402,11 +402,14 @@ Avoir des tabs (et surtout des groupes)
 ** Text-mode
  #+BEGIN_SRC emacs-lisp
    ;; fichier en text-mode
-   (add-to-list 'auto-mode-alist '("TODO\\'" . text-mode))
-   (add-to-list 'auto-mode-alist '("README\\'" . text-mode))
-   (add-to-list 'auto-mode-alist '("Readme\\'" . text-mode))
-   ;; underscore ne separe pas les mots
+   (add-to-list 'auto-mode-alist '("\\.txt$" . text-mode))
+   (add-to-list 'auto-mode-alist '("\\`[^.]+\\'" . text-mode)) ;; fichiers sans extension
+   ;; (_ / . - ~) ne separent pas les mots
    (modify-syntax-entry ?_ "w" text-mode-syntax-table)
+   (modify-syntax-entry ?\/ "w" text-mode-syntax-table)
+   (modify-syntax-entry ?. "w" text-mode-syntax-table)
+   (modify-syntax-entry ?- "w" text-mode-syntax-table)
+   (modify-syntax-entry ?~ "w" text-mode-syntax-table)
  #+END_SRC
 ** Dired
 *** Initialisation
