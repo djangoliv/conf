@@ -2181,7 +2181,7 @@ Avoir des tabs (et surtout des groupes)
   (setq auto-mark-command-classifiers
         (list (lambda (command)
                 (if (and (eq command 'self-insert-command)
-                         (eq last-command-char ? ))
+                         (eq last-command-event ? ))
                     'ignore))))
   (global-auto-mark-mode 1))
 #+END_SRC
@@ -2233,7 +2233,7 @@ Avoir des tabs (et surtout des groupes)
 *** couleurs
 *dépendances*: [[https://github.com/djangoliv/conf/blob/master/lisp/my-css-color.el][my-css-color]]
 #+BEGIN_SRC emacs-lisp
-  (autoload 'css-color-mode "my-css-color" "" t)
+  (load-file "~/.emacs.d/lisp/my-css-color.elc")
   (defun color-mode ()
     (interactive)
     (if css-color-mode
