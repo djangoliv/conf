@@ -618,6 +618,7 @@ Avoir des tabs (et surtout des groupes)
   (setq org-src-tab-acts-natively t)   ;; indentation des block sources
   (modify-coding-system-alist 'file "\\.org\\'" 'utf-8)
   (setq org-cycle-separator-lines 0)
+  (add-hook 'ediff-prepare-buffer-hook #'show-all) ;; edif in org-mode
   ;; theme+
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
@@ -640,6 +641,7 @@ Avoir des tabs (et surtout des groupes)
        (define-key org-mode-map (kbd "M-s-<down>") 'drag-stuff-down)))
 #+END_SRC
 *** babel
+*dépendances* [[https://github.com/gregsexton/ob-ipython][ob-ipython]] [[http://ditaa.sourceforge.net/][ditaa]] [[http://fr.plantuml.com/download.html][plantuml.jar]]
 #+BEGIN_SRC emacs-lisp
   ;; execution
   (org-babel-do-load-languages
@@ -657,7 +659,7 @@ Avoir des tabs (et surtout des groupes)
   ;; plantuml
   (setq org-plantuml-jar-path "~/.emacs.d/plantuml/plantuml.jar")
   ;; ipython
-  (add-to-list 'load-path "/home/giorgis/Outils/emacs/ob-ipython-master")
+  (add-to-list 'load-path "~/Outils/emacs/ob-ipython-master")
   (require 'ob-ipython)
   ;; don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)   
@@ -1662,6 +1664,10 @@ Avoir des tabs (et surtout des groupes)
   (wrap-region-add-wrapper "~" "~" nil 'org-mode)
   (wrap-region-add-wrapper "_" "_" nil 'org-mode)
   (wrap-region-add-wrapper "+" "+" nil 'org-mode)
+  (wrap-region-add-wrapper "float(" ")" "f" 'python-mode)
+  (wrap-region-add-wrapper "str(" ")" "s" 'python-mode)
+  (wrap-region-add-wrapper "int(" ")" "i" 'python-mode)
+  (wrap-region-add-wrapper "round(" ")" "r" 'python-mode)
 #+End_SRC
 ** stripe-buffer
 *dépendances*: [[https://github.com/sabof/stripe-buffer][stripe-buffer.el]]
@@ -2058,6 +2064,17 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   (require 'unaccent)
 #+END_SRC
+*** letter-toggle-case
+#+BEGIN_SRC emacs-lisp
+  (defun toggle-letter-case ()
+    (interactive)
+    (let ((case-fold-search nil))
+      (cond
+       ((looking-at "[[:lower:]]") (upcase-region (point) (1+ (point))))
+       ((looking-at "[[:upper:]]") (downcase-region (point) (1+ (point)))))
+      (right-char)))
+  (global-set-key (kbd "M-C") 'toggle-letter-case)
+#+END_SRC
 * Developpement
 ** Common
 *** insert un shebang
@@ -2093,6 +2110,12 @@ Avoir des tabs (et surtout des groupes)
    (add-to-list 'auto-mode-alist '("\\.properties\\'" . conf-mode))
    (add-to-list 'auto-mode-alist '("sudoers" . conf-mode))
  #+END_SRC
+*** vimrc-mode
+*dépendances* [[https://github.com/mcandre/vimrc-mode][vimrc-mode]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'vimrc-mode "vimrc-mode" nil t)
+  (add-to-list 'auto-mode-alist '(".vim\\(rc\\)?$" . vimrc-mode))
+#+END_SRC
 *** MakeFile-mode
  #+BEGIN_SRC emacs-lisp
    ;; fichier en makefile-mode

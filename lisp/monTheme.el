@@ -46,6 +46,8 @@
  '(org-level-6 ((t (:inherit outline-6 :height 1.00 :foreground "thistle"))))
  '(org-level-7 ((t (:inherit outline-7 :height 1.00 :foreground "Gray90"))))
  '(org-level-8 ((t (:inherit outline-8 :height 1.00 :foreground "white"))))
+ '(org-checkbox ((t (:foreground "#7BC6E4" :bold t))))
+ '(org-checkbox-statistics-todo ((t (:foreground "#DDC5E5" :bold t))))
  '(org-table ((t (:foreground "whitesmoke"))))
  '(org-archived ((t (:foreground "#008f80"))))
  '(org-link ((t (:foreground "Cyan" :underline t :background "#2e3436")))))
