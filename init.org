@@ -840,7 +840,7 @@ Avoir des tabs (et surtout des groupes)
   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   ;; preview in eww
-  (autoload 'eww-mode "eww" "" t)
+  (autoload 'eww-mode "eww" "" t) ;; build-in
   (defun markdown-preview-buffer ()
     (interactive)
     (if (get-buffer "*html*")
@@ -2086,7 +2086,7 @@ Avoir des tabs (et surtout des groupes)
      (concat "#!/usr/bin/env " lang)))
 #+END_SRC
 *** Analyse de code
-*dépendances* [[https://github.com/cosmicexplorer/cloc-emacs][cloc.el]]
+*dépendances* [[https://github.com/cosmicexplorer/cloc-emacs][cloc]]
 #+BEGIN_SRC emacs-lisp
   ;; cloc sur les buffers
   (autoload 'cloc "cloc" nil t)
@@ -2122,20 +2122,20 @@ Avoir des tabs (et surtout des groupes)
    (add-to-list 'auto-mode-alist '("\\makefile.*" . makefile-mode))
  #+END_SRC
 *** Yasnippet
-*dépendances:* [[https://github.com/capitaomorte/yasnippet][yasnippet.el]] [[https://github.com/tuhdo/yasnippet-snippets][yasnippet-snippets]]
+*dépendances:* [[https://github.com/capitaomorte/yasnippet][yasnippet.el]] [[https://github.com/tuhdo/yasnippet-snippets][yasnippet-snippets]] [[https://www.emacswiki.org/emacs/dropdown-list.el][dropdown-list]]
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path  "~/.emacs.d/yasnippet-master/")
   (setq yas-snippet-dirs "~/.emacs.d/yasnippet-snippets-master/")
   (autoload 'yas-insert-snippet "yasnippet" nil t)
   (eval-after-load "yasnippet"
-	'(progn
+    '(progn
        (yas-global-mode 1)
        (setq yas/indent-line 'fixed)
        ;; pour avoir les snippet dans le minibuffer
        (require 'dropdown-list)
-       (defadvice yas-insert-snippet (around use-completing-prompt activate)
-		 "Use `yas/completing-prompt' for `yas/prompt-functions' but only here..."
-		 (let ((yas-prompt-functions '(yas/completing-prompt))) ad-do-it))
+       ;; (defadvice yas-insert-snippet (around use-completing-prompt activate)
+       ;;   "Use `yas/completing-prompt' for `yas/prompt-functions' but only here..."
+       ;;   (let ((yas-prompt-functions '(yas/completing-prompt))) ad-do-it))
        (define-key yas-minor-mode-map (kbd "<tab>") nil) ;; pas sur tab
        (define-key yas-minor-mode-map (kbd "TAB") nil) ;; pas sur tab
        ))
@@ -2189,7 +2189,7 @@ Avoir des tabs (et surtout des groupes)
   (setq iedit-toggle-key-default nil) ;; pas les raccourcis iedit
 #+END_SRC
 *** Global mark
-*dépendances*: [[https://github.com/rolandwalker/back-button][back-button.el]] [[http://www.emacswiki.org/emacs/auto-mark.el][auto-mark]]
+*dépendances*: [[https://github.com/rolandwalker/back-button][back-button.el]] [[http://www.emacswiki.org/emacs/auto-mark.el][auto-mark]] [[https://github.com/myuhe/smartrep.el][smart-rep]] [[https://github.com/rolandwalker/nav-flash][nav-flash]]
 #+BEGIN_SRC emacs-lisp
   ;; global mark :: C-x C-<right> ; C-x C-<left>
   ;; local mark :: C-x <right> ; C-x <left>
@@ -2230,7 +2230,7 @@ Avoir des tabs (et surtout des groupes)
   (setq tags-table-list (list "~/workspaces/proj1/" "~/workspaces/proj2"))
 #+END_SRC
 *** Rechercher dans le projet courant (fiplr)
-*dépendances* [[https://github.com/grizzl/fiplr][fiplr]] [[https://github.com/emacsattic/ifind-mode][ifind-mode.el]]
+*dépendances* [[https://github.com/grizzl/fiplr][fiplr]] [[https://github.com/emacsattic/ifind-mode][ifind-mode.el]] [[https://github.com/grizzl/grizzl][grizzl]]
 #+BEGIN_SRC emacs-lisp
   ;; i-find
   (defvar workspace-dir "~/workspaces/proj1/trunk ~/install/proj1")
@@ -2246,7 +2246,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** whitespace
 #+BEGIN_SRC emacs-lisp
-  (require 'whitespace)
+  (require 'whitespace) ;; build-in
   (setq-default show-trailing-whitespace t)
   (add-hook 'term-mode-hook (lambda() (setq show-trailing-whitespace nil)))
   (add-hook 'eww-mode-hook (lambda() (setq show-trailing-whitespace nil)))
@@ -2447,7 +2447,7 @@ Avoir des tabs (et surtout des groupes)
   ;; XML folding
   (add-hook 'nxml-mode-hook
             (lambda ()
-              (require 'sgml-mode)
+              (require 'sgml-mode) ;; build-in
               (add-to-list 'hs-special-modes-alist
                            '(nxml-mode
                              "<!--\\|<[^/>]*[^/]>"
@@ -2505,6 +2505,7 @@ Avoir des tabs (et surtout des groupes)
      (format "firefox /tmp/%s" (concat (substring (file-name-nondirectory (buffer-file-name)) 0 -3) "svg"))))
   #+END_SRC
 ** YAML
+*dépendances* [[https://github.com/yoshiki/yaml-mode][yaml-mode]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'yaml-mode "yaml-mode" nil t)
   (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
@@ -2550,6 +2551,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 ** Langages
 *** elisp
+*dépendances* [[https://github.com/auto-complete/popup-el][popup.el]]
 #+BEGIN_SRC emacs-lisp
   (defun elisp-function-or-variable-quickhelp (symbol)
     (interactive
@@ -2599,7 +2601,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** Python
 **** Initialisation
-*dépendances* [[https://github.com/gopar/django-manage][django-manage]] [[https://github.com/emacsmirror/fuzzy-format][fuzzy-format.el]] [[https://github.com/flycheck/flycheck][flycheck.el]] (init plus haut)
+*dépendances* [[https://github.com/gopar/django-manage][django-manage]] [[https://github.com/emacsmirror/fuzzy-format][fuzzy-format.el]] [[https://github.com/antonj/Highlight-Indentation-for-Emacs][Highlight-Indentation]] [[https://github.com/flycheck/flycheck][flycheck.el]] (init plus haut)
 #+BEGIN_SRC emacs-lisp
   ;; Use archive mode to open Python eggs
   (add-to-list 'auto-mode-alist '("\\.egg\\'" . archive-mode))
@@ -2899,15 +2901,9 @@ word3
   (autoload 'run-qdb "qdb" nil t)
 #+END_SRC
 **** pyvenv
+*dépendances* [[https://github.com/proofit404/pyenv-mode][pyenv]]
 #+BEGIN_SRC emacs-lisp
   (require 'pyvenv)
-#+END_SRC
-**** auto-import
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'python-mode-hook
-			 (lambda ()
-			   (autoload 'python-auto-import "python-auto-import" nil t)
-			   (define-key python-mode-map (kbd "C-c i") 'python-auto-import)))
 #+END_SRC
 **** pip requirements
 *dépendances* [[https://github.com/emacsmirror/pip-requirements][pip-requirements]]
@@ -3308,6 +3304,7 @@ word3
               (end-of-buffer)))
 #+END_SRC
 **** nginx
+*dépendances* [[https://github.com/ajc/nginx-mode][nginx-mode]]
 #+BEGIN_SRC emacs-lisp
   (require 'nginx-mode)
 #+END_SRC
@@ -3322,6 +3319,7 @@ word3
 #+END_SRC
 * Perso
 ** eswap
+*dépendances* [[https://github.com/djangoliv/eswap][eswap-mode]]
 #+BEGIN_SRC emacs-lisp
   (require 'eswap-mode)
   (eswap-global-mode t)
