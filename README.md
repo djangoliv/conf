@@ -11,7 +11,6 @@
 * init.org
 * custom.el
 * lisp/
-  * eswap-mode.el: toggling between source and target files
-  * monTheme.el: My Emacs skin
+  * djangolivTheme.el: My Emacs skin
   * my-css-color.el: lib for adding colors in buffers
   * tabbar-more.el: more functions for tabbar 
