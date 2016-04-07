@@ -603,6 +603,21 @@ Avoir des tabs (et surtout des groupes)
   (setq peep-dired-cleanup-on-disable t)
   (setq peep-dired-ignored-extensions '("mkv" "iso" "mp4" "zip" "tgz"))
 #+END_SRC
+*** image-dired
+*dépendances* [[https://github.com/mhayashi1120/Emacs-image-diredx][image-dired+]]
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load 'image-dired '(require 'image-dired+))  
+  (eval-after-load 'image-dired+ '(image-diredx-async-mode 1))
+  (setq image-dired-track-movement nil)
+  ;; multiple dired-image
+  (defun my-image-dired (Dir)
+    (interactive "DDir: ")
+    (image-dired Dir)
+    (if (not (boundp 'img-number))
+        (defvar img-number 1 "imageDired index in the current emacs session") )
+    (rename-buffer (concat "Image-Dired-" (int-to-string img-number)))
+    (setq img-number (+ 1 img-number)))
+#+END_SRC
 ** Org-Mode
 *** init
 *dépendances*: [[http://orgmode.org/][org-mode]]  [[https://github.com/sabof/org-bullets][org-bullets.el]] [[http://ditaa.sourceforge.net/][ditaa]]
@@ -869,17 +884,6 @@ Avoir des tabs (et surtout des groupes)
   ;; image manipulation
   (autoload 'eimp-mode "eimp" "Emacs Image Manipulation Package." t)
   (add-hook 'image-mode-hook 'eimp-mode)
-#+END_SRC
-*** multi dired-image
-#+BEGIN_SRC emacs-lisp
-  ;; multiple dired-image
-  (defun my-image-dired (Dir)
-    (interactive "DDir: ")
-    (image-dired Dir)
-    (if (not (boundp 'img-number))
-        (defvar img-number 1 "imageDired index in the current emacs session") )
-    (rename-buffer (concat "Image-Dired-" (int-to-string img-number)))
-    (setq img-number (+ 1 img-number)))
 #+END_SRC
 * Minor-Modes and Helper Functions
 ** undo-tree
