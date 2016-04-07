@@ -71,6 +71,10 @@
 									(tab-mark 9 [9655 9] [92 9])))
 ;;;; yascrollbar
 (custom-set-faces '(yascroll:thumb-fringe ((t (:foreground "SteelBlue" :background "SteelBlue")))))
+;;;; magit
+(custom-set-faces '(magit-section-heading ((t (:foreground "gray"))))
+				  '(magit-section-highlight ((t (:background "#36115AE15AE1"))))
+				  '(magit-diff-context-highlight  ((t (:background "#37115AE15AE1")))))
 ;;;; rainbow-delimiter
 (custom-set-faces
  '(rainbow-delimiters-depth-1-face ((t (:foreground "wheat"))))
