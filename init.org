@@ -870,6 +870,17 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'eimp-mode "eimp" "Emacs Image Manipulation Package." t)
   (add-hook 'image-mode-hook 'eimp-mode)
 #+END_SRC
+*** multi dired-image
+#+BEGIN_SRC emacs-lisp
+  ;; multiple dired-image
+  (defun my-image-dired (Dir)
+    (interactive "DDir: ")
+    (image-dired Dir)
+    (if (not (boundp 'img-number))
+        (defvar img-number 1 "imageDired index in the current emacs session") )
+    (rename-buffer (concat "Image-Dired-" (int-to-string img-number)))
+    (setq img-number (+ 1 img-number)))
+#+END_SRC
 * Minor-Modes and Helper Functions
 ** undo-tree
 *dépendances*: [[https://github.com/emacsmirror/undo-tree][undo-tree.el]]
@@ -2051,12 +2062,12 @@ Avoir des tabs (et surtout des groupes)
 *** diffview
 *dépendances* [[https://github.com/emacsmirror/diffview][diffview]]
 #+BEGIN_SRC emacs-lisp
-  (require 'diffview)
+  (autoload 'diffview-mode "diffview" nil t)
 #+END_SRC
 *** logview
 *dépendances* [[https://github.com/emacsmirror/logview][logview]]
 #+BEGIN_SRC emacs-lisp
-  (require 'logview)
+  (autoload 'logview-mode "logview" nil t)
   (add-to-list 'auto-mode-alist '("message" . logview-mode) t)
 #+END_SRC
 *** unaccent
@@ -2133,9 +2144,9 @@ Avoir des tabs (et surtout des groupes)
        (setq yas/indent-line 'fixed)
        ;; pour avoir les snippet dans le minibuffer
        (require 'dropdown-list)
-       ;; (defadvice yas-insert-snippet (around use-completing-prompt activate)
-       ;;   "Use `yas/completing-prompt' for `yas/prompt-functions' but only here..."
-       ;;   (let ((yas-prompt-functions '(yas/completing-prompt))) ad-do-it))
+       (defadvice yas-insert-snippet (around use-completing-prompt activate)
+         "Use `yas/completing-prompt' for `yas/prompt-functions' but only here..."
+         (let ((yas-prompt-functions '(yas/completing-prompt))) ad-do-it))
        (define-key yas-minor-mode-map (kbd "<tab>") nil) ;; pas sur tab
        (define-key yas-minor-mode-map (kbd "TAB") nil) ;; pas sur tab
        ))
@@ -3306,7 +3317,7 @@ word3
 **** nginx
 *dépendances* [[https://github.com/ajc/nginx-mode][nginx-mode]]
 #+BEGIN_SRC emacs-lisp
-  (require 'nginx-mode)
+  (autoload 'nginx-mode "nginx-mode" nil t)
 #+END_SRC
 *** Jira
 *dépendances* [[https://github.com/baohaojun/org-jira][org-jira]]
