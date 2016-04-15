@@ -2139,11 +2139,11 @@ Avoir des tabs (et surtout des groupes)
 *** Yasnippet
 *dépendances:* [[https://github.com/capitaomorte/yasnippet][yasnippet.el]] [[https://github.com/tuhdo/yasnippet-snippets][yasnippet-snippets]] [[https://www.emacswiki.org/emacs/dropdown-list.el][dropdown-list]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path  "~/.emacs.d/yasnippet-master/")
-  (setq yas-snippet-dirs "~/.emacs.d/yasnippet-snippets-master/")
+  (add-to-list 'load-path  "~/.emacs.d/yasnippet")
   (autoload 'yas-insert-snippet "yasnippet" nil t)
   (eval-after-load "yasnippet"
     '(progn
+       (add-to-list 'yas-snippet-dirs "~/.emacs.d/yasnippet-snippets")
        (yas-global-mode 1)
        (setq yas/indent-line 'fixed)
        ;; pour avoir les snippet dans le minibuffer
