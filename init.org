@@ -879,7 +879,7 @@ Avoir des tabs (et surtout des groupes)
            (current-buffer)))
 #+END_SRC
 ** eimp (manipulation d'image)
-*dépendances*: [[https://github.com/AndreaCrotti/Emacs-configuration/blob/master/site-lisp/eimp.el][eimp.el]]
+*dépendances*: [[https://github.com/nicferrier/eimp][eimp.el]]
 #+BEGIN_SRC emacs-lisp
   ;; image manipulation
   (autoload 'eimp-mode "eimp" "Emacs Image Manipulation Package." t)
@@ -2616,7 +2616,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** Python
 **** Initialisation
-*dépendances* [[https://github.com/gopar/django-manage][django-manage]] [[https://github.com/emacsmirror/fuzzy-format][fuzzy-format.el]] [[https://github.com/antonj/Highlight-Indentation-for-Emacs][Highlight-Indentation]] [[https://github.com/flycheck/flycheck][flycheck.el]] (init plus haut)
+*dépendances* [[https://github.com/emacsmirror/fuzzy-format][fuzzy-format.el]] [[https://github.com/antonj/Highlight-Indentation-for-Emacs][Highlight-Indentation]] [[https://github.com/flycheck/flycheck][flycheck.el]] (init plus haut)
 #+BEGIN_SRC emacs-lisp
   ;; Use archive mode to open Python eggs
   (add-to-list 'auto-mode-alist '("\\.egg\\'" . archive-mode))
@@ -2635,8 +2635,6 @@ Avoir des tabs (et surtout des groupes)
 			  (setq python-indent 4)
 			  ;; parentheses en couleurs
 			  (rainbow-delimiters-mode)
-			  ;; django
-			  (autoload 'django-manage "django-manage" nil t)
 			  ;; highlight-indentation
 			  (require 'highlight-indentation)
 			  (highlight-indentation-mode)
@@ -2914,6 +2912,17 @@ word3
 *dépendances* [[https://github.com/quantopian/qdb/tree/master/client/emacs][qdb.el]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'run-qdb "qdb" nil t)
+#+END_SRC
+**** Django (pony-mode)
+*dépendances* [[https://github.com/davidmiller/pony-mode][pony-mode]]
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/pony-mode/src")
+  (autoload 'pony-mode "pony-mode" nil t)
+  (autoload 'pony-goto-template "pony-mode" nil t)
+  (setq pony-keyboard-prefix (kbd "C-x p"))
+  (global-set-key (kbd "C-x p t") 'pony-goto-template)
+  (global-set-key (kbd "C-x p s") 'pony-goto-settings)
+  (global-set-key (kbd "C-x p r") 'pony-runserver)
 #+END_SRC
 **** pyvenv
 *dépendances* [[https://github.com/proofit404/pyenv-mode][pyenv]]
