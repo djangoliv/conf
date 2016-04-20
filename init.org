@@ -105,10 +105,10 @@ Configuration Minimal (sans librairies externes)
   (exec-path-from-shell-initialize)
 #+END_SRC
 ** Theme (couleurs, modeline)
-*dépendances*: [[https://github.com/djangoliv/conf][djangolivTheme.el]]
+*dépendances*: [[https://github.com/djangoliv/conf][djangoliv-theme.el]]
 #+BEGIN_SRC emacs-lisp
-  ;; modification de la modeLine
-  (load-file "~/.emacs.d/lisp/djangolivTheme.elc")
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/")
+  (load-theme 'djangoliv t)
 #+END_SRC
 ** Registres
   #+BEGIN_SRC emacs-lisp

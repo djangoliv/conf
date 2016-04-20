@@ -2,6 +2,8 @@
 ;; Theme perso
 ;;;;;;;;;;;;;;;;
 
+(deftheme djangoliv "The Djangoliv color theme")
+
 ;;;; Couleurs par defaut
 (cond (window-system
 	   (set-foreground-color "wheat")
