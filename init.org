@@ -2093,6 +2093,20 @@ Avoir des tabs (et surtout des groupes)
       (right-char)))
   (global-set-key (kbd "M-C") 'toggle-letter-case)
 #+END_SRC
+*** swap-regions
+*dépendance* [[https://github.com/xuchunyang/swap-regions.el][swap-region]]s
+#+BEGIN_SRC emacs-lisp
+  (require 'swap-regions)
+  (swap-regions-mode)
+#+END_SRC
+*** emoji (smiley)
+*dépendances*  [[https://github.com/syl20bnr/emacs-emoji-cheat-sheet-plus][emacs-emoji-cheat-sheet-plus]] 
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/emacs-emoji-cheat-sheet-plus")
+  (require 'emoji-cheat-sheet-plus)
+  (add-hook 'org-mode-hook 'emoji-cheat-sheet-plus-display-mode)
+  (defalias 'smiley 'emoji-cheat-sheet-plus-buffer)
+#+END_SRC
 * Developpement
 ** Common
 *** insert un shebang
