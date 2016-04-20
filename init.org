@@ -2113,7 +2113,7 @@ Avoir des tabs (et surtout des groupes)
      (concat "#!/usr/bin/env " lang)))
 #+END_SRC
 *** Analyse de code
-*dépendances* [[https://github.com/cosmicexplorer/cloc-emacs][cloc]]
+*dépendances* [[https://github.com/cosmicexplorer/cloc-emacs][cloc.el]] [[http://kitchingroup.cheme.cmu.edu/media/2015-07-28-A-highlight-annotation-mode-for-Emacs-using-font-lock/highlights.el][highlights.el]]
 #+BEGIN_SRC emacs-lisp
   ;; cloc sur les buffers
   (autoload 'cloc "cloc" nil t)
@@ -2453,13 +2453,14 @@ Avoir des tabs (et surtout des groupes)
  #+END_SRC
 ** XML
 *** nxml-mode
+*dépendances* [[https://github.com/jcsalomon/smarttabs][smarttabs]]
 #+BEGIN_SRC emacs-lisp
   ;; for xml files, use nxml-mode instead of sgml-mode
   (setq auto-mode-alist
         (cons '("\\.\\(xml\\|XML\\|xsd\\|XSD\\|xsl\\|rng\\|xhtml\\)\\'" . nxml-mode)
               auto-mode-alist))
   (defun my-nxml-hook ()
-    (load-file "~/.emacs.d/lisp/smart-tabs-mode.elc")
+    (require 'smart-tabs-mode)
     (setq-default tab-width 4)    ;; taille TAB
     (smart-tabs-insinuate 'nxml)
     (setq nxml-child-indent 4
