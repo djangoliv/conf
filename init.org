@@ -631,6 +631,7 @@ Avoir des tabs (et surtout des groupes)
   (setq org-hide-emphasis-markers t)
   (setq org-src-fontify-natively t)   ;; fontify code in code blocks
   (setq org-src-tab-acts-natively t)   ;; indentation des block sources
+  (setq org-catch-invisible-edits 'show)
   (modify-coding-system-alist 'file "\\.org\\'" 'utf-8)
   (setq org-cycle-separator-lines 0)
   (add-hook 'ediff-prepare-buffer-hook #'show-all) ;; edif in org-mode
@@ -682,7 +683,6 @@ Avoir des tabs (et surtout des groupes)
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
 #+END_SRC
 *** export
-*dépendances* [[https://github.com/kinjo/org-impress-js.el][org-impress.el]] [[https://github.com/marsmining/ox-twbs][ox-twbs]]
 #+BEGIN_SRC emacs-lisp
   ;; export HTML avec css ("~/.emacs.d/org-style.css")
   (defun my-org-inline-css-hook (exporter)
@@ -707,16 +707,19 @@ Avoir des tabs (et surtout des groupes)
   (setq org-html-postamble t)
   (setq org-html-postamble-format
         '(("en" "<p class=\"author\">Author: %a (%e)</p>\n<p class=\"date\">Date: %T</p>")))
-  ;; export presentation (org-reveal)
-  (eval-after-load "org"
-    '(progn
-       (add-to-list 'load-path "~/.emacs.d/org-impress-js.el")
-       (require 'ox-impress-js)))
-  ;; org ox-twbs
-  (eval-after-load "org"
-    '(progn
-       (require 'ox-twbs)
-       (defalias 'org-export 'org-twbs-export-to-html)))
+#+END_SRC
+*** presentation
+*dépendances* [[https://github.com/marsmining/ox-twbs][ox-twbs]] [[https://github.com/takaxp/org-tree-slide][org-tree-slide]] 
+#+BEGIN_SRC emacs-lisp
+  ;; org-tree-slide-mode
+  (when (require 'org-tree-slide nil t)
+    (global-set-key (kbd "<f8>") 'org-tree-slide-mode)
+    (global-set-key (kbd "S-<f8>") 'org-tree-slide-skip-done-toggle)
+    (org-tree-slide-presentation-profile))
+  (autoload 'org-tree-slide-mode "org-tree-slide" nil t)
+  ;; ox-twbs
+  (require 'ox-twbs)
+  (defalias 'org-export 'org-twbs-export-to-html)
 #+END_SRC
 *** bloc generation
 #+BEGIN_SRC emacs-lisp
