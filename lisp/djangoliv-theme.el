@@ -77,6 +77,15 @@
 (custom-set-faces '(magit-section-heading ((t (:foreground "gray"))))
 				  '(magit-section-highlight ((t (:background "#36115AE15AE1"))))
 				  '(magit-diff-context-highlight  ((t (:background "#37115AE15AE1")))))
+;;; popup
+(custom-set-faces `(popup-scroll-bar-background-face ((t (:background ,"lightSlateGray")))))
+;;; cedet
+(custom-set-faces '(semantic-decoration-on-unknown-includes ((t (:background "#36115AE15AE1"))))
+                  '(semantic-decoration-on-unparsed-includes ((t (:background "#36114AE15AE1")))))
+;;; stripe-buffer
+(custom-set-faces '(stripe-highlight ((t (:background "#0e4f4e")))))
+;;; highlight-current-line
+(custom-set-faces '(highlight-current-line-face ((t (:background "#1f4f4f")))))
 ;;;; rainbow-delimiter
 (custom-set-faces
  '(rainbow-delimiters-depth-1-face ((t (:foreground "wheat"))))

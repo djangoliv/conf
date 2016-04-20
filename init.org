@@ -1690,12 +1690,8 @@ Avoir des tabs (et surtout des groupes)
 ** stripe-buffer
 *dépendances*: [[https://github.com/sabof/stripe-buffer][stripe-buffer.el]]
 #+BEGIN_SRC emacs-lisp
-  ;; tableau avec lignes de couleurs différentes
   (require 'stripe-buffer)
   (add-hook 'dired-mode-hook 'turn-on-stripe-buffer-mode)
-  (set-face-background 'stripe-highlight "#0e4f4e")
-  ;; (add-hook 'dired-mode-hook 'stripe-listify-buffer)
-  ;; (set-face-background 'stripe-hl-line "thistle")
 #+End_SRC
 ** Tramp
 #+BEGIN_SRC emacs-lisp
@@ -1934,7 +1930,6 @@ Avoir des tabs (et surtout des groupes)
 *dépendances*: [[http://www.emacswiki.org/emacs/highlight-current-line.el][highlight-current-line.el]]
 #+BEGIN_SRC emacs-lisp
   (require 'highlight-current-line)
-  (set-face-background 'highlight-current-line-face "#1f4f4f")
   ;; pas de highlight-current-line sur quelques modes
   (add-hook 'after-change-major-mode-hook
             '(lambda ()
