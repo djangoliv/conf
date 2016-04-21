@@ -1063,6 +1063,7 @@ Avoir des tabs (et surtout des groupes)
 *** zap-to-char
 *dépendances*: [[https://github.com/cute-jumper/avy-zap][avy-zap.el]] [[https://github.com/thierryvolpiatto/zop-to-char][zop-o-char.el]]
 #+BEGIN_SRC emacs-lisp
+  (setq avy-zap-dwim-prefer-avy nil)
   (autoload 'avy-zap-up-to-char-dwim "avy-zap")
   (autoload 'zop-to-char "zop-to-char" nil t)
   (global-set-key (kbd "M-z") 'avy-zap-up-to-char-dwim)
