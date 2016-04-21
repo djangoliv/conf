@@ -834,7 +834,7 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'ps2pdf-from-region "ps2pdf" "" t)
  #+END_SRC
 ** crontab
-*dépendances*: [[http://web.archive.org/web/20080716014153/http://www.mahalito.net/~harley/elisp/crontab-mode.el][crontab-mode.el]]
+*dépendances*: [[https://github.com/emacsorphanage/crontab-mode][crontab-mode.el]]
 #+BEGIN_SRC emacs-lisp
    (autoload 'crontab-mode "crontab-mode" "" t)
  #+END_SRC
@@ -1656,7 +1656,7 @@ Avoir des tabs (et surtout des groupes)
     (setq completion-ignore-case nil)
   #+END_SRC
 ** Docker
-*dépendances*: [[https://github.com/spotify/dockerfile-mode][dockerfile-mode.el]] [[https://github.com/Silex/docker.el][docker.el]] [[https://github.com/Silex/tabulated-list-extensions][tle]]
+*dépendances*: [[https://github.com/spotify/dockerfile-mode][dockerfile-mode.el]] [[https://github.com/Silex/docker.el][docker.el]] [[https://github.com/Silex/tabulated-list-extensions][tle]] [[https://github.com/politza/tablist][tabList]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'dockerfile-mode "dockerfile-mode" nil t)
   (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
@@ -1773,10 +1773,11 @@ Avoir des tabs (et surtout des groupes)
 (autoload 'tiny-expand "tiny" nil t)
 #+END_SRC
 ** Vrac
-*** palette
-*dépendances*: [[http://www.emacswiki.org/emacs/palette.el][palette.el]]
+*** palette and eyedropper
+*dépendances*: [[http://www.emacswiki.org/emacs/palette.el][palette.el]] [[https://www.emacswiki.org/emacs/eyedropper.el][eyedropper]]
 #+BEGIN_SRC emacs-lisp
 (autoload 'palette "palette" nil t)
+(require 'eyedropper)
 #+END_SRC
 *** Byte-compile
 #+BEGIN_SRC emacs-lisp
@@ -2284,9 +2285,10 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'color-identifiers-mode "color-identifiers-mode" "" t)
 #+END_SRC
 *** couleurs
-*dépendances*: [[https://github.com/djangoliv/conf/blob/master/lisp/my-css-color.el][my-css-color]]
+*dépendances*: [[https://github.com/djangoliv/conf/blob/master/lisp/my-css-color.el][my-css-color]] [[https://github.com/emacsfodder/kurecolor][kurecolor]]
 #+BEGIN_SRC emacs-lisp
   (load-file "~/.emacs.d/lisp/my-css-color.elc")
+  (load-file "~/.emacs.d/lisp/kurecolor.el")
   (defun color-mode ()
     (interactive)
     (if css-color-mode
@@ -2344,7 +2346,7 @@ Avoir des tabs (et surtout des groupes)
   #+END_SRC
 ** Gestion de versions
 *** SVN
-*dépendances* [[http://www.xsteve.at/prg/emacs/psvn.el][psvn.el]]
+*dépendances* [[https://github.com/emacsmirror/psvn][psvn.el]]
 #+BEGIN_SRC emacs-lisp
   (require 'psvn)
   (setq svn-status-ediff-delete-temporary-files t)
@@ -3303,6 +3305,12 @@ word3
     (let ((b (if mark-active (min (point) (mark)) (point-min)))
           (e (if mark-active (max (point) (mark)) (point-max))))
       (shell-command-on-region b e "python -mjson.tool" (current-buffer) t)))
+#+END_SRC
+**** less-css
+*dépendances* [[https://github.com/purcell/less-css-mode][less-css-mode]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'less-css-mode "less-css-mode" "Start less-css-mode" t)
+  (add-to-list 'auto-mode-alist '("\\.less$" . less-css-mode))
 #+END_SRC
 **** Vrac: accents HTML/Apache/Rest
 *dépendances* [[http://www.emacswiki.org/emacs/html-accent.el][html-accent.el]] [[http://www.emacswiki.org/emacs/apache-mode.el][apache-mode.el]] [[https://github.com/pashky/restclient.el][restclient.el]]
