@@ -2580,6 +2580,16 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'po-mode "po-mode" "Major mode for translators to edit PO files" t)
   (setq auto-mode-alist (cons '("\\.po\\'\\|\\.po\\." . po-mode) auto-mode-alist))
 #+END_SRC
+** Jira
+*dépendances* [[https://github.com/baohaojun/org-jira][org-jira]]
+#+BEGIN_SRC emacs-lisp
+  ;; jira
+  (require 'org-jira)
+  (setq jiralib-url "http://machine02:8000")
+  (setq org-jira-working-dir "~/.emacs-org/jira")
+  (setq org-jira-use-status-as-todo t)
+#+END_SRC
+
 ** Langages
 *** elisp
 *dépendances* [[https://github.com/auto-complete/popup-el][popup.el]]
@@ -3354,14 +3364,14 @@ word3
 #+BEGIN_SRC emacs-lisp
   (autoload 'nginx-mode "nginx-mode" nil t)
 #+END_SRC
-*** Jira
-*dépendances* [[https://github.com/baohaojun/org-jira][org-jira]]
+*** Statistiques ESS
+*dépendances* [[https://github.com/emacs-ess/ESS][ESS]]
 #+BEGIN_SRC emacs-lisp
-  ;; jira
-  (require 'org-jira)
-  (setq jiralib-url "http://machine02:8000")
-  (setq org-jira-working-dir "~/.emacs-org/jira")
-  (setq org-jira-use-status-as-todo t)
+  (add-to-list 'load-path "~/.emacs.d/ESS/lisp/")
+  (defun ess ()
+    (interactive)
+    (load "ess-site")
+    (revert-buffer))
 #+END_SRC
 * Perso
 ** eswap
