@@ -2286,15 +2286,14 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'color-identifiers-mode "color-identifiers-mode" "" t)
 #+END_SRC
 *** couleurs
-*dépendances*: [[https://github.com/djangoliv/conf/blob/master/lisp/my-css-color.el][my-css-color]] [[https://github.com/emacsfodder/kurecolor][kurecolor]]
+*dépendances*: [[https://github.com/emacsmirror/rainbow-mode][rainbow-mode]] [[https://github.com/emacsfodder/kurecolor][kurecolor]] [[https://github.com/magnars/s.el][s.el]]
 #+BEGIN_SRC emacs-lisp
-  (load-file "~/.emacs.d/lisp/my-css-color.elc")
-  (load-file "~/.emacs.d/lisp/kurecolor.el")
-  (defun color-mode ()
-    (interactive)
-    (if css-color-mode
-        (css-color-mode -1)
-      (css-color-mode)))
+  (autoload 'rainbow-mode "rainbow-mode" nil t)
+  (add-hook 'rainbow-mode-hook
+            (lambda ()
+              (highlight-current-line nil)
+              (load-file "~/.emacs.d/lisp/kurecolor.el")))
+  (defalias 'color-mode 'rainbow-mode)
 #+END_SRC
 ** flycheck
 *dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]]
