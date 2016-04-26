@@ -233,9 +233,7 @@ Collection of Emacs Development Environment Tools
 ** Initialize CEDET
 *dépendances*: [[http://cedet.sourceforge.net/][cedet]] ([[http://sourceforge.net/p/cedet/git/ci/master/tree/][sources]]) et [[https://github.com/tuhdo/semantic-stickyfunc-enhance][stickyfunc-enhance]]
 #+BEGIN_SRC emacs-lisp
-  (ignore-errors ;; permet le reload du fichier
-    (load-file "~/.emacs.d/cedet-git-master/cedet-devel-load.elc")
-    (load-file "~/.emacs.d/cedet-git-master/cedet-contrib-load.elc"))
+  (load-file "~/.emacs.d/cedet-master/cedet-devel-load.elc")
   (global-ede-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode 1)
@@ -244,6 +242,7 @@ Collection of Emacs Development Environment Tools
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
   (add-to-list 'semantic-default-submodes 'global-srecode-minor-mode t)
+  (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
   (semantic-mode) ;; Active le mode semantic
   (require 'stickyfunc-enhance) ;; multilines concatene dans la header line
 #+END_SRC
@@ -592,7 +591,7 @@ Avoir des tabs (et surtout des groupes)
 *** dired narrow
 *dépendances*: [[https://github.com/Fuco1/dired-hacks][dired-hacks]]
 #+BEGIN_SRC emacs-lisp
-  (require 'dired-narrow) https://github.com/Fuco1/dired-hacks
+  (require 'dired-narrow)
   (define-key dired-mode-map (kbd "/") 'dired-narrow)
 #+END_SRC
 *** peep dired (preview)
@@ -669,6 +668,7 @@ Avoir des tabs (et surtout des groupes)
      (dot . t)
      (plantuml . t)
      (calc . t)
+     (gnuplot . t)
      (python . t)))
   ;; dita
   (setq org-ditaa-jar-path "~/Outils/ditaa/ditaa0_9.jar")
@@ -819,7 +819,7 @@ Avoir des tabs (et surtout des groupes)
 #+Begin_SRC emacs-lisp
   (setq gnuplot-program "/usr/local/bin/gnuplot")
   (setq auto-mode-alist (append '(("\\.\\(gp\\|gnuplot\\)$" . gnuplot-mode)) auto-mode-alist))
-  (autoload 'gnuplot-mode "gnuplot-mode" "" t)
+  (autoload 'gnuplot-mode "gnuplot" "" t)
  #+END_SRC
 ** graphviz
 *dépendances*: [[https://github.com/ppareit/graphviz-dot-mode][graphviz-dot-mode.el]]
@@ -1061,7 +1061,7 @@ Avoir des tabs (et surtout des groupes)
       (define-key isearch-mode-map (kbd "<backspace>") 'isearch-delete-something)
    #+END_SRC
 *** zap-to-char
-*dépendances*: [[https://github.com/cute-jumper/avy-zap][avy-zap.el]] [[https://github.com/thierryvolpiatto/zop-to-char][zop-o-char.el]]
+*dépendances*: [[https://github.com/cute-jumper/avy-zap][avy-zap.el]] [[https://github.com/thierryvolpiatto/zop-to-char][zop-to-char.el]]
 #+BEGIN_SRC emacs-lisp
   (setq avy-zap-dwim-prefer-avy nil)
   (autoload 'avy-zap-up-to-char-dwim "avy-zap")
@@ -1124,7 +1124,7 @@ Avoir des tabs (et surtout des groupes)
   ;; ediff horizontal
   (setq ediff-split-window-function 'split-window-horizontally)
   ;; evite la frame supplementaire
-  (setq ediff-window-setup-function 'ediff-setup-windows-pproj3n)
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
   ;; raccourci
   (global-set-key (kbd "s-=") 'ediff-buffers)
 #+END_SRC
@@ -1473,6 +1473,7 @@ Avoir des tabs (et surtout des groupes)
         (interactive)
         (message (buffer-file-name))
         (kill-new (file-truename buffer-file-name)))
+  (global-set-key (kbd "C-x v f") 'show-file-name)
 #+END_SRC
 ** Correcteurs
 *** Ispell
@@ -1546,7 +1547,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-c l d") 'langtool-check-done)
  #+END_SRC
 *** verbiste (conjugaison)
-*dépendances* [[https://github.com/emacsmirror/verbiste][verbiste.el]]
+*dépendances* [[https://github.com/daimrod/Emacs-config/blob/master/elisp/verbiste.el][verbiste.el]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'verbiste-conjugate "verbiste" nil t)
   (global-set-key (kbd "s-v") 'verbiste-conjugate)
@@ -1687,6 +1688,9 @@ Avoir des tabs (et surtout des groupes)
   (wrap-region-add-wrapper "str(" ")" "s" 'python-mode)
   (wrap-region-add-wrapper "int(" ")" "i" 'python-mode)
   (wrap-region-add-wrapper "round(" ")" "r" 'python-mode)
+  ;; unwrap
+  (defalias 'unwrap-region 'delete-pair)
+  (global-set-key (kbd "M-)") 'unwrap-region)
 #+End_SRC
 ** stripe-buffer
 *dépendances*: [[https://github.com/sabof/stripe-buffer][stripe-buffer.el]]
@@ -1901,32 +1905,32 @@ Avoir des tabs (et surtout des groupes)
     (uniquify-all-lines-region (point-min) (point-max)))
 #+END_SRC
 *** increment/decrement numbers
-*dépendances*: [[https://github.com/cofi/evil-numbers][evil-numbers.el]]
+*dépendances*: [[https://github.com/alezost/shift-number.el][shift-number]]
 #+BEGIN_SRC emacs-lisp
-  ;; increment region
-  (defun increment-progressively-numbers-in-region (start end arg)
-    (interactive "r\np")
-    (increment-numbers-in-region start end arg arg))
-  (defun increment-numbers-in-region (start end arg &optional progressive-increment)
-    (interactive "r\np")
-    (goto-char start)
-    (let ((increment (or arg 1))
-          (progressive-increment (or progressive-increment 0))
-          (previous-line-number (line-number-at-pos)))
-      (while
-          (re-search-forward "[0-9]+" end t)
-        (when (> (line-number-at-pos) previous-line-number)
-          (setq increment (+ increment progressive-increment))
-          (setq previous-line-number (line-number-at-pos)))
-        (let ((incremented-string (int-to-string (+ increment (string-to-int (match-string 0))))))
-          ;; If incremented string and original match differ in length, update end point
-          (setq end (+ end (- (length incremented-string) (length (match-string 0)))))
-          (replace-match incremented-string)))))
+    ;; increment region
+    (defun increment-progressively-numbers-in-region (start end arg)
+      (interactive "r\np")
+      (increment-numbers-in-region start end arg arg))
+    (defun increment-numbers-in-region (start end arg &optional progressive-increment)
+      (interactive "r\np")
+      (goto-char start)
+      (let ((increment (or arg 1))
+            (progressive-increment (or progressive-increment 0))
+            (previous-line-number (line-number-at-pos)))
+        (while
+            (re-search-forward "[0-9]+" end t)
+          (when (> (line-number-at-pos) previous-line-number)
+            (setq increment (+ increment progressive-increment))
+            (setq previous-line-number (line-number-at-pos)))
+          (let ((incremented-string (int-to-string (+ increment (string-to-int (match-string 0))))))
+            ;; If incremented string and original match differ in length, update end point
+            (setq end (+ end (- (length incremented-string) (length (match-string 0)))))
+            (replace-match incremented-string)))))
   ;; incrementer/decrementer un chiffre
-  (autoload 'evil-numbers/inc-at-pt "evil-numbers" nil t)
-  (autoload 'evil-numbers/dec-at-pt "evil-numbers" nil t)
-  (global-set-key (kbd "M-<kp-add>") 'evil-numbers/inc-at-pt)
-  (global-set-key (kbd "M-<kp-subtract>") 'evil-numbers/dec-at-pt)
+  (autoload 'shift-number-up "shift-number" nil t)
+  (autoload 'shift-number-down "shift-number" nil t)
+  (global-set-key (kbd "M-<kp-add>") 'shift-number-up)
+  (global-set-key (kbd "M-<kp-subtract>") 'shift-number-down)
 #+END_SRC
 *** highlight-current-line
 *dépendances*: [[http://www.emacswiki.org/emacs/highlight-current-line.el][highlight-current-line.el]]
@@ -2091,13 +2095,13 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "M-C") 'toggle-letter-case)
 #+END_SRC
 *** swap-regions
-*dépendance* [[https://github.com/xuchunyang/swap-regions.el][swap-region]]s
+*dépendance* [[https://github.com/xuchunyang/swap-regions.el][swap-region]]
 #+BEGIN_SRC emacs-lisp
   (require 'swap-regions)
   (swap-regions-mode)
 #+END_SRC
 *** emoji (smiley)
-*dépendances*  [[https://github.com/syl20bnr/emacs-emoji-cheat-sheet-plus][emacs-emoji-cheat-sheet-plus]] 
+*dépendances*  [[https://github.com/syl20bnr/emacs-emoji-cheat-sheet-plus][emacs-emoji-cheat-sheet-plus]]
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/emacs-emoji-cheat-sheet-plus")
   (require 'emoji-cheat-sheet-plus)
@@ -2370,7 +2374,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-x v u") 'revert-svn)
  #+END_SRC
 *** Git
-*dépendances*: [[https://github.com/magit/magit][magit]] [[https://github.com/tsgates/git-emacs][git-emacs-master]] [[https://github.com/syohex/emacs-git-messenger][git-messenger.el]] [[https://github.com/pidu/git-timemachine][git-timemachine]] [[https://github.com/magit/magit-svn][magit-svn]] [[https://github.com/magit/git-modes][gitconfig-mode]] [[https://github.com/jtatarik/magit-gitflow][magit-gitflow]]
+*dépendances*: [[https://github.com/magit/magit][magit]] [[https://github.com/tsgates/git-emacs][git-emacs-master]] [[https://github.com/syohex/emacs-git-messenger][git-messenger.el]] [[https://github.com/pidu/git-timemachine][git-timemachine]] [[https://github.com/magit/magit-svn][magit-svn]] [[https://github.com/magit/git-modes][gitconfig-mode]] [[https://github.com/jtatarik/magit-gitflow][magit-gitflow]] [[https://github.com/magit/with-editor][with-editor]]
 #+BEGIN_SRC emacs-lisp
 	(add-to-list 'load-path "~/.emacs.d/magit-master/lisp")
 	(autoload 'magit-status "magit" nil t)
@@ -2436,6 +2440,7 @@ Avoir des tabs (et surtout des groupes)
   (setq magit-revert-buffers 1)
   (setq magit-refresh-verbose t)
   ;; fichier de conf
+	(add-to-list 'load-path "~/.emacs.d/git-modes")
   (require 'gitconfig-mode)
   (require 'gitignore-mode)
   (require 'gitattributes-mode)
@@ -2540,6 +2545,12 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'yaml-mode "yaml-mode" nil t)
   (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
 #+END_SRC
+** ldap
+*dépendances* [[https://github.com/emacsmirror/ldap-mode][ldap-mode]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'ldap-mode "ldap-mode" nil t)
+  (add-to-list 'auto-mode-alist '("\\.ldif$" . ldap-mode))
+#+END_SRC
 ** CSV
 *dépendances*: [[https://github.com/emacsmirror/csv-mode][csv-mode.el]]
 #+BEGIN_SRC emacs-lisp
@@ -2582,13 +2593,12 @@ Avoir des tabs (et surtout des groupes)
 ** Jira
 *dépendances* [[https://github.com/baohaojun/org-jira][org-jira]]
 #+BEGIN_SRC emacs-lisp
-  ;; jira
+  (add-to-list 'load-path "~/.emacs.d/org-jira")
   (require 'org-jira)
   (setq jiralib-url "http://machine02:8000")
   (setq org-jira-working-dir "~/.emacs-org/jira")
   (setq org-jira-use-status-as-todo t)
 #+END_SRC
-
 ** Langages
 *** elisp
 *dépendances* [[https://github.com/auto-complete/popup-el][popup.el]]
@@ -2641,33 +2651,30 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** Python
 **** Initialisation
-*dépendances* [[https://github.com/emacsmirror/fuzzy-format][fuzzy-format.el]] [[https://github.com/antonj/Highlight-Indentation-for-Emacs][Highlight-Indentation]] [[https://github.com/flycheck/flycheck][flycheck.el]] (init plus haut)
+*dépendances* [[https://github.com/emacsmirror/fuzzy-format][fuzzy-format.el]] [[https://github.com/flycheck/flycheck][flycheck.el]] (init plus haut)
 #+BEGIN_SRC emacs-lisp
   ;; Use archive mode to open Python eggs
   (add-to-list 'auto-mode-alist '("\\.egg\\'" . archive-mode))
   ;; Use python-mode to open .pylintrc
   (add-to-list 'auto-mode-alist '("\\pylintrc\\'" . python-mode))
   (add-hook 'python-mode-hook
-			(lambda ()
-			  ;; auto-complete
-			  (delq 'ac-source-dictionary ac-sources)
-			  (delq 'ac-source-abbrev ac-sources)
-			  (delq 'ac-source-words-in-same-mode-buffers ac-sources)
-			  ;; yas
-			  (global-set-key (kbd "<S-iso-lefttab>") 'yas-insert-snippet)
-			  ;; Python indentation
-			  (setq tab-width 4)
-			  (setq python-indent 4)
-			  ;; parentheses en couleurs
-			  (rainbow-delimiters-mode)
-			  ;; highlight-indentation
-			  (require 'highlight-indentation)
-			  (highlight-indentation-mode)
-			  ;; indentation auto
+            (lambda ()
+              ;; auto-complete
+              (delq 'ac-source-dictionary ac-sources)
+              (delq 'ac-source-abbrev ac-sources)
+              (delq 'ac-source-words-in-same-mode-buffers ac-sources)
+              ;; yas
+              (global-set-key (kbd "<S-iso-lefttab>") 'yas-insert-snippet)
+              ;; Python indentation
+              (setq tab-width 4)
+              (setq python-indent 4)
+              ;; parentheses en couleurs
+              (rainbow-delimiters-mode)
+              ;; indentation auto
               (setq python-indent-offset 4)
-			  (require 'fuzzy-format)
-			  (setq fuzzy-format-default-indent-tabs-mode 1)
-			  (global-fuzzy-format-mode)))
+              (require 'fuzzy-format)
+              (setq fuzzy-format-default-indent-tabs-mode 1)
+              (global-fuzzy-format-mode)))
   (defalias 'pylint 'flycheck-mode)  ;; raccourci pylint
 #+END_SRC
 **** jedi
@@ -2739,7 +2746,7 @@ C-. => goto definition
   ;; jeddi:show-doc C-c d
 #+END_SRC
 **** pycscope (xcscope) surtout pour call-hierarchy
-*dépendances*: [[https://github.com/portante/pycscope/tree/master/contrib/xpycscope]['xpycscope.el]]
+*dépendances*: [[https://github.com/portante/pycscope/tree/master/contrib/xpycscope][xpycscope.el]]
 #+BEGIN_SRC emacs-lisp
   (require 'xpycscope)
 #+END_SRC
@@ -2752,7 +2759,7 @@ C-. => goto definition
 	(highlight-lines-matching-regexp "import ipdb")
 	(highlight-lines-matching-regexp "import pdb")
 	(highlight-lines-matching-regexp "set_trace()")
-	(highlight-regexp "TODO")
+	(highlight-regexp "TODO"))
   (add-hook 'python-mode-hook 'annotate-pdb)
 #+END_SRC
 **** python shell
@@ -2785,10 +2792,8 @@ C-. => goto definition
   #
   # =============================================================
   # HISTORIQUE :
-  #
   # VERSION::FA:<num_ft>:<date>:[<commentaire libre>]
   # VERSION::DM:<num_ft>:<date>:[<commentaire libre>]
-  #
   # =============================================================")
 	(end-of-line))
   ;; Insertion du shebang python
@@ -2950,7 +2955,7 @@ word3
   (global-set-key (kbd "C-x p r") 'pony-runserver)
 #+END_SRC
 **** pyvenv
-*dépendances* [[https://github.com/proofit404/pyenv-mode][pyenv]]
+*dépendances* [[https://github.com/cyberved/pyenv.el][pyenv]]
 #+BEGIN_SRC emacs-lisp
   (require 'pyvenv)
 #+END_SRC
@@ -3021,7 +3026,7 @@ word3
               (global-set-key (kbd "<down>") 'comint-next-input)))
 #+END_SRC
 **** CEDET for C++
-*dépendances*: [[http://cedet.sourceforge.net/][cedet]] (voir init au dessus)
+*dépendances*: [[https://www.emacswiki.org/emacs/eassist.el][eassist]] [[http://cedet.sourceforge.net/][cedet]] (voir init au dessus)
  #+BEGIN_SRC emacs-lisp
    (defun my-cedet-hook ()
      ;; indentation
@@ -3159,11 +3164,10 @@ word3
   ;;(setq jdee-run-option-debug (quote ("Server" "Socket" "javadebug" nil "4444" t)))))
 #+END_SRC
 **** Class decompiler
-*dépendances*: [[http://sourceforge.net/projects/jdc-el/files/jdc-el/][jdc.el]]
+*dépendances*: [[https://github.com/m0smith/dotfiles/blob/master/.emacs.d/site-lisp/jdc.el][jdc.el]]
 #+BEGIN_SRC emacs-lisp
   (add-hook 'archive-extract-hooks
             (lambda ()
-              (add-to-list 'load-path "~/.emacs.d/jdc/")
               (require 'jdc)
               (cond ((string-match "\312\376\272\276" (buffer-substring-no-properties 1 5))
                      (jdc-buffer)))))

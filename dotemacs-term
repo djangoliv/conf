@@ -16,11 +16,11 @@
 (setq ring-bell-function 'ignore)
 
 ;; historique minibuffer entre les sessions
-(setq savehist-additional-variables    
-	  '(search-ring regexp-search-ring compile-history) 
+(setq savehist-additional-variables
+	  '(search-ring regexp-search-ring compile-history)
 	  savehist-file "~/.emacs.d/savehist-term")
 (setq-default history-length 1000)
-(savehist-mode t)  
+(savehist-mode t)
 
 ;; enlever la barre d'outil
 (tool-bar-mode -1)
@@ -29,6 +29,10 @@
 
 ;; pwd
 (setq default-directory (concat (getenv "HOME") "/"))
+
+;; encoding
+(set-terminal-coding-system 'utf-8-unix)
+(setq default-process-coding-system '((utf-8-unix . utf-8-unix)))
 
 ;; Change les couleurs
 (cond (window-system
@@ -50,7 +54,7 @@
 ;; Recherche automatique des fermetures et ouvertures des parenthššses
 (show-paren-mode 1)
 
-;; baisser la frequence du garbage collector 
+;; baisser la frequence du garbage collector
 (setq gc-cons-threshold 20000000)
 ;; Allow font-lock-mode to do background parsing
 (setq jit-lock-stealth-time 1
@@ -71,11 +75,11 @@
 
 ;;persistance
 ;; save history between sessions
-(setq savehist-additional-variables    
-	  '(search-ring regexp-search-ring compile-history) 
+(setq savehist-additional-variables
+	  '(search-ring regexp-search-ring compile-history)
 	  savehist-file "~/.emacs.d/savehist-term")
 (setq-default history-length 1000)
-(savehist-mode t)  
+(savehist-mode t)
 
 (defun byte-compile-current-file ()
   "Interactive command for byte compiling current file."
@@ -163,14 +167,14 @@
 
 ; envoyer le buffer dans emacs client
 (defun auto-send-2-server(fileName)
-  (shell-command 
+  (shell-command
    (concat "emacsclient -n " fileName))
 )
 (defun send-2-server()
   (interactive)
   (message buffer-file-name)
   (setq lineNb (count-lines 1 (point)))
-  (shell-command 
+  (shell-command
     (concat "emacsclient -n +" (int-to-string (+ lineNb 1)) " " buffer-file-name))
 )
 (global-set-key [f5] 'send-2-server)
@@ -212,7 +216,7 @@
 ;; tabbar group
 (defun tabbar-buffer-groups ()
     (list
-     (cond 
+     (cond
       ((eq major-mode 'dired-mode)
        "Dired"
        )
@@ -250,7 +254,7 @@
 
 (defun term-toggle-mode ()
   (interactive)
-  (if (term-in-line-mode) 
+  (if (term-in-line-mode)
       (term-char-mode)
     (term-line-mode)))
 (global-set-key (kbd "C-x t") 'term-toggle-mode)
@@ -402,7 +406,7 @@
   (term-send-raw-string "\e[1;5D"))
 (defun term-kill-word ()
   (interactive)
-  (term-send-raw-string "\e[9;3~")) 
+  (term-send-raw-string "\e[9;3~"))
 ;; Retour chario dans le terminal
 (defun toggle-hard-newline ()
   (interactive)
@@ -424,7 +428,7 @@
   (interactive "sterminal name: ")
   (rename-buffer name t))
 
-;; unbind keys 
+;; unbind keys
 (setq term-unbind-key-list '("<ESC>" "C-h" "C-s" "C-r"))
 
 ;;term moves in char-mode
@@ -446,17 +450,17 @@
         ("M-n" . next-line)
 	("C-." . getLastOutput)
 	("C-/" . term-dabbrev-expand)
-	("M-<right>" . term-send-forward-word)    
-	("M-<left>" . term-send-backward-word)  
+	("M-<right>" . term-send-forward-word)
+	("M-<left>" . term-send-backward-word)
 	("C-<right>" . term-send-forward-big-word)
 	("C-<left>" . term-send-backward-big-word)
 	("C-<backspace>" . term-send-backward-kill-word)
 	("M-<backspace>" . term-kill-word)
 	("s-l" . toggle-hard-newline)
 	("S-<up>" . previous-line)
-	("S-<down>" . next-line)		
+	("S-<down>" . next-line)
 	("S-<right>" . right-char)
-	("S-<left>" . left-char)		
+	("S-<left>" . left-char)
 	("S-<end>" . move-end-of-line)
 	("S-<home>" . move-beginning-of-line)
 	("M-:" . term-send-raw-meta)
