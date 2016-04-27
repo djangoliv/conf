@@ -2331,6 +2331,15 @@ Avoir des tabs (et surtout des groupes)
               (load-file "~/.emacs.d/lisp/kurecolor.el")))
   (defalias 'color-mode 'rainbow-mode)
 #+END_SRC
+*** which-function-popup
+#+BEGIN_SRC emacs-lisp
+  (defun which-function-popup ()
+    (interactive)
+    (let ((msg (which-function)))
+      (popup-tip msg)
+      (copy-yank-str msg)))
+  (global-set-key (kbd "C-x ?") 'which-function-popup)
+#+END_SRC
 ** flycheck
 *dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]]
 #+BEGIN_SRC emacs-lisp
