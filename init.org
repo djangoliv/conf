@@ -2333,6 +2333,16 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** which-function-popup
 #+BEGIN_SRC emacs-lisp
+  (autoload 'which-function "which-func")
+  (autoload 'popup-tip "popup")
+  (defun copy-yank-str (msg)
+    (kill-new msg)
+    (with-temp-buffer
+      (insert msg)
+      (shell-command-on-region (point-min) (point-max)
+                               (cond ((eq system-type 'cygwin) "putclip")
+                                     ((eq system-type 'darwin) "pbcopy")
+                                     (t "xsel -ib")))))
   (defun which-function-popup ()
     (interactive)
     (let ((msg (which-function)))
@@ -3317,6 +3327,39 @@ word3
   (defun angularJs ()
     (interactive)
     (web-mode-set-engine "angular"))
+  ;; flyspell
+  (defun web-mode-flyspell-verify ()
+      (let ((f (get-text-property (- (point) 1) 'face))
+            thing
+            rlt)
+        (cond
+         ((not (memq f '(web-mode-html-attr-value-face
+                         web-mode-html-tag-face
+                         web-mode-html-attr-name-face
+                         web-mode-constant-face
+                         web-mode-doctype-face
+                         web-mode-keyword-face
+                         web-mode-comment-face ;; focus on get html label right
+                         web-mode-function-name-face
+                         web-mode-variable-name-face
+                         web-mode-css-property-name-face
+                         web-mode-css-selector-face
+                         web-mode-css-color-face
+                         web-mode-type-face
+                         web-mode-block-control-face)
+                     ))
+          (setq rlt t))
+         ((memq f '(web-mode-html-attr-value-face))
+          (save-excursion
+            (search-backward-regexp "=['\"]" (line-beginning-position) t)
+            (backward-char)
+            (setq thing (thing-at-point 'symbol))
+            (setq rlt (string-match "^\\(value\\|class\\|ng[A-Za-z0-9-]*\\)$" thing))
+            rlt))
+         (t t))
+        rlt))
+    (put 'web-mode 'flyspell-mode-predicate 'web-mode-flyspell-verify)
+    (add-hook 'web-mode-hook (lambda () (flyspell-mode 1)))
   #+END_SRC
 **** Emmet
 *dépendances*: [[https://github.com/smihica/emmet-mode][emmet.el]]
