@@ -2490,6 +2490,9 @@ Avoir des tabs (et surtout des groupes)
 *dépendances*: [[https://github.com/dgutov/diff-hl][diff-hl.el]]
 #+BEGIN_SRC emacs-lisp
   (require 'diff-hl)
+  (require 'diff-hl-flydiff)
+  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+  (diff-hl-flydiff-mode)
   (global-diff-hl-mode)
   (global-set-key (kbd "C-x <up>") 'diff-hl-previous-hunk)
   (global-set-key (kbd "C-x <down>") 'diff-hl-next-hunk)
