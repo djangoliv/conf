@@ -122,10 +122,11 @@
 		("IN-PROGRESS" :foreground "orange" :weight bold)
 		("WAIT" :foreground "cornsilk" :weight bold)
 		("VALID" :foreground "coral" :weight bold)
-		("CANCELED" :foreground "blue" :weight bold))))
+		("CANCELED" :foreground "blue" :weight bold)
+        ("NEEDSREVIEW" :foreground "firebrick" :weight bold))))
 (setq org-todo-keywords
 	  (quote
-	   ((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "VALID(v)" "|" "DONE(d!)" "CANCELED(c@)"))))
+	   ((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "VALID(v)" "|" "DONE(d!)" "CANCELED(c@)" "NEEDSREVIEW(n@/!)"))))
 
 ;;vc-annotate
 (custom-set-variables

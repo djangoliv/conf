@@ -663,6 +663,7 @@ Avoir des tabs (et surtout des groupes)
   (setq org-src-fontify-natively t)   ;; fontify code in code blocks
   (setq org-src-tab-acts-natively t)   ;; indentation des block sources
   (setq org-catch-invisible-edits 'show)
+  (setq org-return-follows-link t)
   (modify-coding-system-alist 'file "\\.org\\'" 'utf-8)
   (setq org-cycle-separator-lines 0)
   (add-hook 'ediff-prepare-buffer-hook #'show-all) ;; edif in org-mode
@@ -716,6 +717,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** export
 #+BEGIN_SRC emacs-lisp
+  (setq org-export-coding-system 'utf-8)
   ;; export HTML avec css ("~/.emacs.d/org-style.css")
   (defun my-org-inline-css-hook (exporter)
     "Insert custom inline css"
