@@ -2182,6 +2182,12 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "s-c n") 'highlight-note)
   (global-set-key (kbd "s-c l") 'highlight-load)
   (global-set-key (kbd "s-c s") 'highlight-save)
+  ;; ಠ_ಠ
+  (defun insert-lod ()
+    "Insert look of disapproval"
+    (interactive)
+    (insert "ಠ_ಠ"))
+  (global-set-key (kbd "s-c d") 'insert-lod)
 #+END_SRC
 *** Conf-mode
  #+BEGIN_SRC emacs-lisp
@@ -3032,6 +3038,12 @@ word3
 *dépendances* [[https://github.com/emacsmirror/pip-requirements][pip-requirements]]
 #+BEGIN_SRC emacs-lisp
   (require 'pip-requirements)
+#+END_SRC
+**** pyqt browse documentation
+#+BEGIN_SRC emacs-lisp
+  (defun pyqt-browser ()
+    (interactive)
+    (eww "http://pyqt.sourceforge.net/Docs/PyQt4/classes.html"))
 #+END_SRC
 *** C++
 **** Initialisation
