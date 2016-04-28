@@ -2196,6 +2196,17 @@ Avoir des tabs (et surtout des groupes)
    (add-to-list 'auto-mode-alist '("\\.properties\\'" . conf-mode))
    (add-to-list 'auto-mode-alist '("sudoers" . conf-mode))
  #+END_SRC
+*** ssh-config-mode
+*dépendances* [[https://github.com/jhgorrell/ssh-config-mode-el][ssh-config-mode]] 
+#+BEGIN_SRC emacs-lisp
+  (autoload 'ssh-config-mode "ssh-config-mode" t)
+  (autoload 'ssh-known-hosts-mode "ssh-config-mode" t)
+  (autoload 'ssh-authorized-keys-mode "ssh-config-mode" t)
+  (add-to-list 'auto-mode-alist '("/\\.ssh/config\\'"     . ssh-config-mode))
+  (add-to-list 'auto-mode-alist '("/sshd?_config\\'"      . ssh-config-mode))
+  (add-to-list 'auto-mode-alist '("/known_hosts\\'"       . ssh-known-hosts-mode))
+  (add-to-list 'auto-mode-alist '("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
+#+END_SRC
 *** vimrc-mode
 *dépendances* [[https://github.com/mcandre/vimrc-mode][vimrc-mode]]
 #+BEGIN_SRC emacs-lisp
