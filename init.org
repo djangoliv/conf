@@ -3453,7 +3453,6 @@ word3
   (autoload 'json-mode "json-mode" "" t)
   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
   (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
-  (eval-after-load "js2-mode" ;; doubleclick selection
   (setq js2-highlight-level 3)
   (add-hook 'js2-mode-hook
             (lambda ()
