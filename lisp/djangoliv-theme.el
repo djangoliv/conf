@@ -110,7 +110,6 @@
 						 :inherit 'my-outermost-paren-face)))
 ;; split window
 (set-face-attribute 'vertical-border nil :foreground "CadetBlue")
-
 ;; block source faces
 (defface org-block-begin-line
   '((t (:foreground "firebrick")))"")
@@ -127,12 +126,12 @@
 (setq org-todo-keywords
 	  (quote
 	   ((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "VALID(v)" "|" "DONE(d!)" "CANCELED(c@)" "NEEDSREVIEW(n@/!)"))))
-
 ;; calendar
 (set-face-attribute 'holiday nil :foreground "black" :background "lightslategray")
 (set-face-attribute 'calendar-today nil :foreground "aquamarine")
 (set-face-attribute 'calendar-weekend-header nil :foreground "lightslateblue")
-
+;; completion
+(set-face-attribute 'completions-first-difference nil :foreground "white")
 ;;vc-annotate
 (custom-set-variables
  '(vc-annotate-color-map
