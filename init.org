@@ -801,16 +801,21 @@ Avoir des tabs (et surtout des groupes)
   #+END_SRC
 *** auto-unfold
 #+BEGIN_SRC emacs-lisp
- (defadvice goto-line (after unfold-tree activate)
-   (when (outline-invisible-p)
-                (save-excursion
-                  (outline-previous-visible-heading 1)
-                  (org-show-subtree))))
+  (defadvice goto-line (after unfold-tree activate)
+    (when (outline-invisible-p)
+      (save-excursion
+        (outline-previous-visible-heading 1)
+        (org-show-subtree))))
   (defadvice diff-hl-next-hunk (after unfold-tree activate)
-   (when (outline-invisible-p)
-                (save-excursion
-                  (outline-previous-visible-heading 1)
-                  (org-show-subtree))))
+    (when (outline-invisible-p)
+      (save-excursion
+        (outline-previous-visible-heading 1)
+        (org-show-subtree))))
+  (defadvice undo-tree-undo (after unfold-tree activate)
+    (when (outline-invisible-p)
+      (save-excursion
+        (outline-previous-visible-heading 1)
+        (org-show-subtree))))
 #+END_SRC
 ** Calendrier/Agenda
 *dépendances*: [[https://github.com/matthieucan/dotfiles/blob/master/emacs/.emacs.d/french-holidays.el][french-holidays.el]]
