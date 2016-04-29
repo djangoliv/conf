@@ -2019,6 +2019,14 @@ Avoir des tabs (et surtout des groupes)
       (delete-frame (selected-frame))))
   (global-set-key (kbd "C-x C-c") 'intelligent-close)
 #+END_SRC
+*** force emacs kill
+#+BEGIN_SRC emacs-lisp
+  (defun kill-emacs-force ()
+    "Use `call-process' to send ourselves a KILL signal."
+    (interactive)
+    (call-process "kill" nil nil nil "-9" (number-to-string (emacs-pid))))
+  (global-set-key (kbd "C-x C") 'kill-emacs-force)
+#+END_SRC
 *** indent-buffer
 #+BEGIN_SRC emacs-lisp
   (defun indent-buffer ()
@@ -3220,11 +3228,20 @@ word3
       (call-interactively 'find-tag)))
   (global-unset-key (kbd "M-,"))
   (global-set-key (kbd "M-,") 'find-tag-next)
-  ;; raccourcis deplacement
-  (global-set-key (kbd "S-<right>") 'forward-sexp)
-  (global-set-key (kbd "S-<left>") 'backward-sexp)
-  (global-set-key (kbd "S-<up>") 'beginning-of-defun)
-  (global-set-key (kbd "S-<down>") 'end-of-defun)
+  ;; sexp deplacement
+  (defun forward-or-backward-sexp (&optional arg)
+    "Go to the matching parenthesis character if one is adjacent to point."
+    (interactive "^p")
+    (cond ((looking-at "\\s(") (forward-sexp arg))
+          ((looking-back "\\s)" 1) (backward-sexp arg))
+          ;; Now, try to succeed from inside of a bracket
+          ((looking-at "\\s)") (forward-char) (backward-sexp arg))
+          ((looking-back "\\s(" 1) (backward-char) (forward-sexp arg))))
+   (global-set-key (kbd "C-%") 'forward-or-backward-sexp)
+  ;; (global-set-key (kbd "S-<right>") 'forward-sexp)
+  ;; (global-set-key (kbd "S-<left>") 'backward-sexp)
+  ;; (global-set-key (kbd "S-<up>") 'beginning-of-defun)
+  ;; (global-set-key (kbd "S-<down>") 'end-of-defun)
 #+END_SRC
 **** cmake
 *dépendances* [[https://github.com/Kitware/CMake/tree/master/Auxiliary][cmake-mode.el]]
@@ -3428,7 +3445,7 @@ word3
     (enlarge-window 20)
     (other-window 3))
   #+END_SRC
-**** Javascript
+**** Javascript/json
 *dépendances*: [[https://github.com/mooz/js2-mode][js2-mode.el]] [[https://github.com/joshwnj/json-mode][json-mode.el]] [[https://github.com/gongo/json-reformat][json-reformat]] [[https://github.com/Sterlingg/json-snatcher][json-snatcher]]  [[https://github.com/omouse/angularjs-mode][angularjs-mode.el]]
 #+BEGIN_SRC emacs-lisp
   ;; javascript
@@ -3437,7 +3454,11 @@ word3
   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
   (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
   (eval-after-load "js2-mode" ;; doubleclick selection
-      '(progn (define-key js2-mode-map [mouse-1] 'mouse-set-point)))
+  (setq js2-highlight-level 3)
+  (add-hook 'js2-mode-hook
+            (lambda ()
+              (define-key js2-mode-map [mouse-1] 'mouse-set-point)
+              (define-key js2-mode-map (kbd "C-.") 'js2-jump-to-definition)))
   (defun angular-js ()
     (interactive)
     (load-file "~/.emacs.d/lisp/angular-mode.elc")
@@ -3449,11 +3470,13 @@ word3
           (e (if mark-active (max (point) (mark)) (point-max))))
       (shell-command-on-region b e "python -mjson.tool" (current-buffer) t)))
 #+END_SRC
-**** less-css
+**** css and less-css
 *dépendances* [[https://github.com/purcell/less-css-mode][less-css-mode]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'less-css-mode "less-css-mode" "Start less-css-mode" t)
   (add-to-list 'auto-mode-alist '("\\.less$" . less-css-mode))
+  (add-hook 'less-css-mode-hook 'rainbow-mode)
+  (add-hook 'css-mode-hook 'rainbow-mode)
 #+END_SRC
 **** Vrac: accents HTML/Apache/Rest
 *dépendances* [[http://www.emacswiki.org/emacs/html-accent.el][html-accent.el]] [[http://www.emacswiki.org/emacs/apache-mode.el][apache-mode.el]] [[https://github.com/pashky/restclient.el][restclient.el]]
