@@ -3242,11 +3242,11 @@ word3
           ;; Now, try to succeed from inside of a bracket
           ((looking-at "\\s)") (forward-char) (backward-sexp arg))
           ((looking-back "\\s(" 1) (backward-char) (forward-sexp arg))))
-   (global-set-key (kbd "C-%") 'forward-or-backward-sexp)
-  ;; (global-set-key (kbd "S-<right>") 'forward-sexp)
-  ;; (global-set-key (kbd "S-<left>") 'backward-sexp)
-  ;; (global-set-key (kbd "S-<up>") 'beginning-of-defun)
-  ;; (global-set-key (kbd "S-<down>") 'end-of-defun)
+  (global-set-key (kbd "C-%") 'forward-or-backward-sexp)
+  (global-set-key (kbd "S-<right>") 'forward-sexp)
+  (global-set-key (kbd "S-<left>") 'backward-sexp)
+  (global-set-key (kbd "S-<up>") 'beginning-of-defun)
+  (global-set-key (kbd "S-<down>") 'end-of-defun)
 #+END_SRC
 **** cmake
 *dépendances* [[https://github.com/Kitware/CMake/tree/master/Auxiliary][cmake-mode.el]]
