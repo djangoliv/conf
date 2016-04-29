@@ -128,6 +128,11 @@
 	  (quote
 	   ((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "VALID(v)" "|" "DONE(d!)" "CANCELED(c@)" "NEEDSREVIEW(n@/!)"))))
 
+;; calendar
+(set-face-attribute 'holiday nil :foreground "black" :background "lightslategray")
+(set-face-attribute 'calendar-today nil :foreground "black" :background "lightblue")
+(set-face-attribute 'calendar-weekend-header nil :foreground "lightslateblue")
+
 ;;vc-annotate
 (custom-set-variables
  '(vc-annotate-color-map
