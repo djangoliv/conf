@@ -130,7 +130,7 @@
 
 ;; calendar
 (set-face-attribute 'holiday nil :foreground "black" :background "lightslategray")
-(set-face-attribute 'calendar-today nil :foreground "black" :background "lightblue")
+(set-face-attribute 'calendar-today nil :foreground "aquamarine")
 (set-face-attribute 'calendar-weekend-header nil :foreground "lightslateblue")
 
 ;;vc-annotate

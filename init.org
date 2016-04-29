@@ -820,32 +820,31 @@ Avoir des tabs (et surtout des groupes)
 ** Calendrier/Agenda
 *dépendances*: [[https://github.com/matthieucan/dotfiles/blob/master/emacs/.emacs.d/french-holidays.el][french-holidays.el]]
 #+BEGIN_SRC emacs-lisp
+  (setq calendar-location-name "Paris, France")
   ;; format jour/mois/an
   (setq european-calendar-style t)
   ;; la semaine commence le lundi
   (setq calendar-week-start-day 1)
   ;; jours et mois en francais
-  (defvar calendar-day-abbrev-array
-    ["dim" "lun" "mar" "mer" "jeu" "ven" "sam"])
-  (defvar calendar-day-name-array
-    ["dimanche" "lundi" "mardi" "mercredi" "jeudi" "vendredi" "samedi"])
-  (defvar calendar-month-abbrev-array
-    ["jan" "fev" "mar" "avr" "mai" "jun"
-     "jul" "aou" "sep" "oct" "nov" "dec"])
-  (defvar calendar-month-name-array
-    ["janvier" "fevrier" "mars" "avril" "mai" "juin"
-     "juillet" "aout" "septembre" "octobre" "novembre" "decembre"])
+  (setq calendar-column-width 3)
+  (setq calendar-day-name-array
+        ["dimanche" "lundi" "mardi" "mercredi" "jeudi" "vendredi" "samedi"])
+  (setq calendar-day-header-array
+        ["di" "lu" "ma" "me" "je" "ve" "sa"])
+  (setq calendar-month-name-array
+        ["janvier" "fevrier" "mars" "avril" "mai" "juin"
+         "juillet" "aout" "septembre" "octobre" "novembre" "decembre"])
+  ;; vacances
+  (require 'french-holidays)
+  (setq calendar-holidays holiday-french-holidays)
+  (setq mark-holidays-in-calendar t)
+  (setq calendar-mark-holidays-flag t)
+  (setq calendar-view-holidays-initially t)
   ;; agenda
-  (eval-after-load "calendar"
-    '(progn
-       ;; vacances
-       (require 'french-holidays)
-	   (setq calendar-holidays holiday-french-holidays)
-       (setq mark-holidays-in-calendar t)
-       ;; agenda
-       (setq mark-diary-entries-in-calendar t)
-       ;; la date du jour
-       (add-hook 'today-visible-calendar-hook 'calendar-mark-today)))
+  (setq mark-diary-entries-in-calendar t)
+  (setq calendar-mark-diary-entries-flag t)
+  ;; la date du jour
+  (add-hook 'calendar-today-visible-hook 'calendar-mark-today)
 #+END_SRC
 ** latex (auctex)
 *dépendances*: https://www.gnu.org/software/auctex/
