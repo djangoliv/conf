@@ -687,6 +687,9 @@ Avoir des tabs (et surtout des groupes)
        (define-key org-mode-map (kbd "C-c s") 'org-goto)
        (define-key org-mode-map (kbd "M-s-<up>") 'drag-stuff-up)
        (define-key org-mode-map (kbd "M-s-<down>") 'drag-stuff-down)))
+  ;; org-find-tag
+  (push '(tags-tree . local) org-show-context-detail)
+  (define-key org-mode-map (kbd "C-x r J") 'org-tags-sparse-tree)
 #+END_SRC
 *** babel
 *dépendances* [[https://github.com/gregsexton/ob-ipython][ob-ipython]] [[http://ditaa.sourceforge.net/][ditaa]] [[http://fr.plantuml.com/download.html][plantuml.jar]]
