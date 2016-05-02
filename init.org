@@ -2139,6 +2139,13 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   (autoload 'logview-mode "logview" nil t)
   (add-to-list 'auto-mode-alist '("message" . logview-mode) t)
+  (add-to-list 'auto-mode-alist `(,(expand-file-name "/testLogs/") . logview-mode)) ;; tous les fichiers du repertoire tesLogs
+  (custom-set-variables '(logview-additional-submodes
+                          (quote (("myFormat" (format . "TIMESTAMP - NAME - LEVEL") (levels . "myLevels") (timestamp) (aliases)))))
+                        '(logview-additional-level-mappings
+                          (quote (("myLevels" . ((error "ERROR")(warning "WARNING")(information "INFO")(debug "DEBUG")(trace "TRACE"))))))
+                        '(logview-additional-timestamp-formats
+                          (quote (("xxx" (regexp . "[0-9]\\{4\\}-[01][0-9]-[0-3][0-9] [012][0-9]:[0-5][0-9]:[0-9][0-9],[0-9]\\{3\\}") (aliases))))))
 #+END_SRC
 *** unaccent
 *dépendances* [[https://github.com/emacsmirror/unaccent][unaccent]]
@@ -2362,6 +2369,7 @@ Avoir des tabs (et surtout des groupes)
   (setq-default show-trailing-whitespace t)
   (add-hook 'term-mode-hook (lambda() (setq show-trailing-whitespace nil)))
   (add-hook 'eww-mode-hook (lambda() (setq show-trailing-whitespace nil)))
+  (add-hook 'logview-mode-hook (lambda() (setq show-trailing-whitespace nil)))
 #+END_SRC
 *** color-identifier
 *dépendances* [[https://github.com/ankurdave/color-identifiers-mode][color-idenrifier-mode]]

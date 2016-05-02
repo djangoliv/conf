@@ -136,6 +136,11 @@
 (set-face-attribute 'calendar-weekend-header nil :foreground "lightslateblue")
 ;; completion
 (set-face-attribute 'completions-first-difference nil :foreground "white")
+;; logview
+(custom-set-faces
+ '(logview-level-debug ((t (:foreground "lightgreen"))))
+ '(logview-level-error ((t (:foreground "red"))))
+ '(logview-level-warning ((t (:foreground "chocolate")))))
 ;;vc-annotate
 (custom-set-variables
  '(vc-annotate-color-map
