@@ -2397,6 +2397,12 @@ Avoir des tabs (et surtout des groupes)
       (copy-yank-str msg)))
   (global-set-key (kbd "C-x ?") 'which-function-popup)
 #+END_SRC
+*** indent-guide
+#+BEGIN_SRC emacs-lisp
+  ;; indent-guide
+  (require 'indent-guide)
+  (indent-guide-global-mode)
+#+END_SRC
 ** flycheck
 *dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]]
 #+BEGIN_SRC emacs-lisp

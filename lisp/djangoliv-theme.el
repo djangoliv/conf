@@ -22,6 +22,8 @@
  `(lazy-highlight ((t (:background "DarkSlateGray4"))))
  `(cua-rectangle ((t (:background "CornflowerBlue" :foreground "white"))))
  `(header-line ((t (:foreground "white" :background "#0e3f4e" :box (:line-width -1 :style released-button))))))
+;;;;; comments
+(set-face-italic-p 'font-lock-comment-face t)
 ;;;;; frame
 (add-to-list 'default-frame-alist '(background-color . "darkslategray"))
 (add-to-list 'default-frame-alist '(foreground-color . "wheat"))
@@ -86,6 +88,8 @@
 (custom-set-faces '(stripe-highlight ((t (:background "#0e4f4e")))))
 ;;; highlight-current-line
 (custom-set-faces '(highlight-current-line-face ((t (:background "#1f4f4f")))))
+;;; indent-guide
+(custom-set-faces '(indent-guide-face ((t (:foreground "dimgray")))))
 ;;;; rainbow-delimiter
 (custom-set-faces
  '(rainbow-delimiters-depth-1-face ((t (:foreground "wheat"))))
