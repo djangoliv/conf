@@ -32,7 +32,6 @@
 
 ;; encoding
 (set-terminal-coding-system 'utf-8-unix)
-(setq default-process-coding-system '((utf-8-unix . utf-8-unix)))
 
 ;; Change les couleurs
 (cond (window-system
