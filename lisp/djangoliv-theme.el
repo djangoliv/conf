@@ -90,6 +90,13 @@
 (custom-set-faces '(highlight-current-line-face ((t (:background "#1f4f4f")))))
 ;;; indent-guide
 (custom-set-faces '(indent-guide-face ((t (:foreground "dimgray")))))
+;;; markdown
+(custom-set-faces '(markdown-header-face-1 ((t (:foreground "DodgerBlue" :bold t)))))
+(custom-set-faces '(markdown-header-face-2 ((t (:foreground "lightSkyBlue" :bold t)))))
+(custom-set-faces '(markdown-header-face-3 ((t (:foreground "SkyBlue" :bold t)))))
+(custom-set-faces '(markdown-header-face-4 ((t (:foreground "lightblue" :bold t)))))
+(custom-set-faces '(markdown-header-face-5 ((t (:foreground "PowderBlue" :bold t)))))
+(custom-set-faces '(markdown-header-face-6 ((t (:foreground "PaleTurquoise" :bold t)))))
 ;;;; rainbow-delimiter
 (custom-set-faces
  '(rainbow-delimiters-depth-1-face ((t (:foreground "wheat"))))
@@ -102,7 +109,6 @@
  '(rainbow-delimiters-depth-8-face ((t (:foreground "tomato"))))
  '(rainbow-delimiters-depth-9-face ((t (:foreground "firebrick"))))
  '(rainbow-delimiters-unmatched-face ((t (:foreground "red")))))
-
 (eval-after-load "rainbow-delimiters-mode"
   '(progn
 	 (defface my-outermost-paren-face
