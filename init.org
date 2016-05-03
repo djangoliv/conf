@@ -393,9 +393,7 @@ Avoir des tabs (et surtout des groupes)
 *dépendances*: [[https://github.com/djangoliv/conf][tabbar-more.el]]
 #+BEGIN_SRC emacs-lisp
   ;; possibilité de reorganiser les tabs
-  ;;(defun tabbar-add-sort ()
-    (interactive)
-    (load-file "~/.emacs.d/lisp/tabbar-more.elc");;)
+  (load-file "~/.emacs.d/lisp/tabbar-more.elc")
  #+END_SRC
 * Major-modes
 ** Text-mode
@@ -583,7 +581,7 @@ Avoir des tabs (et surtout des groupes)
 *** subtree insert
 *dépendances*: [[https://github.com/Fuco1/dired-hacks][dired-hacks]]
 #+BEGIN_SRC emacs-lisp
-  (require 'dired-subtree)
+  (autoload 'dired-subtree-insert "dired-subtree" nil t)
   (setq dired-subtree-use-backgrounds nil)
   (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
   (define-key dired-mode-map (kbd "I") 'dired-subtree-remove)
@@ -591,13 +589,13 @@ Avoir des tabs (et surtout des groupes)
 *** dired narrow
 *dépendances*: [[https://github.com/Fuco1/dired-hacks][dired-hacks]]
 #+BEGIN_SRC emacs-lisp
-  (require 'dired-narrow)
+  (autoload 'dired-narrow "dired-narrow" nil t)
   (define-key dired-mode-map (kbd "/") 'dired-narrow)
 #+END_SRC
 *** peep dired (preview)
 *dépendances* [[https://github.com/asok/peep-dired][peep-dired]]
 #+BEGIN_SRC emacs-lisp
-  (require 'peep-dired)
+  (autoload 'peep-dired "peep-dired" nil t)
   (define-key dired-mode-map (kbd "P") 'peep-dired)
   (setq peep-dired-cleanup-on-disable t)
   (setq peep-dired-ignored-extensions '("mkv" "iso" "mp4" "zip" "tgz"))
@@ -605,7 +603,7 @@ Avoir des tabs (et surtout des groupes)
 *** image-dired
 *dépendances* [[https://github.com/mhayashi1120/Emacs-image-diredx][image-dired+]]
 #+BEGIN_SRC emacs-lisp
-  (eval-after-load 'image-dired '(require 'image-dired+))  
+  (eval-after-load 'image-dired '(require 'image-dired+))
   (eval-after-load 'image-dired+ '(image-diredx-async-mode 1))
   (setq image-dired-track-movement nil)
   ;; multiple dired-image
@@ -749,10 +747,11 @@ Avoir des tabs (et surtout des groupes)
 *dépendances* [[https://github.com/marsmining/ox-twbs][ox-twbs]] [[https://github.com/takaxp/org-tree-slide][org-tree-slide]] 
 #+BEGIN_SRC emacs-lisp
   ;; org-tree-slide-mode
-  (when (require 'org-tree-slide nil t)
-    (global-set-key (kbd "<f8>") 'org-tree-slide-mode)
-    (global-set-key (kbd "S-<f8>") 'org-tree-slide-skip-done-toggle)
-    (org-tree-slide-presentation-profile))
+  (eval-after-load "org-tree-slide"
+    '(progn
+       (global-set-key (kbd "<f8>") 'org-tree-slide-mode)
+       (global-set-key (kbd "S-<f8>") 'org-tree-slide-skip-done-toggle)
+       (org-tree-slide-presentation-profile)))
   (autoload 'org-tree-slide-mode "org-tree-slide" nil t)
   ;; ox-twbs
   (require 'ox-twbs)
@@ -1202,7 +1201,7 @@ Avoir des tabs (et surtout des groupes)
 *** ediff tree
 *dépendances*: [[https://github.com/emacsmirror/ediff-trees][ediff-trees.el]]
 #+BEGIN_SRC emacs-lisp
-  (load-file "~/.emacs.d/lisp/ediff-trees.elc")
+  (autoload 'ediff-trees "ediff-trees" nil t)
   (global-set-key (kbd "s-SPC") 'ediff-trees-examine-next)
   (global-set-key (kbd "S-s-SPC") 'ediff-trees-examine-previous)
   (global-set-key (kbd "C-s-SPC") 'ediff-trees-examine-next-regexp)
@@ -1584,15 +1583,6 @@ Avoir des tabs (et surtout des groupes)
     (add-to-list 'ispell-skip-region-alist '("=" "="))
     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC")))
   (add-hook 'org-mode-hook #'endless/org-ispell)
-   ;; dico completion (marche mal)
-  (defun my-ac-ispell-ac-setup ()
-    (load-file "~/.emacs.d/lisp/ac-ispell.elc")
-    (ac-ispell-setup))
-  ;; Completion words longer than 4 characters
-  (custom-set-variables '(ac-ispell-requires 4)
-                        '(ac-ispell-fuzzy-limit 1))
-  (add-hook 'text-mode-hook 'my-ac-ispell-ac-setup)
-  (add-hook 'org-mode-hook 'my-ac-ispell-ac-setup)
 #+END_SRC
 *** languageTool (correction grammaticale)
 *dépendances*: [[https://github.com/mhayashi1120/Emacs-langtool][langtool.el]]
@@ -1755,7 +1745,7 @@ Avoir des tabs (et surtout des groupes)
 ** stripe-buffer
 *dépendances*: [[https://github.com/sabof/stripe-buffer][stripe-buffer.el]]
 #+BEGIN_SRC emacs-lisp
-  (require 'stripe-buffer)
+  (autoload 'turn-on-stripe-buffer-mode "stripe-buffer" "" t)
   (add-hook 'dired-mode-hook 'turn-on-stripe-buffer-mode)
 #+End_SRC
 ** Tramp
@@ -2156,7 +2146,8 @@ Avoir des tabs (et surtout des groupes)
 *** unaccent
 *dépendances* [[https://github.com/emacsmirror/unaccent][unaccent]]
 #+BEGIN_SRC emacs-lisp
-  (require 'unaccent)
+  (autoload 'unaccent-region "unaccent" "" t)
+  (autoload 'unaccent-word "unaccent" "" t)
 #+END_SRC
 *** letter-toggle-case
 #+BEGIN_SRC emacs-lisp
@@ -2170,13 +2161,13 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "M-C") 'toggle-letter-case)
 #+END_SRC
 *** swap-regions
-*dépendance* [[https://github.com/xuchunyang/swap-regions.el][swap-region]]
+*dépendance* [[https://github.com/xuchunyang/swap-regions.el][swap-region]] 
 #+BEGIN_SRC emacs-lisp
   (require 'swap-regions)
   (swap-regions-mode)
 #+END_SRC
 *** emoji (smiley)
-*dépendances*  [[https://github.com/syl20bnr/emacs-emoji-cheat-sheet-plus][emacs-emoji-cheat-sheet-plus]]
+*dépendances*  [[https://github.com/syl20bnr/emacs-emoji-cheat-sheet-plus][emacs-emoji-cheat-sheet-plus]] 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/emacs-emoji-cheat-sheet-plus")
   (require 'emoji-cheat-sheet-plus)
@@ -2321,9 +2312,8 @@ Avoir des tabs (et surtout des groupes)
   (require 'smartrep) ;; sequence C-x right left left ...
   (require 'nav-flash) ;; bref highligth
   (require 'back-button)
-  (back-button-mode 1)
   (require 'auto-mark)
-  (when (require 'auto-mark nil t)
+  (back-button-mode 1)
   (setq auto-mark-command-class-alist
         '((anything . anything)
           (goto-line . jump)
@@ -2334,7 +2324,7 @@ Avoir des tabs (et surtout des groupes)
                 (if (and (eq command 'self-insert-command)
                          (eq last-command-event ? ))
                     'ignore))))
-  (global-auto-mark-mode 1))
+  (global-auto-mark-mode 1)
 #+END_SRC
 *** rainbow-delimiter
 *dépendances* [[https://github.com/Fanael/rainbow-delimiters][rainbow-delimiter.el]]
@@ -2415,7 +2405,7 @@ Avoir des tabs (et surtout des groupes)
 *dépendance* [[https://github.com/zk-phi/indent-guide][indent-guide]]
 #+BEGIN_SRC emacs-lisp
   ;; indent-guide
-  (require 'indent-guide)
+  (autoload 'indent-guide-mode "indent-guide" nil t)
   (add-hook 'prog-mode-hook 'indent-guide-mode)
 #+END_SRC
 ** flycheck
@@ -2466,6 +2456,16 @@ Avoir des tabs (et surtout des groupes)
   (defun exclude-big-friend-buffer (other-buffer)
     (< (buffer-size other-buffer) (* 1 1024 1024)))
   (setq dabbrev-friend-buffer-function 'exclude-big-friend-buffer)
+  ;; dico completion
+  (custom-set-variables '(ac-ispell-requires 4)
+                        '(ac-ispell-fuzzy-limit 1))
+  (eval-after-load "auto-complete"
+    '(progn
+       (require 'ac-ispell)
+       (ac-ispell-setup)))
+  ;; Completion words longer than 4 characters
+  (add-hook 'text-mode-hook 'ac-ispell-ac-setup)
+  (add-hook 'org-mode-hook 'ac-ispell-ac-setup)
   #+END_SRC
 ** Gestion de versions
 *** SVN
@@ -2519,7 +2519,7 @@ Avoir des tabs (et surtout des groupes)
        (require 'magit-gitflow)
        (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)))
 	;; messages de commit
-	(require 'git-messenger)
+	(autoload 'git-messenger:popup-message "git-messenger" nil t)
 	(setq git-messenger:show-detail t)
 	(global-set-key (kbd "C-x g m") 'git-messenger:popup-message)
 	;; remote editor
