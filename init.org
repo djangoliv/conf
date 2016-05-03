@@ -2406,10 +2406,11 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-x ?") 'which-function-popup)
 #+END_SRC
 *** indent-guide
+*dépendance* [[https://github.com/zk-phi/indent-guide][indent-guide]]
 #+BEGIN_SRC emacs-lisp
   ;; indent-guide
   (require 'indent-guide)
-  (indent-guide-global-mode)
+  (add-hook 'prog-mode-hook 'indent-guide-mode)
 #+END_SRC
 ** flycheck
 *dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]]
@@ -3440,7 +3441,9 @@ word3
 **** Emmet
 *dépendances*: [[https://github.com/smihica/emmet-mode][emmet.el]]
 #+BEGIN_SRC emacs-lisp
-  ;; emmet
+  ;; emmet pour css-mode
+  (add-hook 'css-mode-hook 'emmet-mode)
+  ;; emmet pour web-mode
   (eval-after-load "web-mode"
     '(progn
        (autoload 'emmet-expand-line "emmet-mode" "" t)
