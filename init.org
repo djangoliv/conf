@@ -1143,6 +1143,12 @@ Avoir des tabs (et surtout des groupes)
     (call-interactively 'isearch-backward))
   (global-set-key (kbd "C-S-r") 'isearch-forward-use-region)
 #+END_SRC
+*** anzu
+*dépendances* [[https://github.com/syohex/emacs-anzu][anzu]] 
+#+BEGIN_SRC emacs-lisp
+(require 'anzu)
+(global-anzu-mode +1)
+#+END_SRC
 ** Drag Stuff
 *dépendances*: [[https://github.com/rejeep/drag-stuff.el][drag-stuff.el]]
  #+BEGIN_SRC emacs-lisp
@@ -1833,7 +1839,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 ** Vrac
 *** palette and eyedropper
-*dépendances*: [[http://www.emacswiki.org/emacs/palette.el][palette.el]] [[https://www.emacswiki.org/emacs/eyedropper.el][eyedropper]]
+*dépendances*: [[https://github.com/emacsmirror/emacswiki.org/blob/master/palette.el][palette.el]] [[https://github.com/emacsmirror/emacswiki.org/blob/master/eyedropper.el][eyedropper]]
 #+BEGIN_SRC emacs-lisp
 (autoload 'palette "palette" nil t)
 (require 'eyedropper)
@@ -3502,7 +3508,7 @@ word3
   (add-hook 'css-mode-hook 'rainbow-mode)
 #+END_SRC
 **** Vrac: accents HTML/Apache/Rest
-*dépendances* [[http://www.emacswiki.org/emacs/html-accent.el][html-accent.el]] [[http://www.emacswiki.org/emacs/apache-mode.el][apache-mode.el]] [[https://github.com/pashky/restclient.el][restclient.el]]
+*dépendances* [[http://www.emacswiki.org/emacs/html-accent.el][html-accent.el]] [[https://github.com/emacsmirror/emacswiki.org/blob/master/apache-mode.el][apache-mode.el]] [[https://github.com/pashky/restclient.el][restclient.el]]
 #+BEGIN_SRC emacs-lisp
   ;; accents html
   (autoload 'html-accents "htmlAccent" nil t)

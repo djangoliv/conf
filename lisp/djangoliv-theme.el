@@ -171,7 +171,8 @@
 	 (360. . "lightgray"))))
 '(vc-annotate-background "#1f4f4f")
 '(vc-annotate-very-old-color "lightgray"))
-
+;;; anzu
+(set-face-attribute 'anzu-mode-line nil :foreground "lightblue")
 ;;;; modeline
 (setq line-number-mode nil) ;; deja affiché
 (setq-default mode-line-format
