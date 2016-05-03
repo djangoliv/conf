@@ -2138,7 +2138,7 @@ Avoir des tabs (et surtout des groupes)
 *dépendances* [[https://github.com/emacsmirror/logview][logview]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'logview-mode "logview" nil t)
-  (add-to-list 'auto-mode-alist '("message" . logview-mode) t)
+  (add-to-list 'auto-mode-alist '("\\log.txt\\'" . logview-mode))
   (add-to-list 'auto-mode-alist `(,(expand-file-name "/testLogs/") . logview-mode)) ;; tous les fichiers du repertoire tesLogs
   (custom-set-variables '(logview-additional-submodes
                           (quote (("myFormat" (format . "TIMESTAMP - NAME - LEVEL") (levels . "myLevels") (timestamp) (aliases)))))
