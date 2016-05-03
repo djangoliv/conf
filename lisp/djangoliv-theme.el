@@ -8,7 +8,7 @@
 (cond (window-system
 	   (set-foreground-color "wheat")
 	   (set-background-color "DarkSlateGray")
-	   (set-cursor-color "CornflowerBlue")
+	   (set-cursor-color "#7FC2E4")
 	   (set-mouse-color "CadetBlue")
 	   (set-face-foreground 'menu "wheat")
 	   (set-face-background 'menu "DarkSlateGray")
@@ -21,6 +21,7 @@
  `(isearch ((t (:foreground "white" :background "SteelBlue"))))
  `(lazy-highlight ((t (:background "DarkSlateGray4"))))
  `(cua-rectangle ((t (:background "CornflowerBlue" :foreground "white"))))
+ `(cursor ((t (:foreground "CadetBlue"))))
  `(header-line ((t (:foreground "white" :background "#0e3f4e" :box (:line-width -1 :style released-button))))))
 ;;;;; comments
 (set-face-italic-p 'font-lock-comment-face t)
@@ -120,6 +121,12 @@
 						 :inherit 'my-outermost-paren-face)))
 ;; split window
 (set-face-attribute 'vertical-border nil :foreground "CadetBlue")
+;; calendar
+(set-face-attribute 'holiday nil :foreground "black" :background "lightslategray")
+(set-face-attribute 'calendar-today nil :foreground "aquamarine")
+(set-face-attribute 'calendar-weekend-header nil :foreground "lightslateblue")
+;; completion
+(set-face-attribute 'completions-first-difference nil :foreground "white")
 ;; block source faces
 (defface org-block-begin-line
   '((t (:foreground "firebrick")))"")
@@ -136,18 +143,12 @@
 (setq org-todo-keywords
 	  (quote
 	   ((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "VALID(v)" "|" "DONE(d!)" "CANCELED(c@)" "NEEDSREVIEW(n@/!)"))))
-;; calendar
-(set-face-attribute 'holiday nil :foreground "black" :background "lightslategray")
-(set-face-attribute 'calendar-today nil :foreground "aquamarine")
-(set-face-attribute 'calendar-weekend-header nil :foreground "lightslateblue")
-;; completion
-(set-face-attribute 'completions-first-difference nil :foreground "white")
 ;; logview
 (custom-set-faces
  '(logview-level-debug ((t (:foreground "lightgreen"))))
  '(logview-level-error ((t (:foreground "red"))))
  '(logview-level-warning ((t (:foreground "chocolate")))))
-;;vc-annotate
+;; vc-annotate
 (custom-set-variables
  '(vc-annotate-color-map
    (quote
@@ -172,7 +173,7 @@
 '(vc-annotate-background "#1f4f4f")
 '(vc-annotate-very-old-color "lightgray"))
 ;;; anzu
-(custom-set-faces '(anzu-mode-line ((t (:foreground "lightblue")))))
+(custom-set-faces '(anzu-mode-line ((t (:foreground "lightblue" :bold t)))))
 ;;;; modeline
 (setq line-number-mode nil) ;; deja affiché
 (setq-default mode-line-format
