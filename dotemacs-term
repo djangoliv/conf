@@ -122,7 +122,9 @@
 (blink-cursor-mode 0)
 
 ;; FFAP ouvre sans confirm
-;; remplace TRAVAIL par DEBUG ou KEEP si necessaire
+;; remplace NOMREP1 par NOMREP2 ou NOMREP3 si necessaire
+;; Concatene le path avec les path les plus courant (root projet)
+;; remplace elc par el (ouvre le src plutôt que le compilé)
 ;; lit le numero de ligne (si present) apres le signe :
 (defun open-file-at-cursor-replace ()
   (interactive)
@@ -149,20 +151,43 @@
                   (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string ":" "" path )))
 		(if (file-exists-p (replace-regexp-in-string ":.*" "" path ))
 		    (auto-send-2-server (replace-regexp-in-string ":.*" "" path ))
-		  (if (file-exists-p (replace-regexp-in-string "TRAVAIL" "DEBUG" path ))
-		      (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "TRAVAIL" "DEBUG" path )))
-		    (if (file-exists-p (replace-regexp-in-string "TRAVAIL" "DEBUG" path ))
-			(auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "TRAVAIL" "KEEP" path )))
+		  (if (file-exists-p (replace-regexp-in-string "NOMREP1" "NOMREP2" path ))
+		      (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "NOMREP1" "NOMREP2" path )))
+		    (if (file-exists-p (replace-regexp-in-string "NOMREP1" "NOMREP2" path ))
+			(auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "NOMREP1" "NOMREP3" path )))
 		      (if (file-exists-p (replace-regexp-in-string "$i" "0" path ))
 			  (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "$i" "0" path )))
 			(if (file-exists-p (concat "~/workspaces/PROJ1/trunk/" path))
 			    (auto-send-2-server (concat "+" line-number " ~/workspaces/PROJ1/trunk/" path))
-			  (if (file-exists-p (concat "~//workspaces/LAI/" path))
-			      (auto-send-2-server (concat "+" line-number " ~//workspaces/LAI/" path))
+			  (if (file-exists-p (concat "~/workspaces/PROJ2/" path))
+			      (auto-send-2-server (concat "+" line-number " ~/workspaces/PROJ2/" path))
 			    (when (y-or-n-p (format "file doesn't exist: 「%s」. Create?" path) )
 			      (auto-send-2-server path )))))))))))))))
 )
 (global-set-key [(control f1)] 'open-file-at-cursor-replace)
+
+;; open-diff-files-at-cursor
+;; Ouvre les fichiers en sortie d'un diff -r --brief
+(require 'f)
+(defun open-diff-files-at-cursor ()
+  (interactive)
+  (setq theLine (thing-at-point 'line))
+  (setq lineSplit (split-string theLine))
+  (setq firstWord (car lineSplit))
+  (message firstWord)
+  (if (string-equal firstWord "Seulement")
+      (progn
+	(setq fileName (replace-regexp-in-string ":" "" (s-join "/" (cdr (cdr lineSplit)))))
+	(if (f-exists? fileName)
+	    (auto-send-2-server fileName))
+	)
+    (progn
+      (while lineSplit
+        (setq fileName (car lineSplit))
+        (if (f-exists? fileName)
+            (auto-send-2-server fileName))
+        (setq lineSplit (cdr lineSplit))))))
+(global-set-key (kbd "C-<f2>") 'open-diff-files-at-cursor)
 
 ; envoyer le buffer dans emacs client
 (defun auto-send-2-server(fileName)
