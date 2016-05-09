@@ -1581,6 +1581,7 @@ Avoir des tabs (et surtout des groupes)
     (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
     (add-to-list 'ispell-skip-region-alist '("~" "~"))
     (add-to-list 'ispell-skip-region-alist '("=" "="))
+    (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC")))
   (add-hook 'org-mode-hook #'endless/org-ispell)
 #+END_SRC
@@ -2406,7 +2407,8 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   ;; indent-guide
   (autoload 'indent-guide-mode "indent-guide" nil t)
-  (add-hook 'prog-mode-hook 'indent-guide-mode)
+  ;; (add-hook 'prog-mode-hook 'indent-guide-mode)
+  (setq indent-guide-delay 0.5)
 #+END_SRC
 ** flycheck
 *dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]]
