@@ -26,36 +26,36 @@
 ;;;;; comments
 (set-face-italic-p 'font-lock-comment-face t)
 ;;;;; frame
-(add-to-list 'default-frame-alist '(background-color . "darkslategray"))
+(add-to-list 'default-frame-alist '(background-color . "DarkSlateGray"))
 (add-to-list 'default-frame-alist '(foreground-color . "wheat"))
 ;;;;; tabbar
 (setq tabbar-background-color "DarkSlateGray") ;; the color of the tabbar background
 ;;;; dired
 (custom-set-faces
- '(dired-filetype-common ((t (:foreground "White"))))
+ '(dired-filetype-common ((t (:foreground "white"))))
  '(dired-filetype-compress ((t (:foreground "thistle"))))
  '(dired-filetype-image ((t (:foreground "plum"))))
- '(dired-filetype-plain ((t (:foreground "lightgray"))))
- '(dired-filetype-xml ((t (:foreground "whitesmoke"))))
+ '(dired-filetype-plain ((t (:foreground "LightGray"))))
+ '(dired-filetype-xml ((t (:foreground "WhiteSmoke"))))
  '(dired-header ((t (:foreground "#91ba8a"))))
 ;;;; nxml
  '(nxml-attribute-local-name ((t (:foreground "burlywood"))))
- '(nxml-element-local-name ((t (:foreground "lightskyblue"))))
+ '(nxml-element-local-name ((t (:foreground "LightSkyBlue"))))
  '(nxml-tag-delimiter ((t (:foreground "burlywood"))))
 ;;;; org-mode
  '(org-level-1 ((t (:inherit variable-pitch :height 1.11 :foreground "#00cbcd"))))
- '(org-level-2 ((t (:inherit outline-2 :height 1.03 :foreground "deepskyblue"))))
- '(org-level-3 ((t (:inherit outline-3 :height 1.02 :foreground "lightskyblue"))))
- '(org-level-4 ((t (:inherit outline-4 :height 1.01 :foreground "lightblue"))))
- '(org-level-5 ((t (:inherit outline-5 :height 1.00 :foreground "lightsteelblue"))))
+ '(org-level-2 ((t (:inherit outline-2 :height 1.03 :foreground "DeepSkyBlue"))))
+ '(org-level-3 ((t (:inherit outline-3 :height 1.02 :foreground "LightSkyBlue"))))
+ '(org-level-4 ((t (:inherit outline-4 :height 1.01 :foreground "LightBlue"))))
+ '(org-level-5 ((t (:inherit outline-5 :height 1.00 :foreground "LightSteelBlue"))))
  '(org-level-6 ((t (:inherit outline-6 :height 1.00 :foreground "thistle"))))
- '(org-level-7 ((t (:inherit outline-7 :height 1.00 :foreground "Gray90"))))
+ '(org-level-7 ((t (:inherit outline-7 :height 1.00 :foreground "gray90"))))
  '(org-level-8 ((t (:inherit outline-8 :height 1.00 :foreground "white"))))
  '(org-checkbox ((t (:foreground "#7BC6E4" :bold t))))
  '(org-checkbox-statistics-todo ((t (:foreground "#DDC5E5" :bold t))))
- '(org-table ((t (:foreground "whitesmoke"))))
+ '(org-table ((t (:foreground "WhiteSmoke"))))
  '(org-archived ((t (:foreground "#008f80"))))
- '(org-link ((t (:foreground "Cyan" :underline t :background "#2e3436")))))
+ '(org-link ((t (:foreground "cyan" :underline t :background "#2e3436")))))
 ;; org-priority
 (setq org-priority-faces '((?A . (:foreground "OrangeRed" :weight "bold" :background "#271363936393"))
                            (?B . (:foreground "orange" :background "#271363936393"))
@@ -63,9 +63,9 @@
 ;; term
 (custom-set-faces
  '(term-color-blue ((t (:foreground "DeepSkyBlue"))))
- '(term-color-green  ((t (:foreground "green" :background "darkgreen")))))
+ '(term-color-green  ((t (:foreground "green" :background "DarkGreen")))))
 ;; minibuffer
-(set-face-foreground 'minibuffer-prompt "lightBlue")
+(set-face-foreground 'minibuffer-prompt "LightBlue")
 ;; whitespace-mode
 ;;(setq whitespace-style (quote (spaces tabs newline space-mark tab-mark newline-mark space-before-tab space-after-tab)))
 (custom-set-faces
@@ -81,7 +81,7 @@
 				  '(magit-section-highlight ((t (:background "#36115AE15AE1"))))
 				  '(magit-diff-context-highlight  ((t (:background "#37115AE15AE1")))))
 ;;; popup
-(custom-set-faces `(popup-scroll-bar-background-face ((t (:background ,"lightSlateGray")))))
+(custom-set-faces `(popup-scroll-bar-background-face ((t (:background ,"LightSlateGray")))))
 ;;; cedet
 (custom-set-faces '(semantic-decoration-on-unknown-includes ((t (:background "#36115AE15AE1"))))
                   '(semantic-decoration-on-unparsed-includes ((t (:background "#36114AE15AE1")))))
@@ -93,9 +93,9 @@
 (custom-set-faces '(indent-guide-face ((t (:foreground "dimgray")))))
 ;;; markdown
 (custom-set-faces '(markdown-header-face-1 ((t (:foreground "DodgerBlue" :bold t)))))
-(custom-set-faces '(markdown-header-face-2 ((t (:foreground "lightSkyBlue" :bold t)))))
+(custom-set-faces '(markdown-header-face-2 ((t (:foreground "LightSkyBlue" :bold t)))))
 (custom-set-faces '(markdown-header-face-3 ((t (:foreground "SkyBlue" :bold t)))))
-(custom-set-faces '(markdown-header-face-4 ((t (:foreground "lightblue" :bold t)))))
+(custom-set-faces '(markdown-header-face-4 ((t (:foreground "LightBlue" :bold t)))))
 (custom-set-faces '(markdown-header-face-5 ((t (:foreground "PowderBlue" :bold t)))))
 (custom-set-faces '(markdown-header-face-6 ((t (:foreground "PaleTurquoise" :bold t)))))
 ;;;; rainbow-delimiter
@@ -103,10 +103,10 @@
  '(rainbow-delimiters-depth-1-face ((t (:foreground "wheat"))))
  '(rainbow-delimiters-depth-2-face ((t (:foreground "wheat"))))
  '(rainbow-delimiters-depth-3-face ((t (:foreground "burlywood"))))
- '(rainbow-delimiters-depth-4-face ((t (:foreground "Tan2"))))
- '(rainbow-delimiters-depth-5-face ((t (:foreground "Tan3"))))
- '(rainbow-delimiters-depth-6-face ((t (:foreground "Sienna2"))))
- '(rainbow-delimiters-depth-7-face ((t (:foreground "Coral2"))))
+ '(rainbow-delimiters-depth-4-face ((t (:foreground "tan2"))))
+ '(rainbow-delimiters-depth-5-face ((t (:foreground "tan3"))))
+ '(rainbow-delimiters-depth-6-face ((t (:foreground "sienna2"))))
+ '(rainbow-delimiters-depth-7-face ((t (:foreground "coral2"))))
  '(rainbow-delimiters-depth-8-face ((t (:foreground "tomato"))))
  '(rainbow-delimiters-depth-9-face ((t (:foreground "firebrick"))))
  '(rainbow-delimiters-unmatched-face ((t (:foreground "red")))))
@@ -121,12 +121,29 @@
 						 :inherit 'my-outermost-paren-face)))
 ;; split window
 (set-face-attribute 'vertical-border nil :foreground "CadetBlue")
-;; calendar
-(set-face-attribute 'holiday nil :foreground "black" :background "lightslategray")
+;; calendar/diary
+(set-face-attribute 'holiday nil :foreground "#A7FF25" :background "#271363936393")
 (set-face-attribute 'calendar-today nil :foreground "aquamarine")
-(set-face-attribute 'calendar-weekend-header nil :foreground "lightslateblue")
+(set-face-attribute 'calendar-weekend-header nil :foreground "LightSlateBlue")
+(set-face-attribute 'diary nil :foreground "#29FF25" :background "#271363936393")
+(set-face-attribute 'calendar-today nil :foreground "yellow")
 ;; completion
 (set-face-attribute 'completions-first-difference nil :foreground "white")
+;; company
+(custom-set-faces
+ '(company-tooltip ((t (:background "gray" :foreground "DarkSlateGray"))))
+ '(company-scrollbar-bg ((t (:background "DarkGray"))))
+ '(company-scrollbar-fg ((t (:background "WhiteSmoke"))))
+ '(company-tooltip-selection ((t (:background "gainsboro"))))
+ '(company-tooltip-common-selection ((t (:foreground "black"))))
+ '(company-tooltip-common ((t (:foreground "black"))))
+ '(company-tooltip-search ((t (:background "white"))))
+ '(company-tooltip-annotation  ((t (:foreground "DodgerBlue")))))
+(setq pos-tip-foreground-color "#7B9396")
+(setq pos-tip-background-color "#033542")
+;; autocomplete
+(custom-set-faces
+ '(ac-candidate-face ((t (:underline "gray")))))
 ;; block source faces
 (defface org-block-begin-line
   '((t (:foreground "firebrick")))"")
@@ -145,7 +162,7 @@
 	   ((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "VALID(v)" "|" "DONE(d!)" "CANCELED(c@)" "NEEDSREVIEW(n@/!)"))))
 ;; logview
 (custom-set-faces
- '(logview-level-debug ((t (:foreground "lightgreen"))))
+ '(logview-level-debug ((t (:foreground "LightGreen"))))
  '(logview-level-error ((t (:foreground "red"))))
  '(logview-level-warning ((t (:foreground "chocolate")))))
 ;; vc-annotate
@@ -169,11 +186,11 @@
 	 (300. . "#3FC6FF")
 	 (320. . "#3F99FF")
 	 (340. . "white")
-	 (360. . "lightgray"))))
+	 (360. . "LightGray"))))
 '(vc-annotate-background "#1f4f4f")
-'(vc-annotate-very-old-color "lightgray"))
+'(vc-annotate-very-old-color "LightGray"))
 ;;; anzu
-(custom-set-faces '(anzu-mode-line ((t (:foreground "lightblue" :bold t)))))
+(custom-set-faces '(anzu-mode-line ((t (:foreground "LightBlue" :bold t)))))
 ;;;; modeline
 (setq line-number-mode nil) ;; deja affiché
 (setq-default mode-line-format

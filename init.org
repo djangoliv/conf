@@ -9,7 +9,7 @@
 #+OPTIONS: toc:3
 * Initialisation
 ** init Configuration
-Configuration Minimal (sans librairies externes)
+Configuration minimale (sans librairies externes)
 #+BEGIN_SRC emacs-lisp
   (require 'cl) ;; build-in librairie
   ;; path
@@ -245,6 +245,7 @@ Collection of Emacs Development Environment Tools
   (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
   (semantic-mode) ;; Active le mode semantic
   (require 'stickyfunc-enhance) ;; multilines concatene dans la header line
+  (require 'cedet-cscope)  
 #+END_SRC
 ** Initialize ECB
 *dépendances*: [[https://github.com/alexott/ecb/][ecb]]
@@ -504,7 +505,6 @@ Avoir des tabs (et surtout des groupes)
   (define-key dired-mode-map (kbd "<return>") 'dired-find-alternate-file)
   (define-key dired-mode-map (kbd "<right>") 'dired-find-file)
   (define-key dired-mode-map (kbd "^") '(lambda () (interactive) (find-alternate-file "..")))
-  (define-key dired-mode-map (kbd "f") 'dired-name-filter-only-show-matched-lines)
 #+END_SRC
 *** dired-isearch
 *dépendances*: [[http://www.emacswiki.org/emacs/dired-isearch.el][dired-isearch.el]]
@@ -533,6 +533,7 @@ Avoir des tabs (et surtout des groupes)
       (dired-toggle-marks)
       (dired-do-kill-lines nil (concat "Filter:'" filter-regexp "' omitted %d line%s"))
       (dired-move-to-filename)))
+  (define-key dired-mode-map (kbd "f") 'dired-filter-on-names)
  #+END_SRC
 *** ediff sur deux fichiers marqués
 #+BEGIN_SRC emacs-lisp
@@ -674,7 +675,7 @@ Avoir des tabs (et surtout des groupes)
                                (let ((browse-url-browser-function 'browse-url-generic))
                                  ad-do-it))
                              (setq indent-tabs-mode nil)
-                             (setq-local ac-auto-start 8)
+                             ;;(setq-local ac-auto-start 8)
                              (setq-local line-spacing '0.1)
                              (setq-local company-minimum-prefix-length 5)))
   ;; raccourci
@@ -1703,6 +1704,10 @@ Avoir des tabs (et surtout des groupes)
             try-complete-lisp-symbol-partially
             try-complete-lisp-symbol))
     (global-set-key (kbd "M-/") 'hippie-expand)
+    ;; Exclude very large buffers from dabbrev
+    (defun exclude-big-friend-buffer (other-buffer)
+      (< (buffer-size other-buffer) (* 1 1024 1024)))
+    (setq dabbrev-friend-buffer-function 'exclude-big-friend-buffer)
     ;; Ignorer la casse pour la copletion des chemins de fichiers
     (setq read-file-name-completion-ignore-case t)
     ;; completion case sensitive
@@ -1728,6 +1733,7 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   (require 'wrap-region)
   (add-to-list 'wrap-region-except-modes 'web-mode)
+  (add-to-list 'wrap-region-except-modes 'calendar-mode)
   (wrap-region-global-mode t)
   (wrap-region-add-wrapper "*" "*" nil 'org-mode)
   (wrap-region-add-wrapper "/" "/" nil 'org-mode)
@@ -2367,6 +2373,7 @@ Avoir des tabs (et surtout des groupes)
   (add-hook 'term-mode-hook (lambda() (setq show-trailing-whitespace nil)))
   (add-hook 'eww-mode-hook (lambda() (setq show-trailing-whitespace nil)))
   (add-hook 'logview-mode-hook (lambda() (setq show-trailing-whitespace nil)))
+  (add-hook 'calendar-mode-hook (lambda() (setq show-trailing-whitespace nil)))
 #+END_SRC
 *** color-identifier
 *dépendances* [[https://github.com/ankurdave/color-identifiers-mode][color-idenrifier-mode]]
@@ -2423,51 +2430,24 @@ Avoir des tabs (et surtout des groupes)
        (global-set-key (kbd "C-c <down>") 'flycheck-next-error)
        (global-set-key (kbd "C-c <up>") 'flycheck-previous-error)))
  #+END_SRC
-** Auto-Complete
-*dépendances*: [[https://github.com/auto-complete/auto-complete][autocomplete]] [[https://github.com/tjarvstrand/pos-tip][pos-tip.el]] [[https://github.com/auto-complete/popup-el][popup.el]]
+** Company
+*dépendances*: [[https://github.com/company-mode/company-mode][company-mode]] [[https://github.com/expez/company-quickhelp][company-quickhelp]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/auto-complete-master")
-  ;; auto conf auto-complete
-  (require 'auto-complete-config)
-  (add-to-list 'ac-dictionary-directories "~/.emacs.d/auto-complete-master/dict/")
-  (ac-config-default)
-  (global-auto-complete-mode t)
-  (setq ac-use-menu-map t) ;; activer les raccourcis comme C-s pour ac-isearch
-  (set-face-underline-p 'ac-candidate-face "gray") ;; couleur separateur entre propositions
-  ;; dirty fix for having AC everywhere >> partout sauf
-  (define-globalized-minor-mode real-global-auto-complete-mode
-    auto-complete-mode (lambda ()
-                         (if (not (minibufferp (current-buffer)))
-                             (auto-complete-mode 1))))
-  (real-global-auto-complete-mode t)
-  ;; completion uniquement sur le dictionnaire associé au mode
-  (global-set-key (kbd "C-S-<iso-lefttab>") 'ac-complete-dictionary)
-  ;; pour la completion plus lisible
-  (defun completion-hook ()
-    (setq ac-max-width 0.5)
-    ;; Show 1.8 second later
-    (setq ac-auto-start 1.8)
-    (setq ac-auto-show-menu 1))
-  (add-hook 'auto-complete-mode-hook 'completion-hook)
-  (require 'pos-tip)
-  (setq ac-quick-help-prefer-x t)
-  ;; Affiche le pop-up de doc meme si le mot est complet
-  (setq-default ac-dwim nil)
-  (setq-default ac-expand-on-auto-complete nil)
-  ;; Exclude very large buffers from dabbrev
-  (defun exclude-big-friend-buffer (other-buffer)
-    (< (buffer-size other-buffer) (* 1 1024 1024)))
-  (setq dabbrev-friend-buffer-function 'exclude-big-friend-buffer)
-  ;; dico completion
-  (custom-set-variables '(ac-ispell-requires 4)
-                        '(ac-ispell-fuzzy-limit 1))
-  (eval-after-load "auto-complete"
-    '(progn
-       (require 'ac-ispell)
-       (ac-ispell-setup)))
-  ;; Completion words longer than 4 characters
-  (add-hook 'text-mode-hook 'ac-ispell-ac-setup)
-  (add-hook 'org-mode-hook 'ac-ispell-ac-setup)
+  (add-to-list 'load-path "~/.emacs.d/company-mode")
+  (require 'company)
+  (require 'company-quickhelp)
+  (setq company-minimum-prefix-length 1)
+  (setq company-selection-wrap-around t)
+  (setq company-idle-delay 0.2)
+  (setq company-transformers '(company-sort-by-occurrence))
+  (setq company-begin-commands '(self-insert-command))
+  (add-hook 'after-init-hook 'global-company-mode)
+  (company-quickhelp-mode 1)
+  (delq 'company-eclim company-backends)
+  (delq 'company-clang company-backends)
+  (delq 'company-gtags company-backends)
+  (delq 'company-etags company-backends)
+  (delq 'company-oddmuse company-backends)
   #+END_SRC
 ** Gestion de versions
 *** SVN
@@ -2502,6 +2482,7 @@ Avoir des tabs (et surtout des groupes)
 	(autoload 'magit-log-buffer-file "magit" nil t)
 	(autoload 'ediff-revision "magit" nil t)
 	(autoload 'magit-stash "magit" nil t)
+  (autoload 'magit-svn-rebase "magit" nil t)
 	;; pour le status dans la modeline
 	(add-to-list 'load-path "~/.emacs.d/git-emacs-master")
 	(setq git-keyboard-prefix "\C-x£") ;; keybinding improbable (ie desactivation)
@@ -2784,9 +2765,9 @@ Avoir des tabs (et surtout des groupes)
   (add-hook 'python-mode-hook
             (lambda ()
               ;; auto-complete
-              (delq 'ac-source-dictionary ac-sources)
-              (delq 'ac-source-abbrev ac-sources)
-              (delq 'ac-source-words-in-same-mode-buffers ac-sources)
+              ;; (delq 'ac-source-dictionary ac-sources)
+              ;; (delq 'ac-source-abbrev ac-sources)
+              ;; (delq 'ac-source-words-in-same-mode-buffers ac-sources)
               ;; yas
               (global-set-key (kbd "<S-iso-lefttab>") 'yas-insert-snippet)
               ;; Python indentation
@@ -2802,7 +2783,7 @@ Avoir des tabs (et surtout des groupes)
   (defalias 'pylint 'flycheck-mode)  ;; raccourci pylint
 #+END_SRC
 **** jedi
-*dépendances* [[https://github.com/tkf/emacs-jedi][jedi]] [[https://github.com/kiwanami/emacs-deferred][deferred]] [[https://github.com/tkf/emacs-python-environment][python-environment]]
+*dépendances* [[https://github.com/tkf/emacs-jedi][jedi]] [[https://github.com/kiwanami/emacs-deferred][deferred]] [[https://github.com/tkf/emacs-python-environment][python-environment]] [[https://github.com/syohex/emacs-company-jedi][emacs-company-jedi]]
 C-. => goto definition
  C-, => back
  s-? => Afficher la signature de la methode
@@ -2821,24 +2802,25 @@ C-. => goto definition
   (setq jedi:server-command '("~/Outils/emacs/python/jedi24/emacs-jedi-master/jediepcserver.py"))
   (setq jedi:tooltip-method (quote (nil))) ;
   (setq jedi:tooltip-show nil) ;
-  (autoload 'jedi:setup "jedi" nil t)
-  (add-hook 'python-mode-hook 'jedi:setup)
   (setq jedi:setup-keys t)
   (setq jedi:complete-on-dot t)
+  (defun my/python-mode-hook ()
+    (add-to-list 'company-backends 'company-jedi))
+  (add-hook 'python-mode-hook 'my/python-mode-hook)
   ;; goto-definition
   (setq jedi:goto-definition-config
-	    '((nil definition nil)
-		  (t   definition nil)
-		  (nil nil        nil)
-		  (t   nil        nil)
-		  (nil definition t  )
-		  (t   definition t  )
-		  (nil nil        t  )
-		  (t   nil        t  )))
+        '((nil definition nil)
+          (t   definition nil)
+          (nil nil        nil)
+          (t   nil        nil)
+          (nil definition t  )
+          (t   definition t  )
+          (nil nil        t  )
+          (t   nil        t  )))
   ;; Afficher la signature de la methode
   (add-hook 'python-mode-hook
-		    (lambda ()
-			  (define-key python-mode-map (kbd "s-?") 'jedi:get-in-function-call)))
+            (lambda ()
+              (define-key python-mode-map (kbd "s-?") 'jedi:get-in-function-call)))
 #+END_SRC
 **** docstring
 *dépendances* [[https://github.com/glyph/python-docstring-mode][python-docstring-mode]]
@@ -3156,52 +3138,51 @@ word3
               (global-set-key (kbd "<down>") 'comint-next-input)))
 #+END_SRC
 **** CEDET for C++
-*dépendances*: [[https://www.emacswiki.org/emacs/eassist.el][eassist]] [[http://cedet.sourceforge.net/][cedet]] (voir init au dessus)
+*dépendances*: [[https://www.emacswiki.org/emacs/eassist.el][eassist]] [[http://cedet.sourceforge.net/][cedet]] (voir init au dessus) [[https://github.com/randomphrase/company-c-headers][company-c-header]]s
  #+BEGIN_SRC emacs-lisp
-   (defun my-cedet-hook ()
-     ;; indentation
-     (setq c++-tab-always-indent t)
-     ;;(setq c-basic-offset 4)                  ;; Default is 2
-     (setq c-indent-level 4)                  ;; Default is 2
-     ;; semantic
-     (global-set-key (kbd "s-<tab>") 'semantic-ia-complete-symbol-menu)
-     (global-set-key (kbd "C-c ?") 'semantic-ia-complete-symbol)
-     (global-set-key (kbd "C-<tab>") 'semantic-complete-analyze-inline)
-     (global-set-key (kbd "M-i") 'semantic-decoration-include-visit)
-     (global-set-key (kbd "C-.") 'semantic-ia-fast-jump)
-     (global-set-key (kbd "C-c d") 'semantic-ia-show-doc)
-     (global-set-key (kbd "C-,") 'semantic-analyze-proto-impl-toggle)
-     (global-set-key (kbd "C-M-:") 'semantic-complete-jump)
-     (global-set-key (kbd "C-:") 'semantic-complete-jump-local)
-     (global-set-key (kbd "C-c s") 'semantic-ia-show-summary)
-     (global-set-key (kbd "C-c c") 'semantic-ia-describe-class)
-     (global-set-key (kbd "C-c B") 'semantic-ia-fast-jump-back)
-     ;; gtags
-     (global-set-key (kbd "C-s-.") 'ggtags-find-tag-dwim)
-     ;; deplacement de function en function
-     (global-set-key (kbd "M-s-<left>") 'senator-previous-tag)
-     (global-set-key (kbd "M-s-<right>") 'senator-next-tag)
-     (setq c-hungry-delete-key t)
-     (global-set-key (kbd "s-;") 'semantic-symref)
-     (global-set-key (kbd "s-:") 'semantic-symref-symbol)
-     ;; folding
-     (global-set-key (kbd "C-<kp-subtract>") 'senator-fold-tag)
-     (global-set-key (kbd "C-<kp-add>") 'senator-unfold-tag)
-     ;; auto-complete
-     (add-to-list 'ac-sources 'ac-source-semantic)
-     ;; on enleve yasnippet
-     (delq 'ac-source-yasnippet ac-sources)
-     )
-   ;;(delq 'ac-source-yasnippet ac-sources)
-   (add-hook 'c-mode-common-hook 'my-cedet-hook)
-   ;; extension <=> mode
-   (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-   (add-to-list 'auto-mode-alist '("\\.hpp\\'" . c++-mode))
-   (add-to-list 'auto-mode-alist '("\\.cc\\'" . c++-mode))
-   (add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
-   ;; cedet semantic
-   (semanticdb-enable-gnu-global-databases 'c-mode t)
-   (semanticdb-enable-gnu-global-databases 'c++-mode t)
+      (defun my-cedet-hook ()
+        ;; indentation
+        (setq c++-tab-always-indent t)
+        ;;(setq c-basic-offset 4)                  ;; Default is 2
+        (setq c-indent-level 4)                  ;; Default is 2
+        ;; semantic
+        (global-set-key (kbd "s-<tab>") 'semantic-ia-complete-symbol-menu)
+        (global-set-key (kbd "C-c ?") 'semantic-ia-complete-symbol)
+        (global-set-key (kbd "C-<tab>") 'semantic-complete-analyze-inline)
+        (global-set-key (kbd "M-i") 'semantic-decoration-include-visit)
+        (global-set-key (kbd "C-.") 'semantic-ia-fast-jump)
+        (global-set-key (kbd "C-c d") 'semantic-ia-show-doc)
+        (global-set-key (kbd "C-,") 'semantic-analyze-proto-impl-toggle)
+        (global-set-key (kbd "C-M-:") 'semantic-complete-jump)
+        (global-set-key (kbd "C-:") 'semantic-complete-jump-local)
+        (global-set-key (kbd "C-c s") 'semantic-ia-show-summary)
+        (global-set-key (kbd "C-c c") 'semantic-ia-describe-class)
+        (global-set-key (kbd "C-c B") 'semantic-ia-fast-jump-back)
+        ;; gtags
+        (global-set-key (kbd "C-s-.") 'ggtags-find-tag-dwim)
+        ;; deplacement de function en function
+        (global-set-key (kbd "M-s-<left>") 'senator-previous-tag)
+        (global-set-key (kbd "M-s-<right>") 'senator-next-tag)
+        (setq c-hungry-delete-key t)
+        (global-set-key (kbd "s-;") 'semantic-symref)
+        (global-set-key (kbd "s-:") 'semantic-symref-symbol)
+        ;; folding
+        (global-set-key (kbd "C-<kp-subtract>") 'senator-fold-tag)
+        (global-set-key (kbd "C-<kp-add>") 'senator-unfold-tag)
+        ;; company
+        (require 'company-c-headers)
+        (add-to-list 'company-backends 'company-c-headers)
+        (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.7/")
+        )
+      (add-hook 'c-mode-common-hook 'my-cedet-hook)
+      ;; extension <=> mode
+      (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+      (add-to-list 'auto-mode-alist '("\\.hpp\\'" . c++-mode))
+      (add-to-list 'auto-mode-alist '("\\.cc\\'" . c++-mode))
+      (add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
+      ;; cedet semantic
+      (semanticdb-enable-gnu-global-databases 'c-mode t)
+      (semanticdb-enable-gnu-global-databases 'c++-mode t)
    #+END_SRC
 **** eassist/xcscope/function-args
 *dépendances*:  [[http://cedet.sourceforge.net/][cedet]] [[https://github.com/dkogan/xcscope.el][xcscope.el]]
@@ -3294,7 +3275,7 @@ word3
   (add-hook 'jdee-mode-hook
             (lambda()
               ;; autocomplete
-              (add-to-list 'ac-modes 'jdee-mode)
+              ;;(add-to-list 'ac-modes 'jdee-mode)
               ;; raccourcis
               (define-key c-mode-base-map (kbd "s-.") 'jdee-open-class-at-point)
               (define-key c-mode-base-map (kbd "s-d") 'jdee-help-symbol)
@@ -3361,13 +3342,12 @@ word3
 #+END_SRC
 *** Web
 **** Web-mode
-*dépendances* [[https://github.com/fxbois/web-mode][web-mode.el]]
+*dépendances* [[https://github.com/fxbois/web-mode][web-mode.el]] [[https://github.com/osv/company-web][company-web]] [[https://github.com/cheunghy/ac-html][ac-html]] [[https://github.com/osv/web-completion-data][web-completion-data]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'web-mode "web-mode" "" t)
   (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-  ;;(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
@@ -3376,7 +3356,6 @@ word3
   (setq web-mode-enable-auto-pairing t)
   (setq web-mode-enable-auto-indentation t)
   (setq web-mode-enable-indent-cycle t)
-  ;;(setq web-mode-enable-html-entities-fontification t)
   ;; hook
   (add-hook 'web-mode-hook (lambda ()
                              ;; indentation
@@ -3394,11 +3373,20 @@ word3
                              (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
                              (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
                              ))
-  ;; auto complete
-  (setq web-mode-ac-sources-alist
-        '(("css" . (ac-source-css-property))
-          ("php" . (ac-source-php-auto-yasnippets ac-source-yasnippet))
-          ("html" . (ac-source-abbrev))))
+  ;; company
+  (add-to-list 'load-path "~/.emacs.d/company-web")
+  (add-to-list 'load-path "~/.emacs.d/ac-html")
+  (add-to-list 'load-path "~/.emacs.d/web-completion-data")
+  (require 'company-web-html)
+  (add-hook 'web-mode-hook
+                (lambda ()
+                  (add-to-list (make-local-variable 'company-backends)
+                               'company-nxml)
+                  (add-to-list (make-local-variable 'company-backends)
+                               'company-web-html)
+                  (add-to-list (make-local-variable 'company-backends)
+                               'company-css)
+                  ))
   ;; force django engine for html
   (setq web-mode-engines-alist
         '(("django"    . "\\.html\\'"))
@@ -3414,37 +3402,37 @@ word3
     (web-mode-set-engine "angular"))
   ;; flyspell
   (defun web-mode-flyspell-verify ()
-      (let ((f (get-text-property (- (point) 1) 'face))
-            thing
-            rlt)
-        (cond
-         ((not (memq f '(web-mode-html-attr-value-face
-                         web-mode-html-tag-face
-                         web-mode-html-attr-name-face
-                         web-mode-constant-face
-                         web-mode-doctype-face
-                         web-mode-keyword-face
-                         web-mode-comment-face ;; focus on get html label right
-                         web-mode-function-name-face
-                         web-mode-variable-name-face
-                         web-mode-css-property-name-face
-                         web-mode-css-selector-face
-                         web-mode-css-color-face
-                         web-mode-type-face
-                         web-mode-block-control-face)
-                     ))
-          (setq rlt t))
-         ((memq f '(web-mode-html-attr-value-face))
-          (save-excursion
-            (search-backward-regexp "=['\"]" (line-beginning-position) t)
-            (backward-char)
-            (setq thing (thing-at-point 'symbol))
-            (setq rlt (string-match "^\\(value\\|class\\|ng[A-Za-z0-9-]*\\)$" thing))
-            rlt))
-         (t t))
-        rlt))
-    (put 'web-mode 'flyspell-mode-predicate 'web-mode-flyspell-verify)
-    (add-hook 'web-mode-hook (lambda () (flyspell-mode 1)))
+    (let ((f (get-text-property (- (point) 1) 'face))
+          thing
+          rlt)
+      (cond
+       ((not (memq f '(web-mode-html-attr-value-face
+                       web-mode-html-tag-face
+                       web-mode-html-attr-name-face
+                       web-mode-constant-face
+                       web-mode-doctype-face
+                       web-mode-keyword-face
+                       web-mode-comment-face ;; focus on get html label right
+                       web-mode-function-name-face
+                       web-mode-variable-name-face
+                       web-mode-css-property-name-face
+                       web-mode-css-selector-face
+                       web-mode-css-color-face
+                       web-mode-type-face
+                       web-mode-block-control-face)
+                   ))
+        (setq rlt t))
+       ((memq f '(web-mode-html-attr-value-face))
+        (save-excursion
+          (search-backward-regexp "=['\"]" (line-beginning-position) t)
+          (backward-char)
+          (setq thing (thing-at-point 'symbol))
+          (setq rlt (string-match "^\\(value\\|class\\|ng[A-Za-z0-9-]*\\)$" thing))
+          rlt))
+       (t t))
+      rlt))
+  (put 'web-mode 'flyspell-mode-predicate 'web-mode-flyspell-verify)
+  (add-hook 'web-mode-hook (lambda () (flyspell-mode 1)))
   #+END_SRC
 **** Emmet
 *dépendances*: [[https://github.com/smihica/emmet-mode][emmet.el]]
@@ -3488,7 +3476,11 @@ word3
   (setq js2-highlight-level 3)
   (add-hook 'js2-mode-hook
             (lambda ()
-              (define-key js2-mode-map [mouse-1] 'mouse-set-point)
+              ;; parentheses en couleurs
+              (rainbow-delimiters-mode)
+              ;; doubleclick selection
+              (define-key js2-mode-map [mouse-1] 'mouse-set-point) 
+              ;; goto definition
               (define-key js2-mode-map (kbd "C-.") 'js2-jump-to-definition)))
   (defun angular-js ()
     (interactive)
