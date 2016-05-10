@@ -843,9 +843,11 @@ Avoir des tabs (et surtout des groupes)
   (setq mark-holidays-in-calendar t)
   (setq calendar-mark-holidays-flag t)
   (setq calendar-view-holidays-initially t)
-  ;; agenda
-  (setq mark-diary-entries-in-calendar t)
-  (setq calendar-mark-diary-entries-flag t)
+  ;; diary
+  (setq mark-diary-entries-in-calendar t
+        calendar-mark-diary-entries-flag t
+        view-diary-entries-initially t
+        number-of-diary-entries 7)
   ;; la date du jour
   (add-hook 'calendar-today-visible-hook 'calendar-mark-today)
 #+END_SRC
