@@ -162,6 +162,7 @@
 	   ((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "VALID(v)" "|" "DONE(d!)" "CANCELED(c@)" "NEEDSREVIEW(n@/!)"))))
 ;; logview
 (custom-set-faces
+ '(logview-information-entry ((t (:background "#1f4f4f"))))
  '(logview-level-debug ((t (:foreground "LightGreen"))))
  '(logview-level-error ((t (:foreground "red"))))
  '(logview-level-warning ((t (:foreground "chocolate")))))
