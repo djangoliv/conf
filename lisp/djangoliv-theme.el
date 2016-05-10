@@ -131,7 +131,7 @@
 (set-face-attribute 'completions-first-difference nil :foreground "white")
 ;; company
 (custom-set-faces
- '(company-tooltip ((t (:background "gray" :foreground "DarkSlateGray"))))
+ '(company-tooltip ((t (:background "gray" :foreground "DarkSlateGray" :underline "gainsboro"))))
  '(company-scrollbar-bg ((t (:background "DarkGray"))))
  '(company-scrollbar-fg ((t (:background "WhiteSmoke"))))
  '(company-tooltip-selection ((t (:background "gainsboro"))))
@@ -139,8 +139,8 @@
  '(company-tooltip-common ((t (:foreground "black"))))
  '(company-tooltip-search ((t (:background "white"))))
  '(company-tooltip-annotation  ((t (:foreground "DodgerBlue")))))
-(setq pos-tip-foreground-color "#7B9396")
-(setq pos-tip-background-color "#033542")
+(setq pos-tip-foreground-color "WhiteSmoke")
+(setq pos-tip-background-color "#003442")
 ;; autocomplete
 (custom-set-faces
  '(ac-candidate-face ((t (:underline "gray")))))
