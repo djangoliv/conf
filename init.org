@@ -2142,13 +2142,24 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   (autoload 'logview-mode "logview" nil t)
   (add-to-list 'auto-mode-alist '("\\log.txt\\'" . logview-mode))
-  (add-to-list 'auto-mode-alist `(,(expand-file-name "/testLogs/") . logview-mode)) ;; tous les fichiers du repertoire tesLogs
-  (custom-set-variables '(logview-additional-submodes
-                          (quote (("myFormat" (format . "TIMESTAMP - NAME - LEVEL") (levels . "myLevels") (timestamp) (aliases)))))
-                        '(logview-additional-level-mappings
-                          (quote (("myLevels" . ((error "ERROR")(warning "WARNING")(information "INFO")(debug "DEBUG")(trace "TRACE"))))))
-                        '(logview-additional-timestamp-formats
-                          (quote (("xxx" (regexp . "[0-9]\\{4\\}-[01][0-9]-[0-3][0-9] [012][0-9]:[0-5][0-9]:[0-9][0-9],[0-9]\\{3\\}") (aliases))))))
+  (add-to-list 'auto-mode-alist '("\\.log\\'" . logview-mode))
+  (add-to-list 'auto-mode-alist `(,(expand-file-name "/testLogs/") . logview-mode)) ;; tous les fichiers du repertoire tesLogs$
+  (custom-set-variables  '(logview-additional-submodes
+                           (quote
+                            (("proj Format"
+                              (format . "TIMESTAMP - NAME - LEVEL")
+                              (levels . "myLevels")
+                              (timestamp)
+                              (aliases))
+                             ("tomcat Format"
+                              (format . "TIMESTAMP [THREAD] LEVEL NAME")
+                              (levels . "SLF4J")
+                              (timestamp)
+                              (aliases)))))
+                         '(logview-additional-level-mappings
+                           (quote (("myLevels" . ((error "ERROR")(warning "WARNING")(information "INFO")(debug "DEBUG")(trace "TRACE"))))))
+                         '(logview-additional-timestamp-formats
+                           (quote (("xxx" (regexp . "[0-9]\\{4\\}-[01][0-9]-[0-3][0-9] [012][0-9]:[0-5][0-9]:[0-9][0-9],[0-9]\\{3\\}") (aliases))))))
 #+END_SRC
 *** unaccent
 *dépendances* [[https://github.com/emacsmirror/unaccent][unaccent]]
@@ -3517,25 +3528,6 @@ word3
   ;; client REST
   (autoload 'restclient-mode "restclient" "" t)
   (add-to-list 'auto-mode-alist '("\\.restclient$" . restclient-mode))
-#+END_SRC
-**** log4j
-*dépendances*: [[https://github.com/emacsmirror/log4j-mode][log4j-mode.el]]
-#+BEGIN_SRC emacs-lisp
-  (autoload 'log4j-mode "log4j-mode" nil t)
-  (setq auto-mode-alist
-        (append '(("server.log" . log4j-mode)
-                  ("catalina.out" . log4j-mode)
-                  ("axis2.log" . log4j-mode)
-                  ("\\Service.log" . log4j-mode)
-                  ("tomcat.log" . log4j-mode))
-                auto-mode-alist))
-  (add-hook 'log4j-mode-hook
-            (lambda ()
-              (setq truncate-lines t)
-              (text-scale-set -1)
-              (toggle-read-only t)
-              (buffer-disable-undo)
-              (end-of-buffer)))
 #+END_SRC
 **** nginx
 *dépendances* [[https://github.com/ajc/nginx-mode][nginx-mode]]
