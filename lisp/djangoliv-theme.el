@@ -38,6 +38,8 @@
  '(dired-filetype-plain ((t (:foreground "LightGray"))))
  '(dired-filetype-xml ((t (:foreground "WhiteSmoke"))))
  '(dired-header ((t (:foreground "#91ba8a"))))
+ ;;; dired-k
+ '(dired-k-directory ((t (:foreground "deepSkyBlue"))))
 ;;;; nxml
  '(nxml-attribute-local-name ((t (:foreground "burlywood"))))
  '(nxml-element-local-name ((t (:foreground "LightSkyBlue"))))
