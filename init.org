@@ -2814,13 +2814,12 @@ C-. => goto definition
   (add-to-list 'load-path "~/Outils/emacs/python/jedi24/emacs-jedi-master")
   (add-to-list 'load-path "~/Outils/emacs/python/emacs-deferred-master")
   (setq jedi:server-command '("~/Outils/emacs/python/jedi24/emacs-jedi-master/jediepcserver.py"))
-  (setq jedi:tooltip-method (quote (nil))) ;
-  (setq jedi:tooltip-show nil) ;
-  (setq jedi:setup-keys t)
-  (setq jedi:complete-on-dot t)
+  (setq jedi:tooltip-method (quote (nil)))
+  (setq jedi:tooltip-show nil)
   (defun my/python-mode-hook ()
     (add-to-list 'company-backends 'company-jedi))
   (add-hook 'python-mode-hook 'my/python-mode-hook)
+  (setq jedi:complete-on-dot t)
   ;; goto-definition
   (setq jedi:goto-definition-config
         '((nil definition nil)
@@ -2831,6 +2830,8 @@ C-. => goto definition
           (t   definition t  )
           (nil nil        t  )
           (t   nil        t  )))
+  (define-key python-mode-map (kbd "C-.") 'jedi:goto-definition)
+  (define-key python-mode-map (kbd "C-,") 'jedi:goto-definition-pop-marker)
   ;; Afficher la signature de la methode
   (add-hook 'python-mode-hook
             (lambda ()
