@@ -937,6 +937,8 @@ Avoir des tabs (et surtout des groupes)
              (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s </xmp><script src=\"http://strapdownjs.com/v/0.2/strapdown.js\"></script></html>"
                      (buffer-substring-no-properties (point-min) (point-max))))
            (current-buffer)))
+  ;; Org-struct minor mode
+  (add-hook 'markdown-mode-hook 'turn-on-orgstruct)
 #+END_SRC
 ** eimp (manipulation d'image)
 *dépendances*: [[https://github.com/nicferrier/eimp][eimp.el]]
@@ -3583,20 +3585,6 @@ word3
       (while (re-search-forward "[0-9]*\\.?[0-9]+" nil t)
         (setq sum (+ sum (string-to-number (match-string 0)))))
       (message "Sum: %f" sum)))
-  ;; goToday
-  (eval-after-load "org"
-    '(progn
-       ;; Va au jour de la semaine
-       (defun gotoday ()
-         (interactive)
-         (setq year (format-time-string "%Y" (current-time)))
-         (org-cycle)
-         (search-forward year)
-         (org-cycle)
-         (setq week (concat "semaine " (format-time-string "%V")))
-         (search-forward week)
-         (org-cycle))
-       (define-key org-mode-map (kbd "s-<end>") 'gotoday)))
 #+END_SRC
 ** Sort helper
 #+BEGIN_SRC emacs-lisp
