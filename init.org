@@ -103,6 +103,7 @@ Configuration minimale (sans librairies externes)
 #+BEGIN_SRC emacs-lisp
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "PYTHONPATH")
 #+END_SRC
 ** Theme (couleurs, modeline)
 *dépendances*: [[https://github.com/djangoliv/conf][djangoliv-theme.el]]
@@ -3092,6 +3093,12 @@ word3
   (defun pyqt-browser ()
     (interactive)
     (eww "http://pyqt.sourceforge.net/Docs/PyQt4/classes.html"))
+#+END_SRC
+**** pycoverage
+*dépendances* [[https://github.com/mattharrison/pycoverage.el][pycoverage]]
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/pycoverage/")
+  (require 'pycoverage)
 #+END_SRC
 *** C++
 **** Initialisation
