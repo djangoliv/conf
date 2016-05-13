@@ -94,11 +94,11 @@
   (toggle-read-only 0))
 (setq-default kill-read-only-ok t)
 
-;; Mettre tous les fichiers de sauvegarde dans un seul repertoire
- (setq backup-directory-alist
-       '(("." . "~/.emacs-backup-terms-files/")))
- (setq auto-save-file-name-transforms
-           `((".*" ,"~/.emacs-autosave-terms-files/" t)))
+;; pas de sauvegarde auto
+(setq auto-save-default nil)
+(setq make-backup-files nil)
+
+;; conf dans registre
 (set-register ?e '(file . "~/.emacs-terms"))
 
 ;; copier-coller application externe
