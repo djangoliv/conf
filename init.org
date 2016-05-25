@@ -2199,6 +2199,13 @@ Avoir des tabs (et surtout des groupes)
   (setq open-junk-file-format "/tmp/%Y%m%d-%H%M%S.")
   (global-set-key (kbd "C-x r f") 'open-junk-file)
 #+END_SRC
+*** zoom-window
+*dépendances* [[https://github.com/syohex/emacs-zoom-window][emacs-zomm-windows]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'zoom-window-zoom "zoom-window" nil t)
+  (global-set-key (kbd "<f11>") 'zoom-window-zoom)
+  (setq zoom-window-mode-line-color "LightSlateGray")
+#+END_SRC
 * Developpement
 ** Common
 *** insert un shebang
