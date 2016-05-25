@@ -2192,6 +2192,13 @@ Avoir des tabs (et surtout des groupes)
   (add-hook 'org-mode-hook 'emoji-cheat-sheet-plus-display-mode)
   (defalias 'smiley 'emoji-cheat-sheet-plus-buffer)
 #+END_SRC
+*** open-junk-file
+*dépendances* [[https://www.emacswiki.org/emacs/open-junk-file.el][open-junk-file]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'open-junk-file "open-junk-file" nil t)
+  (setq open-junk-file-format "/tmp/%Y%m%d-%H%M%S.")
+  (global-set-key (kbd "C-x r f") 'open-junk-file)
+#+END_SRC
 * Developpement
 ** Common
 *** insert un shebang
