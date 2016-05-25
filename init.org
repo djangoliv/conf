@@ -909,7 +909,7 @@ Avoir des tabs (et surtout des groupes)
   (setq goby-use-advanced-window-manager t)
 #+END_SRC
 ** Markdown
-*dépendances*: [[https://github.com/defunkt/markdown-mode][markdown-mode.el]] [[https://github.com/skeeto/impatient-mode][impatient-mode]] [[https://github.com/skeeto/emacs-web-server][simple-httpd]]
+*dépendances*: [[https://github.com/defunkt/markdown-mode][markdown-mode.el]] [[https://github.com/skeeto/emacs-web-server][simple-httpd]] [[https://github.com/mola-T/flymd][flymd]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'markdown-mode "markdown-mode" "Major mode for editing Markdown files" t)
   (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
@@ -917,7 +917,7 @@ Avoir des tabs (et surtout des groupes)
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   ;; preview in eww
   (autoload 'eww-mode "eww" "" t) ;; build-in
-  (defun markdown-preview-buffer ()
+  (defun markdown-preview-eww ()
     (interactive)
     (if (get-buffer "*html*")
         (kill-buffer "*html*"))
@@ -929,16 +929,10 @@ Avoir des tabs (et surtout des groupes)
       (shr-render-buffer buf-html)
       (kill-buffer buf-html)))
   ;; live preview in firefox
-  ;; M-x httpd-start,  M-x impatient-mode,  M-x imp-set-user-filter RET markdown-html
-  ;; http://localhost:8080/imp/
-  (add-to-list 'load-path "~/Outils/emacs/impatient-mode-master")
-  (require 'impatient-mode)
-  (defun markdown-html (buffer) 
-    (princ (with-current-buffer buffer 
-             (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s </xmp><script src=\"http://strapdownjs.com/v/0.2/strapdown.js\"></script></html>"
-                     (buffer-substring-no-properties (point-min) (point-max))))
-           (current-buffer)))
-  ;; Org-struct minor mode
+  (add-to-list 'load-path "~/.emacs.d/flymd/")
+  (autoload 'flymd-flyit "flymd" nil t)
+  (defalias 'markdown-live 'flymd-flyit)
+  ;; Org-struct minor mode active in markdown mode.
   (add-hook 'markdown-mode-hook 'turn-on-orgstruct)
 #+END_SRC
 ** eimp (manipulation d'image)
@@ -2144,7 +2138,7 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'diffview-mode "diffview" nil t)
 #+END_SRC
 *** logview
-*dépendances* [[https://github.com/emacsmirror/logview][logview]]
+*dépendances* [[https://github.com/emacsmirror/logview][logview]] [[https://github.com/doublep/datetime][datetime]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'logview-mode "logview" nil t)
   (add-to-list 'auto-mode-alist '("\\log.txt\\'" . logview-mode))
