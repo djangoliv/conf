@@ -2767,12 +2767,15 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** Python
 **** Initialisation
-*dépendances* [[https://github.com/emacsmirror/fuzzy-format][fuzzy-format.el]] [[https://github.com/flycheck/flycheck][flycheck.el]] (init plus haut)
+*dépendances* [[https://github.com/emacsmirror/fuzzy-format][fuzzy-format.el]] [[https://github.com/flycheck/flycheck][flycheck.el]] [[http://melpa.org/#/highlight-operators][highlight-operators]]
 #+BEGIN_SRC emacs-lisp
   ;; Use archive mode to open Python eggs
   (add-to-list 'auto-mode-alist '("\\.egg\\'" . archive-mode))
   ;; Use python-mode to open .pylintrc
   (add-to-list 'auto-mode-alist '("\\pylintrc\\'" . python-mode))
+  ;; highlight-operators
+  (autoload 'highlight-operators-mode "highlight-operators" nil t)
+  ;; hook
   (add-hook 'python-mode-hook
             (lambda ()
               ;; auto-complete
@@ -2786,6 +2789,8 @@ Avoir des tabs (et surtout des groupes)
               (setq python-indent 4)
               ;; parentheses en couleurs
               (rainbow-delimiters-mode)
+              ;; highlight operators
+              (highlight-operators-mode)
               ;; indentation auto
               (setq python-indent-offset 4)
               (require 'fuzzy-format)

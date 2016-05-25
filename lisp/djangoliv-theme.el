@@ -146,6 +146,9 @@
 ;; autocomplete
 (custom-set-faces
  '(ac-candidate-face ((t (:underline "gray")))))
+;; highlight-operators
+(custom-set-faces
+ '(highlight-operators-face ((t (:foreground "paleTurquoise2")))))
 ;; block source faces
 (defface org-block-begin-line
   '((t (:foreground "firebrick")))"")
