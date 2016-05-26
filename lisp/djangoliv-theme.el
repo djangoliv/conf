@@ -30,6 +30,13 @@
 (add-to-list 'default-frame-alist '(foreground-color . "wheat"))
 ;;;;; tabbar
 (setq tabbar-background-color "DarkSlateGray") ;; the color of the tabbar background
+(setq tabbar-tab-label-function (lambda (tab) (format " %s " (car tab)))) ; ajoute des espaces autours des labels
+(custom-set-variables
+ '(tabbar-scroll-left-button (quote (("") "")))
+ '(tabbar-scroll-right-button (quote (("") ""))))
+(custom-set-faces
+ '(tabbar-unselected ((t (:inherit tabbar-default :foreground "lightGray"))))
+ '(tabbar-selected ((t (:inherit tabbar-default :foreground "whiteSmoke" :bold t)))))
 ;;;; dired
 (custom-set-faces
  '(dired-filetype-common ((t (:foreground "white"))))

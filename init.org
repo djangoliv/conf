@@ -261,7 +261,7 @@ Avoir des tabs (et surtout des groupes)
 ** Initialisation
 *dépendances*: [[https://github.com/dholm/tabbar][tabbar.el]]
 #+BEGIN_SRC emacs-lisp
-  ;(setq tabbar-use-images nil)
+  (setq tabbar-use-images nil)
   ;; permet de ne pas afficher les buffers non pertinents (comme *scratch* par exemple):
   (when (require 'tabbar nil t)
     (setq tabbar-buffer-groups-function
@@ -281,15 +281,6 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-<prior>") 'tabbar-backward-tab)
   (global-set-key (kbd "C-c C-t") 'tabbar-local-mode) ;; switch tabbar (header-line)
  #+END_SRC
-** apparences
-#+BEGIN_SRC emacs-lisp
-  ;; Apparence tabbar custom color
-  (setq tabbar-background-color "DarkSlateGray") ;; the color of the tabbar background
-  (set-face-attribute
-   'tabbar-unselected nil
-   :foreground "gainsboro")
-  (setq tabbar-tab-label-function (lambda (tab) (format " %s " (car tab)))) ; ajoute des espaces autours des labels
-#+END_SRC
 ** groupes
 #+BEGIN_SRC emacs-lisp
   ;; tabbar group
