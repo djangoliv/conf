@@ -22,6 +22,11 @@ Configuration minimale (sans librairies externes)
   (modify-frame-parameters nil '((wait-for-wm . nil)) )
   ;; Bip en mode visuel
   (setq visible-bell t)
+  (defun my-visible-bell ()
+    (invert-face 'mode-line)
+    (run-with-timer 0.1 nil 'invert-face 'mode-line))
+  (setq visible-bell nil
+        ring-bell-function 'my-visible-bell)
   ;; enlever la barre d'outil
   (tool-bar-mode -1)
   (custom-set-variables '(toolbar-visible-p nil))
@@ -135,6 +140,7 @@ Configuration minimale (sans librairies externes)
   (setq backup-directory-alist
         '(("." . "~/.emacs-backup-files/")))
   (setq version-control t      ;; activation
+        backup-by-copying t    ;; don't clobber symlinks
         delete-old-versions t  ;; nettoyage silencieux
         kept-new-versions 3
         kept-old-versions 1)
@@ -846,7 +852,6 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'plantuml-mode "plantuml-mode" "" t)
   (add-to-list 'auto-mode-alist '("\\.uml\\'" . plantuml-mode))
   (setq plantuml-jar-path "~/.emacs.d/plantuml/plantuml.jar")
-  (global-set-key (kbd "C-c p") 'plantuml-run-and-display)
  #+END_SRC
 ** gnuplot
 *dépendances*: [[https://github.com/bruceravel/gnuplot-mode][gnuplot-mode]]
@@ -1373,12 +1378,14 @@ Avoir des tabs (et surtout des groupes)
 *dépendances*: [[https://github.com/laysakura/doc-view-fit-to-page][doc-view-fit-page.el]]
 #+BEGIN_SRC emacs-lisp
   ;; new search c-u c-s (c-t pour le tool-tip)
-  (setq doc-view-continuous t)
-  (add-hook 'doc-view-mode-hook (lambda ()
-                                  (require 'doc-view-fit-page)
-                                  (define-key doc-view-mode (kbd "f") 'doc-view-fit-page)
-                                  (define-key doc-view-mode (kbd "h") 'doc-view-fit-height)
-                                  (define-key doc-view-mode (kbd "w") 'doc-view-fit-width)))
+  (setq doc-view-continuous t
+        doc-view-resolution 300)
+  (add-hook 'doc-view-mode-hook
+            (lambda ()
+              (require 'doc-view-fit-page)
+              (define-key doc-view-mode (kbd "f") 'doc-view-fit-page)
+              (define-key doc-view-mode (kbd "h") 'doc-view-fit-height)
+              (define-key doc-view-mode (kbd "w") 'doc-view-fit-width)))
  #+END_SRC
 *** txt-view
 *dépendances*: [[https://github.com/emacsmirror/no-word][no-word.el]]
@@ -1463,13 +1470,12 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
 #+END_SRC
 *** zoom-window
-*dépendances* [[https://github.com/syohex/emacs-zoom-window][emacs-zomm-windows]]
+*dépendances* [[https://github.com/syohex/emacs-zoom-window][emacs-zopm-windows]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'zoom-window-zoom "zoom-window" nil t)
   (global-set-key (kbd "<f11>") 'zoom-window-zoom)
   (setq zoom-window-mode-line-color "LightSlateGray")
 #+END_SRC
-
 ** Gestion Fichiers
 *** Renomer le fichier courant
 #+BEGIN_SRC emacs-lisp
@@ -2355,19 +2361,12 @@ Avoir des tabs (et surtout des groupes)
   (setq tags-table-list (list "~/workspaces/proj1/" "~/workspaces/proj2"))
 #+END_SRC
 *** Rechercher dans le projet courant (fiplr)
-*dépendances* [[https://github.com/grizzl/fiplr][fiplr]] [[https://github.com/emacsattic/ifind-mode][ifind-mode.el]] [[https://github.com/grizzl/grizzl][grizzl]]
+*dépendances* [[https://github.com/emacsattic/ifind-mode][ifind-mode]]
 #+BEGIN_SRC emacs-lisp
   ;; i-find
   (defvar workspace-dir "~/workspaces/proj1/trunk ~/install/proj1")
   (autoload 'ifind-mode "ifind-mode" "" t)
-  (global-set-key (kbd "C-c F") 'ifind-mode)
-  ;; fiplr
-  (require 'grizzl)
-  (autoload 'fiplr-find-file "fiplr" "" t)
-  (setq fiplr-root-markers '("trunk"))
-  (setq fiplr-ignored-globs '((directories (".git" ".svn"))
-                              (files ("*.zip" "*~" "*.pyc"))))
-  (global-set-key (kbd "C-c f") 'fiplr-find-file)
+  (global-set-key (kbd "C-x F") 'ifind-mode)
 #+END_SRC
 *** whitespace
 #+BEGIN_SRC emacs-lisp
@@ -2420,8 +2419,8 @@ Avoir des tabs (et surtout des groupes)
   ;; (add-hook 'prog-mode-hook 'indent-guide-mode)
   (setq indent-guide-delay 0.5)
 #+END_SRC
-** flycheck
-*dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]]
+** flycheck/flyspell
+*dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]] [[https://github.com/xuchunyang/flyspell-popup][flyspell-popup]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'flycheck-mode "flycheck" nil t)
   (eval-after-load "flycheck"
@@ -2432,6 +2431,54 @@ Avoir des tabs (et surtout des groupes)
        (flycheck-tip-use-timer 'verbose)
        (global-set-key (kbd "C-c <down>") 'flycheck-next-error)
        (global-set-key (kbd "C-c <up>") 'flycheck-previous-error)))
+  ;; flyspell popup 
+      (require 'flyspell-popup)
+      (add-hook 'flyspell-mode-hook #'flyspell-popup-auto-correct-mode)
+  ;; flyspell in git commit
+  (defun flyspell-ignore-comments ()
+    "Used for 'flyspell-generic-check-word-predicate' to ignore comments."
+    (not (string-match "^ *#" (thing-at-point 'line t))))
+  (put 'git-commit-mode 'flyspell-mode-predicate 'flyspell-ignore-comments)
+  (add-hook 'git-commit-setup-hook #'git-commit-turn-on-flyspell)
+  ;; flyspell in markdown
+  (defun flyspell-generic-textmode-verify () ;; ignore code block
+    "Used for `flyspell-generic-check-word-predicate' in text modes."
+    (let ((f (get-text-property (- (point) 1) 'face)))
+      (not (memq f '(markdown-pre-face)))))
+  (setq flyspell-generic-check-word-predicate 'flyspell-generic-textmode-verify)
+  (add-hook 'markdown-mode-hook 'flyspell-mode)
+  ;; flyspell web-mode
+  (defun web-mode-flyspell-verify ()
+    (let ((f (get-text-property (- (point) 1) 'face))
+          thing
+          rlt)
+      (cond
+       ((not (memq f '(web-mode-html-attr-value-face
+                       web-mode-html-tag-face
+                       web-mode-html-attr-name-face
+                       web-mode-constant-face
+                       web-mode-doctype-face
+                       web-mode-keyword-face
+                       web-mode-function-name-face
+                       web-mode-variable-name-face
+                       web-mode-css-property-name-face
+                       web-mode-css-selector-face
+                       web-mode-css-color-face
+                       web-mode-type-face
+                       web-mode-block-control-face)
+                   ))
+        (setq rlt t))
+       ((memq f '(web-mode-html-attr-value-face))
+        (save-excursion
+          (search-backward-regexp "=['\"]" (line-beginning-position) t)
+          (backward-char)
+          (setq thing (thing-at-point 'symbol))
+          (setq rlt (string-match "^\\(value\\|class\\|ng[A-Za-z0-9-]*\\)$" thing))
+          rlt))
+       (t t))
+      rlt))
+  (put 'web-mode 'flyspell-mode-predicate 'web-mode-flyspell-verify)
+  (add-hook 'web-mode-hook 'flyspell-mode)
  #+END_SRC
 ** Company
 *dépendances*: [[https://github.com/company-mode/company-mode][company-mode]] [[https://github.com/expez/company-quickhelp][company-quickhelp]]
@@ -2439,11 +2486,14 @@ Avoir des tabs (et surtout des groupes)
   (add-to-list 'load-path "~/.emacs.d/company-mode")
   (require 'company)
   (require 'company-quickhelp)
-  (setq company-minimum-prefix-length 1)
-  (setq company-selection-wrap-around t)
-  (setq company-idle-delay 0.2)
-  (setq company-transformers '(company-sort-by-occurrence))
-  (setq company-begin-commands '(self-insert-command))
+  (setq company-minimum-prefix-length 1
+        company-idle-delay 0.2
+        company-tooltip-limit 20
+        company-selection-wrap-around t
+        company-dabbrev-downcase nil
+        company-tooltip-align-annotations 't
+        company-transformers '(company-sort-by-occurrence)
+        company-begin-commands '(self-insert-command))
   (add-hook 'after-init-hook 'global-company-mode)
   (company-quickhelp-mode 1)
   (delq 'company-eclim company-backends)
@@ -3415,39 +3465,6 @@ word3
   (defun angularJs ()
     (interactive)
     (web-mode-set-engine "angular"))
-  ;; flyspell
-  (defun web-mode-flyspell-verify ()
-    (let ((f (get-text-property (- (point) 1) 'face))
-          thing
-          rlt)
-      (cond
-       ((not (memq f '(web-mode-html-attr-value-face
-                       web-mode-html-tag-face
-                       web-mode-html-attr-name-face
-                       web-mode-constant-face
-                       web-mode-doctype-face
-                       web-mode-keyword-face
-                       web-mode-comment-face ;; focus on get html label right
-                       web-mode-function-name-face
-                       web-mode-variable-name-face
-                       web-mode-css-property-name-face
-                       web-mode-css-selector-face
-                       web-mode-css-color-face
-                       web-mode-type-face
-                       web-mode-block-control-face)
-                   ))
-        (setq rlt t))
-       ((memq f '(web-mode-html-attr-value-face))
-        (save-excursion
-          (search-backward-regexp "=['\"]" (line-beginning-position) t)
-          (backward-char)
-          (setq thing (thing-at-point 'symbol))
-          (setq rlt (string-match "^\\(value\\|class\\|ng[A-Za-z0-9-]*\\)$" thing))
-          rlt))
-       (t t))
-      rlt))
-  (put 'web-mode 'flyspell-mode-predicate 'web-mode-flyspell-verify)
-  (add-hook 'web-mode-hook (lambda () (flyspell-mode 1)))
   #+END_SRC
 **** Emmet
 *dépendances*: [[https://github.com/smihica/emmet-mode][emmet.el]]

@@ -36,6 +36,8 @@
  '(tabbar-scroll-right-button (quote (("") ""))))
 (custom-set-faces
  '(tabbar-unselected ((t (:inherit tabbar-default :foreground "lightGray"))))
+ '(tabbar-button ((t (:inherit tabbar-default :foreground "whiteSmoke"))))
+ '(tabbar-separator ((t (:background "gray60"))))
  '(tabbar-selected ((t (:inherit tabbar-default :foreground "whiteSmoke" :bold t)))))
 ;;;; dired
 (custom-set-faces
