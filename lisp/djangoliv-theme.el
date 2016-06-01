@@ -142,22 +142,22 @@
 (set-face-attribute 'completions-first-difference nil :foreground "white")
 ;; company
 (custom-set-faces
- '(company-tooltip ((t (:background "gray" :foreground "DarkSlateGray" :underline "gainsboro"))))
- '(company-scrollbar-bg ((t (:background "DarkGray"))))
- '(company-scrollbar-fg ((t (:background "WhiteSmoke"))))
- '(company-tooltip-selection ((t (:background "gainsboro"))))
- '(company-tooltip-common-selection ((t (:foreground "black"))))
+ '(company-tooltip ((t (:background "skyBlue4" :foreground "gray" :box "#003442"))))
+ '(company-scrollbar-bg ((t (:background "gray30"))))
+ '(company-scrollbar-fg ((t (:background "#003442"))))
+ '(company-tooltip-selection ((t (:foreground "WhiteSmoke" :background "#003442"))))
+ '(company-tooltip-common-selection ((t (:foreground "gray50"))))
  '(company-tooltip-common ((t (:foreground "black"))))
  '(company-tooltip-search ((t (:background "white"))))
- '(company-tooltip-annotation  ((t (:foreground "DodgerBlue")))))
-(setq pos-tip-foreground-color "WhiteSmoke")
+ '(company-tooltip-annotation  ((t (:foreground "darkBlue")))))
+(setq pos-tip-foreground-color "whiteSmoke")
 (setq pos-tip-background-color "#003442")
 ;; autocomplete
 (custom-set-faces
  '(ac-candidate-face ((t (:underline "gray")))))
 ;; highlight-operators
 (custom-set-faces
- '(highlight-operators-face ((t (:foreground "paleTurquoise2")))))
+ '(highlight-operators-face ((t (:foreground "burlywood3")))))
 ;; block source faces
 (defface org-block-begin-line
   '((t (:foreground "firebrick")))"")
