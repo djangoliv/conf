@@ -168,7 +168,7 @@ Configuration minimale (sans librairies externes)
   (setq mouse-drag-copy-region t)
   (global-set-key [mouse-2] 'mouse-yank-at-click)
   ;; copie du clipboard
-  (require 'simpleclip)
+  (autoload 'simpleclip-get-contents "simpleclip" nil t)
   (defun paste-from-x-clipboard()
 	"Paste string clipboard"
 	(interactive)
@@ -1138,11 +1138,6 @@ Avoir des tabs (et surtout des groupes)
    (drag-stuff-global-mode t)
    (add-to-list 'drag-stuff-except-modes 'org-mode) ;; org-mode gere mieux tout seul
  #+END_SRC
-** smart-comment
-#+BEGIN_SRC emacs-lisp
-  (require 'smart-comment)
-  (global-set-key (kbd "M-;") 'smart-comment)
-#+END_SRC
 ** Expand Region
 *dépendances*: [[https://github.com/magnars/expand-region.el][expand-region]]
 #+BEGIN_SRC emacs-lisp
