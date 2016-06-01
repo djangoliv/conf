@@ -1516,7 +1516,7 @@ Avoir des tabs (et surtout des groupes)
         (make-directory parent-directory t))))
   (add-to-list 'find-file-not-found-functions 'my-create-non-existent-directory)
 #+END_SRC
-*** Show file name
+*** Show file name/info
 #+BEGIN_SRC emacs-lisp
   ;; Afficher le nom du fichier dans le minibuffer et le mettre dans la kill-ring
   (defun show-file-name ()
@@ -1524,6 +1524,25 @@ Avoir des tabs (et surtout des groupes)
         (message (buffer-file-name))
         (kill-new (file-truename buffer-file-name)))
   (global-set-key (kbd "C-x v f") 'show-file-name)
+  ;; Afficher les informations du fichier courant
+  (defun show-file-info ()
+    (interactive)
+    (let* ((fname (buffer-file-name))
+           (data (file-attributes fname))
+           (access (current-time-string (nth 4 data)))
+           (mod (current-time-string (nth 5 data)))
+           (change (current-time-string (nth 6 data)))
+           (size (nth 7 data))
+           (mode (nth 8 data)))
+      (message
+       "%s:
+    Size: %s bytes
+    Accessed: %s
+    Modified: %s
+    Changed: %s
+    Mode: %s"
+       fname size access mod change mode)))
+(global-set-key (kbd "C-x v i") 'show-file-info)
 #+END_SRC
 *** open-junk-file
 *dépendances* [[https://www.emacswiki.org/emacs/open-junk-file.el][open-junk-file]]
