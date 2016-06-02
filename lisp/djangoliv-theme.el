@@ -35,10 +35,10 @@
  '(tabbar-scroll-left-button (quote (("") "")))
  '(tabbar-scroll-right-button (quote (("") ""))))
 (custom-set-faces
- '(tabbar-unselected ((t (:inherit tabbar-default :foreground "lightGray"))))
- '(tabbar-button ((t (:inherit tabbar-default :foreground "whiteSmoke"))))
+ '(tabbar-unselected ((t (:inherit tabbar-default :foreground "LightGray"))))
+ '(tabbar-button ((t (:inherit tabbar-default :foreground "WhiteSmoke"))))
  '(tabbar-separator ((t (:background "gray60"))))
- '(tabbar-selected ((t (:inherit tabbar-default :foreground "whiteSmoke" :bold t)))))
+ '(tabbar-selected ((t (:inherit tabbar-default :foreground "WhiteSmoke" :bold t)))))
 ;;;; dired
 (custom-set-faces
  '(dired-filetype-common ((t (:foreground "white"))))
@@ -138,6 +138,7 @@
  '(calendar-today ((t (:foreground "aquamarine"))))
  '(calendar-weekend-header ((t (:foreground "LightSlateBlue"))))
  '(diary ((t (:foreground "#29FF25" :background "#271363936393"))))
+ '(calendar-iso-week-face ((t (:foreground "LightBlue" :height 0.7))))
  '(calendar-today ((t (:foreground "yellow")))))
 ;; completion
 (set-face-attribute 'completions-first-difference nil :foreground "white")
