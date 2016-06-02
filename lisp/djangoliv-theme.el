@@ -133,11 +133,12 @@
 ;; split window
 (set-face-attribute 'vertical-border nil :foreground "CadetBlue")
 ;; calendar/diary
-(set-face-attribute 'holiday nil :foreground "#A7FF25" :background "#271363936393")
-(set-face-attribute 'calendar-today nil :foreground "aquamarine")
-(set-face-attribute 'calendar-weekend-header nil :foreground "LightSlateBlue")
-(set-face-attribute 'diary nil :foreground "#29FF25" :background "#271363936393")
-(set-face-attribute 'calendar-today nil :foreground "yellow")
+(custom-set-faces
+ '(holiday ((t (:foreground "#A7FF25" :background "#27136393639"))))
+ '(calendar-today ((t (:foreground "aquamarine"))))
+ '(calendar-weekend-header ((t (:foreground "LightSlateBlue"))))
+ '(diary ((t (:foreground "#29FF25" :background "#271363936393"))))
+ '(calendar-today ((t (:foreground "yellow")))))
 ;; completion
 (set-face-attribute 'completions-first-difference nil :foreground "white")
 ;; company
