@@ -464,8 +464,6 @@ Avoir des tabs (et surtout des groupes)
   (define-key dired-sort-map "t" 'dired-sort-by-time)
   (define-key dired-sort-map "n" 'dired-sort-by-Name)
   (define-key dired-sort-map "?" (lambda () "sort help" (interactive) (message "s Size; x eXtension; t Time; n Name;")))
-  ;;(require 'dired-sort-menu)
-  ;;(define-key dired-mode-map (kbd "<down-mouse-3>") 'dired-sort-menu-popup)
 #+END_SRC
 *** (de)compression
 #+BEGIN_SRC emacs-lisp
@@ -2307,7 +2305,7 @@ Avoir des tabs (et surtout des groupes)
        (yas-global-mode 1)
        (setq yas/indent-line 'fixed)
        ;; pour avoir les snippet dans le minibuffer
-       (require 'dropdown-list)
+       (autoload 'yas-insert-snippet "dropdown-list" nil t)
        (defadvice yas-insert-snippet (around use-completing-prompt activate)
          "Use `yas/completing-prompt' for `yas/prompt-functions' but only here..."
          (let ((yas-prompt-functions '(yas/completing-prompt))) ad-do-it))
@@ -2368,8 +2366,6 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   ;; global mark :: C-x C-<right> ; C-x C-<left>
   ;; local mark :: C-x <right> ; C-x <left>
-  (require 'smartrep) ;; sequence C-x right left left ...
-  (require 'nav-flash) ;; bref highligth
   (require 'back-button)
   (require 'auto-mark)
   (back-button-mode 1)
@@ -2928,7 +2924,7 @@ C-. => goto definition
 *dépendances* [[https://github.com/glyph/python-docstring-mode][python-docstring-mode]]
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/Outils/emacs/python/python-docstring-mode-master")
-  (load-file "~/Outils/emacs/python/python-docstring-mode-master/python-docstring.el")
+  (autoload 'python-docstring-mode "python-docstring" nil t)
   (add-hook 'python-mode-hook (lambda () (python-docstring-mode t)))
 #+END_SRC
 **** doc (pydoc)
@@ -3500,12 +3496,12 @@ word3
         '(("django"    . "\\.html\\'"))
         )
   ;; force django engine (manual)
-  (defun django ()
+  (defun web-mode-django ()
     (interactive)
     (web-mode-set-engine "django"))
-  (global-set-key (kbd "s-%") 'django)
+  (global-set-key (kbd "s-%") 'web-mode-django)
   ;; force angular engine (manual)
-  (defun angularJs ()
+  (defun web-mode-angularJs ()
     (interactive)
     (web-mode-set-engine "angular"))
   #+END_SRC
