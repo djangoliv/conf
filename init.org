@@ -632,9 +632,12 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 ** Org-Mode
 *** init
-*dépendances*: [[http://orgmode.org/][org-mode]]  [[https://github.com/sabof/org-bullets][org-bullets.el]] [[http://ditaa.sourceforge.net/][ditaa]]
+*dépendances*: [[http://orgmode.org/][org-mode]] [[http://ditaa.sourceforge.net/][ditaa]]
 #+BEGIN_SRC emacs-lisp
   ;; initialisation
+  (add-to-list 'load-path "~/Outils/emacs/org-mode/org-8.3.4/lisp/")
+  (add-to-list 'load-path "~/Outils/emacs/org-mode/org-8.3.4/contrib/lisp/")
+  (require 'org)
   (setq org-ellipsis " ••• ")
   (setq org-startup-indented t)
   (setq org-indent-mode t)
@@ -648,9 +651,6 @@ Avoir des tabs (et surtout des groupes)
   (modify-coding-system-alist 'file "\\.org\\'" 'utf-8)
   (setq org-cycle-separator-lines 0)
   (add-hook 'ediff-prepare-buffer-hook #'show-all) ;; edif in org-mode
-  ;; theme+
-  (require 'org-bullets)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (add-hook 'org-mode-hook (lambda ()
                              (global-set-key (kbd "s-<escape>") 'hide-sublevels)   ;; tout plier
                              (defadvice org-open-at-point (around org-open-at-point-choose-browser activate)
@@ -660,6 +660,10 @@ Avoir des tabs (et surtout des groupes)
                              ;;(setq-local ac-auto-start 8)
                              (setq-local line-spacing '0.1)
                              (setq-local company-minimum-prefix-length 5)))
+  ;; theme+
+  (require 'org-bullets)
+  (setq org-bullets-bullet-list '("☯" "○" "✸" "✿" "~"))
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   ;; raccourci
   (eval-after-load "org"
     '(progn
