@@ -410,10 +410,9 @@ Avoir des tabs (et surtout des groupes)
 ** Dired
 *** Initialisation
 #+BEGIN_SRC emacs-lisp
-  ;; chargement
-  (require 'dired)
   ;; apparence
   (setq dired-listing-switches "-lah --time-style long")
+  (setq directory-free-space-args "-Pkh")
   ;; wdired permet le changement des permissions
   (setq wdired-allow-to-change-permissions t)
   ;; find-dired options
@@ -481,7 +480,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** omit
 #+BEGIN_SRC emacs-lisp
-  (require 'dired-x) ;; build-in librairie
+  (eval-after-load 'dired '(require 'dired-x)) ;; build-in librairie
   (define-key dired-mode-map (kbd "M-o") 'dired-omit-mode)
   (setq-default dired-omit-files-p t)
   (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
@@ -2203,7 +2202,8 @@ Avoir des tabs (et surtout des groupes)
 *dépendances*  [[https://github.com/syl20bnr/emacs-emoji-cheat-sheet-plus][emacs-emoji-cheat-sheet-plus]] 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/emacs-emoji-cheat-sheet-plus")
-  (require 'emoji-cheat-sheet-plus)
+  (autoload 'emoji-cheat-sheet-plus-display-mode "emoji-cheat-sheet-plus" nil t)
+  (autoload 'emoji-cheat-sheet-plus-buffer "emoji-cheat-sheet-plus" nil t)
   (add-hook 'org-mode-hook 'emoji-cheat-sheet-plus-display-mode)
   (defalias 'smiley 'emoji-cheat-sheet-plus-buffer)
 #+END_SRC
@@ -2470,9 +2470,11 @@ Avoir des tabs (et surtout des groupes)
        (flycheck-tip-use-timer 'verbose)
        (global-set-key (kbd "C-c <down>") 'flycheck-next-error)
        (global-set-key (kbd "C-c <up>") 'flycheck-previous-error)))
-  ;; flyspell popup 
-      (require 'flyspell-popup)
-      (add-hook 'flyspell-mode-hook #'flyspell-popup-auto-correct-mode)
+  ;; flyspell popup
+  (eval-after-load "flyspell"
+    '(progn
+       (require 'flyspell-popup)
+       (add-hook 'flyspell-mode-hook #'flyspell-popup-auto-correct-mode)))
   ;; flyspell in git commit
   (defun flyspell-ignore-comments ()
     "Used for 'flyspell-generic-check-word-predicate' to ignore comments."
