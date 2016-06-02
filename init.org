@@ -410,6 +410,7 @@ Avoir des tabs (et surtout des groupes)
 ** Dired
 *** Initialisation
 #+BEGIN_SRC emacs-lisp
+  (require 'dired)
   ;; apparence
   (setq dired-listing-switches "-lah --time-style long")
   (setq directory-free-space-args "-Pkh")
