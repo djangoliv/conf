@@ -2179,7 +2179,6 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'logview-mode "logview" nil t)
   (add-to-list 'auto-mode-alist '("\\log.txt\\'" . logview-mode))
   (add-to-list 'auto-mode-alist '("\\.log\\'" . logview-mode))
-  (add-to-list 'auto-mode-alist `(,(expand-file-name "/testLogs/") . logview-mode)) ;; tous les fichiers du repertoire tesLogs$
   (custom-set-variables  '(logview-additional-submodes
                            (quote
                             (("proj Format"
@@ -2420,14 +2419,6 @@ Avoir des tabs (et surtout des groupes)
 *** etags (tables)
 #+BEGIN_SRC emacs-lisp
   (setq tags-table-list (list "~/workspaces/proj1/" "~/workspaces/proj2"))
-#+END_SRC
-*** Rechercher dans le projet courant (fiplr)
-*dépendances* [[https://github.com/emacsattic/ifind-mode][ifind-mode]]
-#+BEGIN_SRC emacs-lisp
-  ;; i-find
-  (defvar workspace-dir "~/workspaces/proj1/trunk ~/install/proj1")
-  (autoload 'ifind-mode "ifind-mode" "" t)
-  (global-set-key (kbd "C-x F") 'ifind-mode)
 #+END_SRC
 *** whitespace
 #+BEGIN_SRC emacs-lisp
@@ -3640,6 +3631,18 @@ word3
           ("~/workspaces/proj2/trunk/src/Main" . "~/install/proj2/Main")
           ;; ("" . "")
           )))
+#+END_SRC
+** Rechercher dans le projet courant
+*dépendances* [[https://github.com/djangoliv/ifind-mode-plus][ifind-mode-plus]]
+#+BEGIN_SRC emacs-lisp
+  (setq workspace-dir "/space/giorgis/workspaces/AGILE/trunk /AGILE/SAG_3.4/OPERATIONNEL/REFERENTIEL/TRAITEMENTS/SAG/ /space/giorgis/workspaces/4ARTIC/trunk /space/giorgis/workspaces/FLEGM/trunk")
+  (setq ifind-project-list '(("4ARTIC" . "/space/giorgis/workspaces/4ARTIC/trunk")
+                             ("AGILE" . "/space/giorgis/workspaces/AGILE/trunk /AGILE/SAG_3.4/OPERATIONNEL/REFERENTIEL/TRAITEMENTS/SAG/")
+                             ("FLEGM" . "/space/giorgis/workspaces/FLEGM/trunk")))
+  (autoload 'ifind-mode "ifind-mode-plus" "" t)
+  (autoload 'ifind-switch-project "ifind-mode-plus" "" t)
+  (global-set-key (kbd "C-x F") 'ifind-mode)
+  (global-set-key (kbd "C-x S") 'ifind-switch-project)
 #+END_SRC
 ** Vrac
 #+BEGIN_SRC emacs-lisp
