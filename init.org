@@ -365,11 +365,11 @@ Avoir des tabs (et surtout des groupes)
   ;; kill all current major mode
   (defun kill-current-major-mode-buffers ()
     (interactive)
-    (setq current-mode  major-mode)
-    (mapc (lambda (buffer)
-            (when (eq current-mode (buffer-local-value 'major-mode buffer))
-              (kill-buffer buffer)))
-          (buffer-list)))
+    (let ((current-mode  major-mode))
+      (mapc (lambda (buffer)
+              (when (eq current-mode (buffer-local-value 'major-mode buffer))
+                (kill-buffer buffer)))
+            (buffer-list))))
   (global-set-key (kbd "C-c k") 'kill-current-major-mode-buffers)
  #+END_SRC
 ** Terminal dans des tabs
@@ -650,7 +650,7 @@ Avoir des tabs (et surtout des groupes)
   (setq org-return-follows-link t)
   (modify-coding-system-alist 'file "\\.org\\'" 'utf-8)
   (setq org-cycle-separator-lines 0)
-  (add-hook 'ediff-prepare-buffer-hook #'show-all) ;; edif in org-mode
+  (add-hook 'ediff-prepare-buffer-hook #'outline-show-all) ;; edif in org-mode
   (add-hook 'org-mode-hook (lambda ()
                              (global-set-key (kbd "s-<escape>") 'hide-sublevels)   ;; tout plier
                              (defadvice org-open-at-point (around org-open-at-point-choose-browser activate)
@@ -958,7 +958,7 @@ Avoir des tabs (et surtout des groupes)
   ;; lit le numero de ligne (si present) apres le signe : (suivi ou non d'un espace) ou apres line
   (defun find-file-at-cursor-replace ()
     (interactive)
-    (setq line-number (and (string-match ":[0-9]+" (thing-at-point 'line))
+    (defvar line-number (and (string-match ":[0-9]+" (thing-at-point 'line))
                            (substring (thing-at-point 'line) (1+ (match-beginning 0)) (match-end 0))))
     (if (equal line-number nil)
         (setq line-number (and (string-match "line [0-9]+" (thing-at-point 'line))
@@ -998,7 +998,7 @@ Avoir des tabs (et surtout des groupes)
                                   (find-file (concat "~/workspaces/proj2/trunk/" path))
                               (when (y-or-n-p (format "file doesn't exist: '%s'. Create?" path))
                                 (find-file path ))))))))))))))))
-    (goto-line (string-to-number line-number)))
+    (forward-line (- (string-to-number line-number) 1)))
   (global-set-key (kbd "C-<f1>") 'find-file-at-cursor-replace)
   ;; ffap avec la sourie (Ctrl click-droit)
   (global-set-key [S-mouse-3] 'ffap-at-mouse)
@@ -1012,7 +1012,7 @@ Avoir des tabs (et surtout des groupes)
        (skip-chars-backward " \t")
        (if (/= (point) here)
            (delete-region (point) here)
-         (delete-backward-char 1))))
+         (delete-char -1))))
    (global-set-key (kbd "s-<backspace>") 'hungry-backspace)
  #+END_SRC
 ** copy/delete/kill line
@@ -1020,9 +1020,9 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   (defun copy-line (&optional arg)
     (interactive "P")
-    (toggle-read-only 1)
+    (read-only-mode 1)
     (kill-line arg)
-    (toggle-read-only 0))
+    (read-only-mode 0))
   (setq-default kill-read-only-ok t)
   (global-set-key (kbd "C-c C-k") 'copy-line)
 #+END_SRC
@@ -1421,7 +1421,7 @@ Avoir des tabs (et surtout des groupes)
       (fset mode-command
             `(lambda ()
                (interactive)
-               (toggle-read-only t)
+               (read-only-mode t)
                (start-process ,mode-prefix nil
                               ,command (buffer-file-name))
                (let ((obuf (other-buffer (current-buffer) t))
@@ -1815,7 +1815,7 @@ Avoir des tabs (et surtout des groupes)
             (let ((buffer-read-only nil))
               (erase-buffer)
               (insert content))))))
-    (goto-line theLine))
+    (forward-line (- theLine 1)))
   (global-set-key (kbd "s-C-a") 'revert-buffer-with-user)
   ;; ouvir un fichier en tant que user
   (defun user-find-file (file)
@@ -1856,7 +1856,7 @@ Avoir des tabs (et surtout des groupes)
             (let ((buffer-read-only nil))
               (erase-buffer)
               (insert content))))))
-    (goto-line theLine))
+    (forward-line (- theLine 1)))
   (global-set-key (kbd "s-C-r") 'revert-buffer-with-sudo)
 #+END_SRC
 ** Tiny-expand
@@ -2015,7 +2015,7 @@ Avoir des tabs (et surtout des groupes)
           (when (> (line-number-at-pos) previous-line-number)
             (setq increment (+ increment progressive-increment))
             (setq previous-line-number (line-number-at-pos)))
-          (let ((incremented-string (int-to-string (+ increment (string-to-int (match-string 0))))))
+          (let ((incremented-string (int-to-string (+ increment (string-to-number (match-string 0))))))
             ;; If incremented string and original match differ in length, update end point
             (setq end (+ end (- (length incremented-string) (length (match-string 0)))))
             (replace-match incremented-string)))))
@@ -2236,7 +2236,7 @@ Avoir des tabs (et surtout des groupes)
     (interactive)
     (and (= ?w (char-syntax (char-before)))
          (save-excursion
-           (and (if (called-interactively-p)
+           (and (if (called-interactively-p 'any)
                     (skip-syntax-backward "w")
                   (= -3 (skip-syntax-backward "w")))
                 (let (case-fold-search)
@@ -2891,13 +2891,12 @@ Avoir des tabs (et surtout des groupes)
               (global-set-key (kbd "<S-iso-lefttab>") 'yas-insert-snippet)
               ;; Python indentation
               (setq tab-width 4)
-              (setq python-indent 4)
+              (setq python-indent-offset 4)
               ;; parentheses en couleurs
               (rainbow-delimiters-mode)
               ;; highlight operators
               (highlight-operators-mode)
               ;; indentation auto
-              (setq python-indent-offset 4)
               (require 'fuzzy-format)
               (setq fuzzy-format-default-indent-tabs-mode 1)
               (global-fuzzy-format-mode)))
@@ -3053,7 +3052,7 @@ C-. => goto definition
       (setq col (current-column))
       ;; on s'arrete a la definition de la classe
       (while (and (not (or (string-match "^class" theLine)(string-match "^def" theLine))) (> col 0))
-		(previous-line)
+		(forward-line -1)
 		(setq theLine (thing-at-point 'line))
 		(back-to-indentation)
 		;; si ligne non commentaire
@@ -3067,14 +3066,14 @@ C-. => goto definition
 					;; cas du else (ou elif) on affiche le if correspondant
 					(if (or (string-match ".*elif .*:*" theLine) (string-match ".*else.*:*" theLine))
 						(progn
-                          (previous-line)
+                          (forward-line -1)
                           (setq theLine (thing-at-point 'line))
                           (back-to-indentation)
                           ;; tant que la ligne est vide ou en commentaire ou que l'indentation est differente et que if n'est pas dans la ligne
                           (while (or (string-match "^[ \t\n]*#" theLine) (= (length (trim-string theLine)) 0)
 									 (or (< col (current-column))
 										 (and (not (string-match ".*[ \t]if .*:*" theLine)) (not (string-match ".*for .*:*" theLine)) (not (string-match ".*try.*:*" theLine)) )))
-							(previous-line)
+							(forward-line -1)
 							(back-to-indentation)
 							(setq theLine (thing-at-point 'line))
 							;; si elif ou except on l'affiche
@@ -3149,7 +3148,7 @@ word3
 		(current-column))))
   (defun hide-body-recenter ()
 	(interactive)
-	(hide-body)
+	(outline-hide-body)
 	(recenter))
   (defun my-pythonFold-hook ()
 	(setq outline-regexp "[^ \t\n]\\|[ \t]*\\(def[ \t]+\\|class[ \t]+\\)")
@@ -3157,7 +3156,7 @@ word3
 	(outline-minor-mode t)
 	;;(show-paren-mode 1)
 	(define-key python-mode-map (kbd "C-<kp-subtract>") 'hide-body-recenter)
-	(define-key python-mode-map (kbd "C-<kp-add>") 'show-all)
+	(define-key python-mode-map (kbd "C-<kp-add>") 'outline-show-all)
 	(define-key python-mode-map (kbd "C-S-<kp-subtract>") 'hide-subtree)
 	(define-key python-mode-map (kbd "C-S-<kp-add>") 'show-subtree))
 #+END_SRC
