@@ -32,7 +32,7 @@ case "$TERM" in
 esac
 
 #Editeur pour client svn
-export SVN_EDITOR=emacs
+export SVN_EDITOR=emacsclient
 
 # append to the history file, don't overwrite it
 shopt -s histappend
