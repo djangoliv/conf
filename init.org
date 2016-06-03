@@ -1701,12 +1701,12 @@ Avoir des tabs (et surtout des groupes)
   (defun firefox-tab-open (address)
     (interactive
      (list
-      (completing-read "Page: " '("duckduckgo" "memo" "listServices" "tisseo" "pythonPackages")))
-     (insert address))
+      (completing-read "Page: " '("duckduckgo" "memo" "listServices" "tisseo" "pythonPackages"))))
+     (insert address)
     (cond
      ((equal address "duckduckgo") (browse-url-firefox-new-tab "https://duckduckgo.com"))
      ((equal address "memo") (browse-url-firefox-new-tab "http://djangoliv.alwaysdata.net/memos/"))
-     ((equal address "listServices" browse-url-firefox-new-tab "http://localhost/axis2/services/listServices"))
+     ((equal address "listServices") (browse-url-firefox-new-tab "http://localhost/axis2/services/listServices"))
      ((equal address "pythonPackages") (browse-url-firefox-new-tab "https://pypi.python.org/pypi/"))
      ((equal address "tisseo") (browse-url-firefox-new-tab "http://www.tisseo.fr/"))))
   (global-set-key (kbd "s-f") 'firefox-tab-open) ; Mapper sur la touche windows + f
