@@ -1521,6 +1521,13 @@ Avoir des tabs (et surtout des groupes)
         (when (not (equal currentFile nil))
           (delete-file currentFile) ) ) ) )
  #+END_SRC
+*** Copier un fichier sans ouvrir la destination
+#+BEGIN_SRC emacs-lisp
+ (defun write-file-copy (filename)
+   (interactive "F")
+   (write-region (point-min) (point-max) filename))
+ (global-set-key (kbd "C-x w") 'write-file-copy)
+#+END_SRC
 *** Proposer de creer les repertoires s'ils n'existent pas à la creation d'un nouveau fichier
 #+BEGIN_SRC emacs-lisp
   (defun my-create-non-existent-directory ()
@@ -2977,6 +2984,8 @@ C-. => goto definition
 	(highlight-lines-matching-regexp "import ipdb")
 	(highlight-lines-matching-regexp "import pdb")
 	(highlight-lines-matching-regexp "set_trace()")
+	(highlight-regexp "FIXME")
+	(highlight-regexp "XXX")
 	(highlight-regexp "TODO"))
   (add-hook 'python-mode-hook 'annotate-pdb)
 #+END_SRC
