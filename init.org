@@ -1087,15 +1087,6 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'vr/query-replace "visual-regexp" nil t)
   (global-set-key (kbd "C-M-%") 'vr/query-replace)
 #+END_SRC
-*** isearch-occur
-#+BEGIN_SRC emacs-lisp
-  ;; occur a partir de la recherche
-  (define-key isearch-mode-map (kbd "C-o") 'isearch-occur)
-  (defun isearch-occur ()
-    (interactive)
-    (let ((case-fold-search isearch-case-fold-search))
-      (occur (if isearch-regexp isearch-string (regexp-quote isearch-string)))))
-#+END_SRC
 *** Supprimer toutes les lettres inutiles dans isearch
 	#+BEGIN_SRC emacs-lisp
       (defun isearch-delete-something ()
@@ -1114,15 +1105,6 @@ Avoir des tabs (et surtout des groupes)
         (isearch-update))
       (define-key isearch-mode-map (kbd "<backspace>") 'isearch-delete-something)
    #+END_SRC
-*** zap-to-char
-*dépendances*: [[https://github.com/cute-jumper/avy-zap][avy-zap.el]] [[https://github.com/thierryvolpiatto/zop-to-char][zop-to-char.el]]
-#+BEGIN_SRC emacs-lisp
-  (setq avy-zap-dwim-prefer-avy nil)
-  (autoload 'avy-zap-up-to-char-dwim "avy-zap")
-  (autoload 'zop-to-char "zop-to-char" nil t)
-  (global-set-key (kbd "M-z") 'avy-zap-up-to-char-dwim)
-  (global-set-key (kbd "M-Z") 'zop-to-char)
-#+END_SRC
 *** isearch-use-region
 #+BEGIN_SRC emacs-lisp
   (defun region-as-string ()
@@ -1142,6 +1124,39 @@ Avoir des tabs (et surtout des groupes)
       (deactivate-mark))
     (call-interactively 'isearch-backward))
   (global-set-key (kbd "C-S-r") 'isearch-forward-use-region)
+#+END_SRC
+*** isearch-occur
+#+BEGIN_SRC emacs-lisp
+  ;; occur a partir de la recherche
+  (define-key isearch-mode-map (kbd "C-o") 'isearch-occur)
+  (defun isearch-occur ()
+    (interactive)
+    (let ((case-fold-search isearch-case-fold-search))
+      (occur (if isearch-regexp isearch-string (regexp-quote isearch-string)))))
+#+END_SRC
+*** occur dwim
+#+BEGIN_SRC emacs-lisp
+  (defun occur-dwim ()
+    "Call `occur' with a sane default."
+    (interactive)
+    (push (if (region-active-p)
+              (buffer-substring-no-properties
+               (region-beginning)
+               (region-end))
+            (let ((sym (thing-at-point 'symbol)))
+              (when (stringp sym)
+                (regexp-quote sym))))
+          regexp-history)
+    (call-interactively 'occur))
+#+END_SRC
+*** zap-to-char
+*dépendances*: [[https://github.com/cute-jumper/avy-zap][avy-zap.el]] [[https://github.com/thierryvolpiatto/zop-to-char][zop-to-char.el]]
+#+BEGIN_SRC emacs-lisp
+  (setq avy-zap-dwim-prefer-avy nil)
+  (autoload 'avy-zap-up-to-char-dwim "avy-zap")
+  (autoload 'zop-to-char "zop-to-char" nil t)
+  (global-set-key (kbd "M-z") 'avy-zap-up-to-char-dwim)
+  (global-set-key (kbd "M-Z") 'zop-to-char)
 #+END_SRC
 *** anzu
 *dépendances* [[https://github.com/syohex/emacs-anzu][anzu]] 
@@ -1526,7 +1541,7 @@ Avoir des tabs (et surtout des groupes)
  (defun write-file-copy (filename)
    (interactive "F")
    (write-region (point-min) (point-max) filename))
- (global-set-key (kbd "C-x w") 'write-file-copy)
+ (global-set-key (kbd "C-x C-W") 'write-file-copy)
 #+END_SRC
 *** Proposer de creer les repertoires s'ils n'existent pas à la creation d'un nouveau fichier
 #+BEGIN_SRC emacs-lisp
@@ -1629,6 +1644,7 @@ Avoir des tabs (et surtout des groupes)
   (setq langtool-java-bin "/COTS/java/bin/java")
   (setq langtool-language-tool-jar "~/.emacs.d/LanguageTool-3.1-SNAPSHOT/languagetool-commandline.jar")
   (setq langtool-default-language "fr")
+  (setq langtool-mother-tongue "fr")
   (autoload 'langtool-check-buffer "langtool" "" t)
   (setq langtool-keyboard-prefix (kbd "C-c l"))
   (global-set-key (kbd "C-c l l") 'langtool-check-buffer)
