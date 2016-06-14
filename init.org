@@ -389,7 +389,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "M-&") 'my-run-term) ;; mappe sur M-&
  #+END_SRC
 ** tabbar more
-*dépendances*: [[https://github.com/djangoliv/conf][tabbar-more.el]]
+*dépendances*: [[https://github.com/djangoliv/conf/blob/master/lisp/tabbar-more.el][tabbar-more.el]]
 #+BEGIN_SRC emacs-lisp
   ;; possibilité de reorganiser les tabs
   (load-file "~/.emacs.d/lisp/tabbar-more.elc")
@@ -660,10 +660,22 @@ Avoir des tabs (et surtout des groupes)
                              ;;(setq-local ac-auto-start 8)
                              (setq-local line-spacing '0.1)
                              (setq-local company-minimum-prefix-length 5)))
-  ;; theme+
+  ;; bullets
   (require 'org-bullets)
   (setq org-bullets-bullet-list '("☯" "○" "✸" "✿" "~"))
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  ;; keywords
+  (setq org-todo-keyword-faces
+        (quote
+         (("TODO" :foreground "red" :weight bold)
+          ("IN-PROGRESS" :foreground "orange" :weight bold)
+          ("WAIT" :foreground "cornsilk" :weight bold)
+          ("VALID" :foreground "coral" :weight bold)
+          ("CANCELED" :foreground "blue" :weight bold)
+          ("NEEDSREVIEW" :foreground "firebrick" :weight bold))))
+  (setq org-todo-keywords
+        (quote
+         ((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "VALID(v)" "|" "DONE(d!)" "CANCELED(c@)" "NEEDSREVIEW(n@/!)"))))
   ;; raccourci
   (eval-after-load "org"
     '(progn
@@ -2915,6 +2927,8 @@ Avoir des tabs (et surtout des groupes)
               (setq fuzzy-format-default-indent-tabs-mode 1)
               (global-fuzzy-format-mode)))
   (defalias 'pylint 'flycheck-mode)  ;; raccourci pylint
+  ;; gud
+  (setq gud-pdb-command-name "~/Outils/pdb/pdb.py")
 #+END_SRC
 **** jedi
 *dépendances* [[https://github.com/tkf/emacs-jedi][jedi]] [[https://github.com/kiwanami/emacs-deferred][deferred]] [[https://github.com/tkf/emacs-python-environment][python-environment]] [[https://github.com/syohex/emacs-company-jedi][emacs-company-jedi]]

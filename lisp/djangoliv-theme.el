@@ -165,17 +165,6 @@
   '((t (:foreground "firebrick")))"")
 (defface org-block-end-line
   '((t (:foreground "firebrick")))"")
-(setq org-todo-keyword-faces
-	  (quote
-	   (("TODO" :foreground "red" :weight bold)
-		("IN-PROGRESS" :foreground "orange" :weight bold)
-		("WAIT" :foreground "cornsilk" :weight bold)
-		("VALID" :foreground "coral" :weight bold)
-		("CANCELED" :foreground "blue" :weight bold)
-        ("NEEDSREVIEW" :foreground "firebrick" :weight bold))))
-(setq org-todo-keywords
-	  (quote
-	   ((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "VALID(v)" "|" "DONE(d!)" "CANCELED(c@)" "NEEDSREVIEW(n@/!)"))))
 ;; logview
 (custom-set-faces
  '(logview-information-entry ((t (:background "#1f4f4f"))))
