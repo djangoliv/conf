@@ -3419,6 +3419,12 @@ word3
         (append '(("CMakeLists\\.txt\\'" . cmake-mode)
                   ("\\.cmake\\'" . cmake-mode)) auto-mode-alist))
 #+END_SRC
+**** doxygen
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/Outils/emacs/doxymacs-1.8.0/lisp/")
+  (require 'doxymacs)
+  (add-hook 'c-mode-common-hook 'doxymacs-mode)
+#+END_SRC
 *** Java
 **** Initialisation
 *dépendances*: [[https://github.com/jdee-emacs/jdee][jdee]] [[https://github.com/jdee-emacs/jdee-server][jdee-server]] [[http://cedet.sourceforge.net/][cedet]]
