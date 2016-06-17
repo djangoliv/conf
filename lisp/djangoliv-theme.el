@@ -197,6 +197,8 @@
 '(vc-annotate-very-old-color "LightGray"))
 ;;; anzu
 (custom-set-faces '(anzu-mode-line ((t (:foreground "LightBlue" :bold t)))))
+;;; python
+(custom-set-faces '(font-lock-doc-face ((t (:foreground "sienna2")))))
 ;;;; modeline
 (setq line-number-mode nil) ;; deja affiché
 (setq-default mode-line-format
