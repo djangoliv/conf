@@ -2786,7 +2786,11 @@ Avoir des tabs (et surtout des groupes)
     (shell-command
      (format "firefox /tmp/%s" (concat (substring (file-name-nondirectory (buffer-file-name)) 0 -3) "svg"))))
   ;; generation xsd from xml
-
+  (defun xsd-generator ()
+    (interactive)
+    (shell-command
+     (format "java -jar ~/.emacs.d/trang/trang.jar %s %s" (buffer-file-name) (concat (substring (buffer-file-name) 0 -3) "xsd")))
+    (find-file (concat (substring (buffer-file-name) 0 -3) "xsd")))
   #+END_SRC
 ** YAML
 *dépendances* [[https://github.com/yoshiki/yaml-mode][yaml-mode]]
