@@ -240,7 +240,6 @@ Collection of Emacs Development Environment Tools
 ** Initialize CEDET
 *dépendances*: [[http://cedet.sourceforge.net/][cedet]] ([[http://sourceforge.net/p/cedet/git/ci/master/tree/][sources]]) et [[https://github.com/tuhdo/semantic-stickyfunc-enhance][stickyfunc-enhance]]
 #+BEGIN_SRC emacs-lisp
-  (load-file "~/.emacs.d/cedet-master/cedet-devel-load.elc")
   (global-ede-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode 1)
@@ -252,7 +251,7 @@ Collection of Emacs Development Environment Tools
   (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
   (semantic-mode) ;; Active le mode semantic
   (require 'stickyfunc-enhance) ;; multilines concatene dans la header line
-  (require 'cedet-cscope)  
+  (require 'cedet-cscope)
 #+END_SRC
 ** Initialize ECB
 *dépendances*: [[https://github.com/alexott/ecb/][ecb]]
