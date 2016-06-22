@@ -3014,13 +3014,14 @@ C-. => goto definition
   (setq gud-pdb-command-name "~/Outils/pdb/pdb.py")
   ;; Surligne les mots temporaires pdb, ipdb,
   (defun annotate-pdb ()
-	(interactive)
-	(highlight-lines-matching-regexp "import ipdb")
-	(highlight-lines-matching-regexp "import pdb")
-	(highlight-lines-matching-regexp "set_trace()")
-	(highlight-regexp "FIXME")
-	(highlight-regexp "XXX")
-	(highlight-regexp "TODO"))
+    (interactive)
+    (let ((case-fold-search nil))
+      (highlight-lines-matching-regexp "import ipdb")
+      (highlight-lines-matching-regexp "import pdb")
+      (highlight-lines-matching-regexp "set_trace()")
+      (highlight-regexp "FIXME")
+      (highlight-regexp "XXX")
+      (highlight-regexp "TODO")))
   (add-hook 'python-mode-hook 'annotate-pdb)
 #+END_SRC
 **** python shell
