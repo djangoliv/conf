@@ -2625,6 +2625,8 @@ Avoir des tabs (et surtout des groupes)
 	(autoload 'ediff-revision "magit" nil t)
 	(autoload 'magit-stash "magit" nil t)
   (autoload 'magit-svn-rebase "magit" nil t)
+  ;; encoding
+  (add-to-list 'process-coding-system-alist '("git" iso-8859-1 . iso-8859-1))
 	;; pour le status dans la modeline
 	(add-to-list 'load-path "~/.emacs.d/git-emacs-master")
 	(setq git-keyboard-prefix "\C-x£") ;; keybinding improbable (ie desactivation)
