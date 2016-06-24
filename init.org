@@ -387,12 +387,6 @@ Avoir des tabs (et surtout des groupes)
     (setq term-number (+ 1 term-number)))
   (global-set-key (kbd "M-&") 'my-run-term) ;; mappe sur M-&
  #+END_SRC
-** tabbar more
-*dépendances*: [[https://github.com/djangoliv/conf/blob/master/lisp/tabbar-more.el][tabbar-more.el]]
-#+BEGIN_SRC emacs-lisp
-  ;; possibilité de reorganiser les tabs
-  (load-file "~/.emacs.d/lisp/tabbar-more.elc")
- #+END_SRC
 * Major-modes
 ** Text-mode
  #+BEGIN_SRC emacs-lisp
