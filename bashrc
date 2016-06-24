@@ -24,7 +24,7 @@ alias tial='tail'
 alias max="emacsclient -n -a emacs "
 alias smax="emacs --geometry 130x60 -q -l ~giorgis/.emacs-simple "
 
-setterm -blength 0 
+setterm -blength 0
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
@@ -69,10 +69,10 @@ fi
 function cd
 {
     local i MAX LEN p
-    
+
     MAX=10
     LEN=${#DIRSTACK[@]}
-   
+
     if [ $# -eq 0 ]; then
         builtin cd /space/giorgis/ || return 1
         pushd -n $OLDPWD > /dev/null
@@ -82,7 +82,7 @@ function cd
     else
         pushd "$@" > /dev/null || return 1
     fi
-    
+
     if [ $LEN -gt 1 ]; then
         for ((i=1; i <= LEN ; i++)); do
             eval p=~$i
@@ -92,7 +92,7 @@ function cd
             fi
         done
     fi
-    
+
     if [ $LEN -ge $MAX ]; then
         popd -n -0 > /dev/null
     fi
@@ -162,3 +162,8 @@ psgrep() {
 }
 
 export PYTHONSTARTUP="/home/giorgis/.pythonrc.py"
+
+# emacs diff
+diffEmacs () {
+    emacsclient -e "(ediff-files \"$1\" \"$2\")"
+}
