@@ -705,7 +705,7 @@ Avoir des tabs (et surtout des groupes)
   ;; execution
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((sh . t)
+   '((shell . t)
      (latex . t)
      (emacs-lisp . nil)
      (ditaa . t)
@@ -1212,8 +1212,14 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'ediff-files "ediff" "Intelligent Emacs interface to diff" t)
   (autoload 'ediff-files-remote "ediff" "Intelligent Emacs interface to diff")
   ;; restore la configuration à la fin
-  (winner-mode)
-  (add-hook 'ediff-after-quit-hook-internal 'winner-undo)
+  (defvar ediff-last-windows nil  "Last ediff window configuration.")
+  (defun ediff-restore-windows ()
+    "Restore window configuration to `ediff-last-windows'."
+    (set-window-configuration ediff-last-windows)
+    (remove-hook 'ediff-after-quit-hook-internal 'ediff-restore-windows))
+  (defadvice ediff-buffers (around ediff-restore-windows activate)
+    (setq ediff-last-windows (current-window-configuration))
+    (add-hook 'ediff-after-quit-hook-internal 'ediff-restore-windows) ad-do-it)
   ;; ediff horizontal
   (setq ediff-split-window-function 'split-window-horizontally)
   ;; evite la frame supplementaire
