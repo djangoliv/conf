@@ -104,8 +104,9 @@ Configuration minimale (sans librairies externes)
   (setq load-prefer-newer t)
  #+END_SRC
 ** auto tangle init file
+*dépendances*: [[https://github.com/jwiegley/emacs-async][emacs-async]]
 #+BEGIN_SRC emacs-lisp
-    ;; async tangle init.org at save  dependnace https://github.com/jwiegley/emacs-async
+    ;; async tangle init.org at save
     (add-to-list 'load-path "~/.emacs.d/emacs-async/")
     (require 'async)
     (defun tangle-init-async ()
@@ -3252,6 +3253,11 @@ word3
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/pycoverage/")
   (require 'pycoverage)
+#+END_SRC
+**** pyimport
+*dépendances*: [[https://github.com/Wilfred/pyimport][pyimport]]
+#+BEGIN_SRC emacs-lisp
+  (require 'pyimport)
 #+END_SRC
 *** C++
 **** Initialisation
