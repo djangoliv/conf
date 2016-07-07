@@ -103,6 +103,23 @@ Configuration minimale (sans librairies externes)
   ;; ne pas charger un ancien fichier compile
   (setq load-prefer-newer t)
  #+END_SRC
+** auto tangle init file
+#+BEGIN_SRC emacs-lisp
+    ;; async tangle init.org at save  dependnace https://github.com/jwiegley/emacs-async
+    (add-to-list 'load-path "~/.emacs.d/emacs-async/")
+    (require 'async)
+    (defun tangle-init-async ()
+      "If the current buffer is 'emacs-init.org' the code-blocks are tangled."
+      (when (equal (buffer-file-name) (expand-file-name (concat user-emacs-directory "init.org")))
+        (async-start
+         `(lambda ()
+            (require 'org)
+            (org-babel-tangle-file (expand-file-name (concat user-emacs-directory "init.org")) (expand-file-name (concat user-emacs-directory "init.el") "emacs-lisp")))
+         (lambda (result)
+           (byte-compile-file (expand-file-name (concat user-emacs-directory "init.el")))
+           (message "Tangled file compiled.")))))
+    (add-hook 'after-save-hook 'tangle-init-async)
+#+END_SRC
 ** source du bashrc au démarrage
 *dépendances*: [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
 #+BEGIN_SRC emacs-lisp
