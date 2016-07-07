@@ -2953,6 +2953,8 @@ C-. => goto definition
   (defun my/python-mode-hook ()
     (add-to-list 'company-backends 'company-jedi))
   (add-hook 'python-mode-hook 'my/python-mode-hook)
+  (autoload 'jedi-mode "jedi-core" nil t)
+  (add-hook 'python-mode-hook 'jedi-mode)
   (setq jedi:complete-on-dot t)
   ;; goto-definition
   (setq jedi:goto-definition-config
@@ -3348,10 +3350,12 @@ word3
   (defun my-c-mode-common-hook ()
        ;; eassist
        (require 'eassist) ;; M-o M-m
-       (add-to-list 'load-path "~/Outils/emacs/cedet/function-args-master")
        ;; function-args
+       (add-to-list 'load-path "~/.emacs.d/function-args")
        (require 'function-args)
        (fa-config-default)  ;; M-i M-j
+       (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+       ;; eassist
        (setq eassist-header-switches '(("h" . ("cpp" "cc" "c" "cxx"))
                                        ("hpp" . ("cpp" "cc" "cxx"))
                                        ("cpp" . ("h" "hpp"))
@@ -3360,12 +3364,15 @@ word3
                                        ("C" . ("H"))
                                        ("H" . ("C" "CPP" "CC" "CXX"))
                                        ("cc" . ("h" "hpp"))))
-       ;; eassist
        (define-key function-args-mode-map (kbd "M-o") 'eassist-switch-h-cpp)
        (define-key function-args-mode-map (kbd "M-m") 'eassist-list-methods)
-    (require 'xcscope)
-    (cscope-setup)
-    (setq cscope-initial-directory "~/workspaces/proj3/cscope"))
+       ;; You can add this to improve the parse of macro-heavy code:
+       (require 'semantic/bovine/c)
+       (add-to-list 'semantic-lex-c-preprocessor-symbol-file "/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/stddef.h")
+       ;; cscope
+       (require 'xcscope)
+       (cscope-setup)
+       (setq cscope-initial-directory "/space/giorgis/workspaces/CSO/cscope/"))
   (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 #+END_SRC
 **** helpers
