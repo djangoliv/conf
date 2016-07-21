@@ -2825,7 +2825,7 @@ Avoir des tabs (et surtout des groupes)
   (add-to-list 'auto-mode-alist '("\\.ldif$" . ldap-mode))
 #+END_SRC
 ** CSV
-*dépendances*: [[https://github.com/emacsmirror/csv-mode][csv-mode.el]]
+*dépendances*: [[http://elpa.gnu.org/packages/csv-mode.html][csv-mode.el]]
 #+BEGIN_SRC emacs-lisp
   (setq csv-separators '("," ";" "|" "£" "\t"))
   (autoload 'csv-mode "csv-mode" "Major mode for editing comma-separated value files." t)
