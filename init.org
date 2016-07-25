@@ -3768,6 +3768,59 @@ word3
           (my-sort-lines-buffer)
           (message "Sorted buffer")))))
 #+END_SRC
+** delete enclose text
+#+BEGIN_SRC emacs-lisp
+  ;; delete enclose text
+  ;; returns the enclosing character for the character "c"
+  (defun get-enc-char (c) (cond
+                           ((string= c "(") ")")
+                           ((string= c "[") "]")
+                           ((string= c "{") "}")
+                           ((string= c ">") "<")
+                           ((string= c "<") ">")
+                           ((string= c "'") "'")
+                           ((string= c "\"") "\"")
+                           (t nil)
+                           ))
+  (defun delete-enclosed-text ()
+    "Delete texts between any pair of delimiters."
+    (interactive)
+    (defvar case nil)
+    (save-excursion
+      (let (p1 p2 porig)
+        ;; where I am (init loop)
+        (setq porig (point))
+        (setq p1 (point))
+        ;; end-of-buffer
+        (save-excursion  (end-of-buffer) (setq eob (point)))
+        (setq p2 eob)
+        ;; test if there is nothing between delimiters => delete delimiters
+        (setq mychar (thing-at-point 'char))
+        (backward-char -1)
+        (if (string-equal (thing-at-point 'char) (get-enc-char mychar))
+            (progn
+              (setq case "if")
+              (backward-char -1)
+              (setq p2 (point))
+              (delete-region p1 p2))
+          ;; else delete between
+          (progn
+            (setq case "else")
+            (backward-char 1)
+            (while (and (equal p2 eob)) (not (equal p1 0))
+                   (message "cas2")
+                   (goto-char p1)
+                   (backward-char 1)
+                   (skip-chars-backward "^({[<>\"'" )
+                   (setq p1 (point))
+                   (backward-char 1) (setq mychar (thing-at-point 'char)) (goto-char porig)
+                   (skip-chars-forward (concatenate 'string "^" (get-enc-char mychar)))
+                   (setq p2 (point)))
+            (delete-region p1 p2)))))
+    (if (equal case "else")
+        (backward-char 1)))
+  (global-set-key (kbd "s-<delete>") 'delete-enclosed-text)
+#+END_SRC
 * Final
 ** Custum file
 #+BEGIN_SRC emacs-lisp
