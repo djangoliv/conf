@@ -253,6 +253,17 @@ Configuration minimale (sans librairies externes)
   (setq find-grep-options "-q -i")
   (setq grep-command "grep -nH -r --exclude-dir='svn' ")
 #+END_SRC
+** navigation
+#+BEGIN_SRC emacs-lisp
+  ;; syntax-subword
+  (require 'syntax-subword)
+  (setq syntax-subword-skip-spaces t)
+  (global-set-key (kbd "s-<backspace>") 'syntax-subword-backward-kill)
+  (global-set-key (kbd "s-<left>") 'syntax-subword-backward)
+  (global-set-key (kbd "s-<right>") 'syntax-subword-forward)
+  (global-set-key (kbd "s-<up>") 'backward-paragraph)
+  (global-set-key (kbd "s-<down>") 'forward-paragraph)
+#+END_SRC
 * CEDET
 Collection of Emacs Development Environment Tools
 ** Initialize CEDET
