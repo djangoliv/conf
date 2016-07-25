@@ -3832,6 +3832,24 @@ word3
         (backward-char 1)))
   (global-set-key (kbd "s-<delete>") 'delete-enclosed-text)
 #+END_SRC
+** flip bool at point
+#+BEGIN_SRC emacs-lisp
+  ;; A list of opposite boolean pairs.
+  (defvar bools '(("true" . "false") ("True" . "False") ("#t" . "#f") ("yes" . "no") ("Yes" . "No")))
+  (defun flip-bool-at-point ()
+    "Flips the boolean literal at point, changing true to false and vice-versa."
+    (interactive)
+    (let* ((true (cdr (assoc (current-word) bools)))
+           (false (car (rassoc (current-word) bools)))
+           (wrd (cond (true true)
+                      (false false)
+                      (t (current-word)))))
+      (save-excursion
+        (forward-word)
+        (backward-kill-word 1)
+        (insert wrd))))
+  (global-set-key (kbd "C-c b") 'flip-bool-at-point)
+#+END_SRC
 * Final
 ** Custum file
 #+BEGIN_SRC emacs-lisp
