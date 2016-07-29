@@ -3183,22 +3183,22 @@ word3
 			(match-string 0 y)))
 	)
   (autoload 'thing-at-point "thingatpt" nil t) ;; build-in librairie
-  (defun python-generate-header()
+(defun python-generate-header()
 	(interactive)
 	(setq p (get-parameters (thing-at-point 'sentence)))
 	(forward-line 1)
-	(insert "\t\"\"\"\n\n\n")
+	(insert "\t\'\'\'\n")
 	(setq params (split-string p "[?\,?\(?\)?\ ]"))
 	(while params
       (if (/= (length (chomp (car params))) 0)
           (progn
-			(insert "\t:param ")
+			(insert "\t@param ")
 			(insert (chomp (car params)))
 			(insert ": \n")))
       (setq params (cdr params)))
-	(insert "\n\t\"\"\"\n\n")
+	(insert "\t\'\'\'\n")
 	)
-  (global-set-key (kbd "<f9>") 'generate-header)
+  (global-set-key (kbd "<f9>") 'python-generate-header)
   (defun chomp (str)
 	"Chomp leading and tailing whitespace from STR."
 	(let ((s (if (symbolp str) (symbol-name str) str)))
