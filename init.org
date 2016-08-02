@@ -2009,6 +2009,16 @@ Avoir des tabs (et surtout des groupes)
       (set-marker e nil)))
   (global-set-key (kbd "C-M-;") 'comment-box) ;;-line)
  #+END_SRC
+*** Comment todo
+#+BEGIN_SRC emacs-lisp
+  (defun todo-comment ()
+    "Inserts an empty TODO comment or makes an existing comment into a TODO."
+    (interactive)
+    (when (not (region-active-p))
+      (comment-dwim nil)
+      (unless (equal (current-word) "TODO") (insert "TODO: "))))
+  (global-set-key (kbd "s-;") 'todo-comment)
+#+END_SRC
 *** Insert-date
 #+BEGIN_SRC emacs-lisp
   ;; insertion de la date
@@ -3187,16 +3197,16 @@ word3
 	(interactive)
 	(setq p (get-parameters (thing-at-point 'sentence)))
 	(forward-line 1)
-	(insert "\t\'\'\'\n")
+	(insert "    \'\'\'\n")
 	(setq params (split-string p "[?\,?\(?\)?\ ]"))
 	(while params
       (if (/= (length (chomp (car params))) 0)
           (progn
-			(insert "\t@param ")
+			(insert "    @param ")
 			(insert (chomp (car params)))
 			(insert ": \n")))
       (setq params (cdr params)))
-	(insert "\t\'\'\'\n")
+	(insert "    \'\'\'\n")
 	)
   (global-set-key (kbd "<f9>") 'python-generate-header)
   (defun chomp (str)
