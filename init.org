@@ -102,6 +102,8 @@ Configuration minimale (sans librairies externes)
   (setq-default tab-width 4)
   ;; ne pas charger un ancien fichier compile
   (setq load-prefer-newer t)
+  ;; compilation scroll
+  (setq compilation-scroll-output t)
  #+END_SRC
 ** auto tangle init file
 *dépendances*: [[https://github.com/jwiegley/emacs-async][emacs-async]]
@@ -2723,7 +2725,8 @@ Avoir des tabs (et surtout des groupes)
   (setq magit-push-always-verify nil)
   (setq magit-commit-show-diff nil)
   (setq magit-revert-buffers 1)
-  (setq magit-refresh-verbose t)
+  (setq auto-revert-buffer-list-filter 'magit-auto-revert-repository-buffers-p)
+  (remove-hook 'server-switch-hook 'magit-commit-diff)
   ;; fichier de conf
 	(add-to-list 'load-path "~/.emacs.d/git-modes")
   (require 'gitconfig-mode)
