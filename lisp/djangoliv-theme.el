@@ -30,15 +30,24 @@
 (add-to-list 'default-frame-alist '(foreground-color . "wheat"))
 ;;;;; tabbar
 (setq tabbar-background-color "DarkSlateGray") ;; the color of the tabbar background
-(setq tabbar-tab-label-function (lambda (tab) (format " %s " (car tab)))) ; ajoute des espaces autours des labels
 (custom-set-variables
  '(tabbar-scroll-left-button (quote (("") "")))
  '(tabbar-scroll-right-button (quote (("") ""))))
 (custom-set-faces
- '(tabbar-unselected ((t (:inherit tabbar-default :foreground "LightGray"))))
- '(tabbar-button ((t (:inherit tabbar-default :foreground "WhiteSmoke"))))
- '(tabbar-separator ((t (:background "gray60"))))
- '(tabbar-selected ((t (:inherit tabbar-default :foreground "WhiteSmoke" :bold t)))))
+ '(tabbar-default ((t (:height 0.95))))
+ '(tabbar-button ((t (:inherit tabbar-default :foreground "WhiteSmoke" :background "#1f4f4f" :box '(:line-width 1 :color "whiteSmoke" :style nil)))))
+ '(tabbar-separator ((t (:background "gray50"))))
+ '(tabbar-selected ((t (:inherit tabbar-default :foreground "WhiteSmoke" :background "#1f4f4f" :bold t :box '(:line-width 1 :color "whiteSmoke" :style nil)))))
+ '(tabbar-selected-modified nil :foreground "peru" :bold t :box '(:line-width 1 :color "blue4" :style nil))
+ '(tabbar-unselected ((t (:inherit tabbar-default :foreground "DarkGray" :background "#1f4f4f" :bold t :box '(:line-width 1 :color "gray40" :style nil)))))
+ '(tabbar-unselected-modified nil :foreground "DarkOrange3" :box '(:line-width 1 :color "gray40" :style nil)))
+(dolist (face '(tabbar-default
+				tabbar-button
+				tabbar-selected
+				tabbar-selected-modified
+				tabbar-unselected
+				tabbar-unselected-modified))
+  (put face 'saved-face-comment "modify"))
 ;;;; dired
 (custom-set-faces
  '(dired-filetype-common ((t (:foreground "white"))))
@@ -47,21 +56,21 @@
  '(dired-filetype-plain ((t (:foreground "LightGray"))))
  '(dired-filetype-xml ((t (:foreground "WhiteSmoke"))))
  '(dired-header ((t (:foreground "#91ba8a"))))
- ;;; dired-k
+;;; dired-k
  '(dired-k-directory ((t (:foreground "deepSkyBlue"))))
 ;;;; nxml
  '(nxml-attribute-local-name ((t (:foreground "burlywood"))))
  '(nxml-element-local-name ((t (:foreground "LightSkyBlue"))))
  '(nxml-tag-delimiter ((t (:foreground "burlywood"))))
 ;;;; org-mode
- '(org-level-1 ((t (:inherit variable-pitch :height 1.11 :foreground "#00cbcd"))))
- '(org-level-2 ((t (:inherit outline-2 :height 1.03 :foreground "DeepSkyBlue"))))
+ '(org-level-1 ((t (:inherit variable-pitch :height 1.08 :foreground "DeepSkyBlue"))))
+ '(org-level-2 ((t (:inherit outline-2 :height 1.03 :foreground "SteelBlue2"))))
  '(org-level-3 ((t (:inherit outline-3 :height 1.02 :foreground "LightSkyBlue"))))
  '(org-level-4 ((t (:inherit outline-4 :height 1.01 :foreground "LightBlue"))))
- '(org-level-5 ((t (:inherit outline-5 :height 1.00 :foreground "LightSteelBlue"))))
- '(org-level-6 ((t (:inherit outline-6 :height 1.00 :foreground "thistle"))))
+ '(org-level-5 ((t (:inherit outline-5 :height 1.00 :foreground "LightSteelBlue1"))))
+ '(org-level-6 ((t (:inherit outline-6 :height 1.00 :foreground "LightGray"))))
  '(org-level-7 ((t (:inherit outline-7 :height 1.00 :foreground "gray90"))))
- '(org-level-8 ((t (:inherit outline-8 :height 1.00 :foreground "white"))))
+ '(org-level-8 ((t (:inherit outline-8 :height 1.00 :foreground "WhiteSmoke"))))
  '(org-checkbox ((t (:foreground "#7BC6E4" :bold t))))
  '(org-checkbox-statistics-todo ((t (:foreground "#DDC5E5" :bold t))))
  '(org-table ((t (:foreground "WhiteSmoke"))))
@@ -145,6 +154,7 @@
 ;; company
 (custom-set-faces
  '(company-tooltip ((t (:background "skyBlue4" :foreground "gray" :box "#003442"))))
+ '(company-tooltip-mouse ((t (:background "skyBlue4"))))
  '(company-scrollbar-bg ((t (:background "gray30"))))
  '(company-scrollbar-fg ((t (:background "#003442"))))
  '(company-tooltip-selection ((t (:foreground "WhiteSmoke" :background "#003442"))))
@@ -162,9 +172,9 @@
  '(highlight-operators-face ((t (:foreground "burlywood3")))))
 ;; block source faces
 (defface org-block-begin-line
-  '((t (:foreground "firebrick")))"")
+  '((t (:foreground "IndianRed")))"")
 (defface org-block-end-line
-  '((t (:foreground "firebrick")))"")
+  '((t (:foreground "IndianRed")))"")
 ;; logview
 (custom-set-faces
  '(logview-information-entry ((t (:background "#1f4f4f"))))
@@ -204,7 +214,7 @@
 (setq-default mode-line-format
 			  '("  "
 				;; Position, including warning for 200 columns
-				(:propertize "%5l" face font-lock-constant-face)
+				(:propertize "%5l" face mode-line-lin-face)
 				":"
 				(:eval (propertize "%3c" 'face
 								   (if (>= (current-column) 200)
@@ -212,9 +222,9 @@
 									 'mode-line-col-face))) ;;font-lock-constant-face)))
 				;; relative position, size of file
 				"  ["
-				mode-line-position
+				(:propertize mode-line-position face mode-line-col-face)
 				"/"
-				(:propertize "%I" 'face 'font-lock-constant-face) ;; size
+				(:propertize "%I" face mode-line-col-face) ;; size
 				"]  "
 				;;emacsclient [default -- keep?]
 				mode-line-client
@@ -242,8 +252,10 @@
 				;; narrow [default -- keep?]
 				" %n "
 				;;"  mode
-				(:propertize "%m" face mode-line-mode-face 'help-echo buffer-file-coding-system)
 				" "
+				(:propertize mode-name face mode-line-col-face)
+				" "
+				(:eval (if (boundp 'mode-icons-cached-mode-name) (propertize mode-icons-cached-mode-name)))
 				;; mode indicators: vc, recursive edit, major mode, minor modes, process, global
 				(vc-mode vc-mode)
 				"    "
@@ -282,6 +294,7 @@
 (make-face 'mode-line-80col-face)
 (make-face 'mode-line-dired-face)
 (make-face 'mode-line-col-face)
+(make-face 'mode-line-lin-face)
 (set-face-attribute 'mode-line-read-only-face nil
 					:inherit 'mode-line-face
 					:foreground "blue")
@@ -289,7 +302,7 @@
 					:inherit 'mode-line-face)
 (set-face-attribute 'mode-line-filename-face nil
 					:inherit 'mode-line-face
-					:foreground "whitesmoke")
+					:foreground "WhiteSmoke")
 (set-face-attribute 'mode-line-dired-face nil ;; permet de rendre le filename invisible sous dired
 					:inherit 'mode-line-face
 					:foreground "#1f4f4f")
@@ -298,20 +311,38 @@
 					:weight 'bold :foreground "black")
 (set-face-attribute 'mode-line-mode-face nil
 					:inherit 'mode-line-face
-					:foreground "mediumblue")
+					:foreground "MediumBlue")
 (set-face-attribute 'mode-line-80col-face nil
 					:inherit 'mode-line-black-face
 					:foreground "black" :background "Gray50")
 (set-face-attribute 'mode-line-col-face nil
 					:inherit 'mode-line-face
-					:foreground "cadetblue")
+					:foreground "CadetBlue")
+(set-face-attribute 'mode-line-lin-face nil
+					:inherit 'mode-line-face
+					:foreground "aquamarine")
 ;; defaut
 (set-face-attribute 'mode-line nil
-					:foreground "Gray60" :background "#1f4f4f"
+					:foreground "gray70" :background "#1f4f4f"
 					:inverse-video nil)
 (set-face-attribute 'mode-line-inactive nil
-					:foreground "Gray60" :background "DarkSlateGray"
+					:foreground "gray70" :background "DarkSlateGray"
 					:inverse-video nil)
+
+(defun toggle-mode-line-buffer-name-face (window)
+  (with-current-buffer (window-buffer window)
+	(if (eq (current-buffer) (window-buffer (selected-window)))
+		(progn
+		  (face-remap-reset-base 'mode-line-filename-face)
+		  (face-remap-reset-base 'mode-line-col-face)
+		  (face-remap-reset-base 'mode-line-lin-face)
+		  (face-remap-reset-base 'mode-line-black-face))
+	  (progn
+		(face-remap-set-base 'mode-line-black-face '(:foreground "gray60"))
+		(face-remap-set-base 'mode-line-col-face '(:foreground "gray60"))
+		(face-remap-set-base 'mode-line-lin-face '(:foreground "gray60"))
+		(face-remap-set-base 'mode-line-filename-face '(:foreground "gray60"))))))
+(add-hook 'buffer-list-update-hook (lambda () (walk-windows #'toggle-mode-line-buffer-name-face nil t)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Fin mode line
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
