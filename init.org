@@ -1843,7 +1843,7 @@ Avoir des tabs (et surtout des groupes)
   (wrap-region-add-wrapper "round(" ")" "r" 'python-mode)
   ;; unwrap
   (defalias 'unwrap-region 'delete-pair)
-  (global-set-key (kbd "M-)") 'unwrap-region)
+  (global-set-key (kbd "M-\"") 'unwrap-region)
 #+End_SRC
 ** stripe-buffer
 *dépendances*: [[https://github.com/sabof/stripe-buffer][stripe-buffer.el]]
@@ -2547,6 +2547,12 @@ Avoir des tabs (et surtout des groupes)
   ;; (add-hook 'prog-mode-hook 'indent-guide-mode)
   (setq indent-guide-delay 0.5)
 #+END_SRC
+*** generalClose
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/general-close")
+  (require 'general-close)
+  (global-set-key (kbd "M-)") 'general-close)
+#+END_SRC
 ** flycheck/flyspell
 *dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]] [[https://github.com/xuchunyang/flyspell-popup][flyspell-popup]]
 #+BEGIN_SRC emacs-lisp
@@ -2747,7 +2753,7 @@ Avoir des tabs (et surtout des groupes)
   (defadvice svn-status-update-modeline (after svn-update-diff-hl activate)
     (diff-hl-update))
   ;; pour git
-  (add-hook 'magit-refresh-file-buffer-hook 'diff-hl-update)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
  #+END_SRC
 ** XML
 *** nxml-mode
