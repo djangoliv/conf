@@ -527,6 +527,8 @@ Avoir des tabs (et surtout des groupes)
   (define-key dired-mode-map (kbd "<return>") 'dired-find-alternate-file)
   (define-key dired-mode-map (kbd "<right>") 'dired-find-file)
   (define-key dired-mode-map (kbd "^") '(lambda () (interactive) (find-alternate-file "..")))
+  ;; eww in dired
+  (define-key dired-mode-map "e" (lambda () (interactive) (eww-open-file (dired-get-file-for-visit))))
 #+END_SRC
 *** dired-isearch
 *dépendances*: [[http://www.emacswiki.org/emacs/dired-isearch.el][dired-isearch.el]]
@@ -2339,7 +2341,7 @@ Avoir des tabs (et surtout des groupes)
      (concat "#!/usr/bin/env " lang)))
 #+END_SRC
 *** Analyse de code
-*dépendances* [[https://github.com/cosmicexplorer/cloc-emacs][cloc.el]] [[http://kitchingroup.cheme.cmu.edu/media/2015-07-28-A-highlight-annotation-mode-for-Emacs-using-font-lock/highlights.el][highlights.el]]
+*dépendances* [[https://github.com/cosmicexplorer/cloc-emacs][cloc.el]] [[http://kitchingroup.cheme.cmu.edu/media/2015-07-28-A-highlight-annotation-mode-for-Emacs-using-font-lock/highlights.el][highlights.el]] [[https://github.com/bastibe/annotate.el][annotate.el]]
 #+BEGIN_SRC emacs-lisp
   ;; cloc sur les buffers
   (autoload 'cloc "cloc" nil t)
@@ -2361,6 +2363,8 @@ Avoir des tabs (et surtout des groupes)
     (interactive)
     (insert "ಠ_ಠ"))
   (global-set-key (kbd "s-c d") 'insert-lod)
+  ;; annotate
+  (load-file "~/.emacs.d/annotate.el/annotate.el")
 #+END_SRC
 *** Conf-mode
  #+BEGIN_SRC emacs-lisp
@@ -2390,6 +2394,7 @@ Avoir des tabs (et surtout des groupes)
  #+BEGIN_SRC emacs-lisp
    ;; fichier en makefile-mode
    (add-to-list 'auto-mode-alist '("\\makefile.*" . makefile-mode))
+   (add-to-list 'auto-mode-alist '("\\Makefile" . makefile-mode))
  #+END_SRC
 *** Yasnippet
 *dépendances:* [[https://github.com/capitaomorte/yasnippet][yasnippet.el]] [[https://github.com/tuhdo/yasnippet-snippets][yasnippet-snippets]] [[https://www.emacswiki.org/emacs/dropdown-list.el][dropdown-list]]
