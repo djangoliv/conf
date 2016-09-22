@@ -235,6 +235,11 @@ Configuration minimale (sans librairies externes)
 	 (if mark-active (list (region-beginning) (region-end))
 	   (list (line-beginning-position)
 			 (line-beginning-position 2)))))
+  ;; yank in overwrite-mode
+  (defadvice yank (before yank-if-overwrite)
+    (if (bound-and-true-p overwrite-mode)
+        (delete-char (length (current-kill 0)))))
+  (ad-activate 'yank)
 #+END_SRC
 ** isearch
 #+BEGIN_SRC emacs-lisp
