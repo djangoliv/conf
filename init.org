@@ -985,6 +985,12 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'eimp-mode "eimp" "Emacs Image Manipulation Package." t)
   (add-hook 'image-mode-hook 'eimp-mode)
 #+END_SRC
+** ereader (epub)
+*dépendances*: [[https://github.com/bddean/emacs-ereader][emacs-ereader]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'ereader-mode "ereader" nil t)
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . ereader-mode))
+#+END_SRC
 * Minor-Modes and Helper Functions
 ** undo-tree
 *dépendances*: [[https://github.com/emacsmirror/undo-tree][undo-tree.el]]
