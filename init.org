@@ -3509,25 +3509,23 @@ word3
   (add-hook 'c-mode-common-hook 'doxymacs-mode)
 #+END_SRC
 *** Java
-**** Initialisation
-*dépendances*: [[https://github.com/jdee-emacs/jdee][jdee]] [[https://github.com/jdee-emacs/jdee-server][jdee-server]] [[http://cedet.sourceforge.net/][cedet]]
+**** Initialisation meghanada
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/Outils/emacs/jdee/jdee-master")
-  (autoload 'jdee-mode "jdee" "" t)
-  (setq auto-mode-alist (append '(("\\.java\\'" . jdee-mode)) auto-mode-alist))
-  (setq jde-complete-add-space-after-method t)
-  (setq jdee-server-dir "~/Outils/emacs/jdee/jdee-server-master/target/")
-  (setq jdee-enable-abbrev-mode t)
-  (add-hook 'jdee-mode-hook
-            (lambda()
-              ;; autocomplete
-              ;;(add-to-list 'ac-modes 'jdee-mode)
-              ;; raccourcis
-              (define-key c-mode-base-map (kbd "s-.") 'jdee-open-class-at-point)
-              (define-key c-mode-base-map (kbd "s-d") 'jdee-help-symbol)
-              (define-key c-mode-base-map (kbd "s-<tab>") 'jdee-complete)))
-              ;; JDE runs the app on port 4444 (via socket)
-  ;;(setq jdee-run-option-debug (quote ("Server" "Socket" "javadebug" nil "4444" t)))))
+  (autoload 'meghanada-mode "meghanada" nil t)
+  (add-hook 'java-mode-hook
+            (lambda ()
+              (global-set-key (kbd "C-.") 'meghanada-jump-declaration)
+              (global-set-key (kbd "C-,") 'meghanada-back-jump)
+              (meghanada-mode t)))
+  #+END_SRC
+**** javadoc
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'java-mode-hook
+            (lambda ()
+              (require 'javadoc-lookup)
+              (setq-local browse-url-browser-function 'eww-browse-url)
+              (javadoc-add-roots "~/Outils/java/javadocs/api/")
+              (global-set-key (kbd "s-d") 'javadoc-lookup)))
 #+END_SRC
 **** Class decompiler
 *dépendances*: [[https://github.com/m0smith/dotfiles/blob/master/.emacs.d/site-lisp/jdc.el][jdc.el]]
