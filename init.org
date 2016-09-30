@@ -688,7 +688,6 @@ Avoir des tabs (et surtout des groupes)
                                (let ((browse-url-browser-function 'browse-url-generic))
                                  ad-do-it))
                              (setq indent-tabs-mode nil)
-                             ;;(setq-local ac-auto-start 8)
                              (setq-local line-spacing '0.1)
                              (setq-local company-minimum-prefix-length 5)))
   ;; bullets
@@ -2981,10 +2980,6 @@ Avoir des tabs (et surtout des groupes)
   ;; hook
   (add-hook 'python-mode-hook
             (lambda ()
-              ;; auto-complete
-              ;; (delq 'ac-source-dictionary ac-sources)
-              ;; (delq 'ac-source-abbrev ac-sources)
-              ;; (delq 'ac-source-words-in-same-mode-buffers ac-sources)
               ;; yas
               (global-set-key (kbd "<S-iso-lefttab>") 'yas-insert-snippet)
               ;; Python indentation
@@ -3586,7 +3581,7 @@ word3
 #+END_SRC
 *** Web
 **** Web-mode
-*dépendances* [[https://github.com/fxbois/web-mode][web-mode.el]] [[https://github.com/osv/company-web][company-web]] [[https://github.com/cheunghy/ac-html][ac-html]] [[https://github.com/osv/web-completion-data][web-completion-data]]
+*dépendances* [[https://github.com/fxbois/web-mode][web-mode.el]] [[https://github.com/osv/company-web][company-web]] [[https://github.com/osv/web-completion-data][web-completion-data]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'web-mode "web-mode" "" t)
   (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
@@ -3619,7 +3614,6 @@ word3
                              ))
   ;; company
   (add-to-list 'load-path "~/.emacs.d/company-web")
-  (add-to-list 'load-path "~/.emacs.d/ac-html")
   (add-to-list 'load-path "~/.emacs.d/web-completion-data")
   (require 'company-web-html)
   (add-hook 'web-mode-hook
