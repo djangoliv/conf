@@ -2340,6 +2340,14 @@ Avoir des tabs (et surtout des groupes)
   (add-hook 'org-mode-hook #'sk/dubcaps-mode)
   (add-hook 'python-mode-hook #'sk/dubcaps-mode)
 #+END_SRC
+*** eww recherche la region ou prompt
+#+BEGIN_SRC emacs-lisp
+  ;; M-s M-w recherche la région, si pas de sélection => prompt
+  (defun jab/eww-search (orig-fun &rest args)
+    (if (region-active-p) (apply orig-fun args)
+      (eww (read-string "Query: "))))
+  (advice-add 'eww-search-words :around #'jab/eww-search)
+#+END_SRC
 * Developpement
 ** Common
 *** insert un shebang
@@ -2632,9 +2640,8 @@ Avoir des tabs (et surtout des groupes)
   (add-hook 'web-mode-hook 'flyspell-mode)
  #+END_SRC
 ** Company
-*dépendances*: [[https://github.com/company-mode/company-mode][company-mode]] [[https://github.com/expez/company-quickhelp][company-quickhelp]]
+*dépendances*: [[https://github.com/company-mode/company-mode][company-mode]] [[https://github.com/expez/company-quickhelp][company-quickhelp]] [[https://github.com/hlissner/emacs-company-dict][company-dict]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/company-mode")
   (require 'company)
   (require 'company-quickhelp)
   (setq company-minimum-prefix-length 1
@@ -2646,12 +2653,17 @@ Avoir des tabs (et surtout des groupes)
         company-transformers '(company-sort-by-occurrence)
         company-begin-commands '(self-insert-command))
   (add-hook 'after-init-hook 'global-company-mode)
-  (company-quickhelp-mode 1)
+  (company-quickhelp-mode)
   (delq 'company-eclim company-backends)
   (delq 'company-clang company-backends)
   (delq 'company-gtags company-backends)
   (delq 'company-etags company-backends)
   (delq 'company-oddmuse company-backends)
+  ;; company-dict
+  (autoload 'company-dict "company-dict" nil t)
+  (setq company-dict-dir (concat user-emacs-directory "dict/"))
+  (define-key org-mode-map (kbd "C-c <tab>") 'company-dict)
+  (define-key text-mode-map (kbd "C-c <tab>") 'company-dict)
   #+END_SRC
 ** Gestion de versions
 *** SVN
