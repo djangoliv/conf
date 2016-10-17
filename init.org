@@ -154,29 +154,24 @@ Configuration minimale (sans librairies externes)
   #+END_SRC
 ** Sauvegarde auto
 #+BEGIN_SRC emacs-lisp
-  ;; pas de sauvegarde auto
+  ;; Pas d'auto-save
   (setq auto-save-default nil)
   ;; Mettre tous les fichiers de backup dans un seul repertoire
   (setq backup-directory-alist
         '(("." . "~/.emacs-backup-files/")))
-  (setq version-control t      ;; activation
-        backup-by-copying t    ;; don't clobber symlinks
-        delete-old-versions t  ;; nettoyage silencieux
-        kept-new-versions 3
-        kept-old-versions 1)
-  ;; Faire aussi des backups des fichiers sous control de version
-  (setq vc-make-backup-files t)
+  (setq version-control t       ;; activation
+        vc-make-backup-files t  ;; Faire aussi des backups des fichiers sous control de version
+        backup-by-copying t     ;; on ne copie pas des liens
+        delete-old-versions -1) ;; On garde tout
 #+END_SRC
 ** Persistance
-*dépendances*: [[https://github.com/tkf/savekill-el][savekill.el]]
 #+BEGIN_SRC emacs-lisp
   ;; savegarde de l'historique entre les sessions
+  (setq savehist-save-minibuffer-history 1)
   (setq savehist-additional-variables
-        '(search-ring regexp-search-ring compile-history)
+        '(kill-ring search-ring regexp-search-ring compile-history log-edit-comment-ring)
         savehist-file "~/.emacs.d/savehist")
   (savehist-mode t)
-  ;; sauvegarde de la kill-ring
-  (require 'savekill)
 #+END_SRC
 ** Copy/paste/Kill-ring
 *dépendances*: [[https://github.com/browse-kill-ring/browse-kill-ring][browse-kill-ring.el]] [[https://github.com/rolandwalker/simpleclip][simpleclip]]
@@ -681,6 +676,7 @@ Avoir des tabs (et surtout des groupes)
   (setq org-return-follows-link t)
   (modify-coding-system-alist 'file "\\.org\\'" 'utf-8)
   (setq org-cycle-separator-lines 0)
+  (setq org-startup-with-inline-images t)
   (add-hook 'ediff-prepare-buffer-hook #'outline-show-all) ;; edif in org-mode
   (add-hook 'org-mode-hook (lambda ()
                              (global-set-key (kbd "s-<escape>") 'hide-sublevels)   ;; tout plier
@@ -717,6 +713,10 @@ Avoir des tabs (et surtout des groupes)
   ;; org-find-tag
   (push '(tags-tree . local) org-show-context-detail)
   (define-key org-mode-map (kbd "C-x r J") 'org-tags-sparse-tree)
+  ;; org-template (<s TAB, <e TAB)
+  (setq org-structure-template-alist
+        '(("s" "#+BEGIN_SRC ?\n\n#+END_SRC" "<src lang=\"?\">\n\n</src>")
+          ("e" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC" "<src lang=\"emacs-lisp\">\n?\n</src>")))
 #+END_SRC
 *** babel
 *dépendances* [[https://github.com/gregsexton/ob-ipython][ob-ipython]] [[http://ditaa.sourceforge.net/][ditaa]] [[http://fr.plantuml.com/download.html][plantuml.jar]]
@@ -996,6 +996,8 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   (require 'undo-tree)
   (global-undo-tree-mode 1)
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-visualizer-diff t)
   (setq undo-tree-auto-save-history 1)
   (setq-default undo-tree-history-directory-alist (quote (("." . "~/.emacs-undo-files/"))))
 #+END_SRC
