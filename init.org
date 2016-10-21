@@ -108,20 +108,23 @@ Configuration minimale (sans librairies externes)
 ** auto tangle init file
 *dépendances*: [[https://github.com/jwiegley/emacs-async][emacs-async]]
 #+BEGIN_SRC emacs-lisp
-    ;; async tangle init.org at save
-    (add-to-list 'load-path "~/.emacs.d/emacs-async/")
-    (require 'async)
-    (defun tangle-init-async ()
-      "If the current buffer is 'emacs-init.org' the code-blocks are tangled."
-      (when (equal (buffer-file-name) (expand-file-name (concat user-emacs-directory "init.org")))
-        (async-start
-         `(lambda ()
-            (require 'org)
-            (org-babel-tangle-file (expand-file-name (concat user-emacs-directory "init.org")) (expand-file-name (concat user-emacs-directory "init.el") "emacs-lisp")))
-         (lambda (result)
-           (byte-compile-file (expand-file-name (concat user-emacs-directory "init.el")))
-           (message "Tangled file compiled.")))))
-    (add-hook 'after-save-hook 'tangle-init-async)
+  ;; async tangle init.org at save
+  (add-to-list 'load-path "~/.emacs.d/emacs-async/")
+  (require 'async)
+  (defun tangle-init-async ()
+    "If the current buffer is 'emacs-init.org' the code-blocks are tangled."
+    (when (equal (buffer-file-name) (expand-file-name (concat user-emacs-directory "init.org")))
+      (async-start
+       `(lambda ()
+          (require 'org)
+          (org-babel-tangle-file (expand-file-name (concat user-emacs-directory "init.org")) (expand-file-name (concat user-emacs-directory "init.el") "emacs-lisp")))
+       (lambda (result)
+         (byte-compile-file (expand-file-name (concat user-emacs-directory "init.el")))
+         ;; scroll to the end to see if there's an error
+         (let ((buf (get-buffer "*Compile-Log*")))
+           (set-window-point (get-buffer-window buf) (buffer-size buf)))
+         (message "Tangled file compiled.")))))
+  (add-hook 'after-save-hook 'tangle-init-async)
 #+END_SRC
 ** source du bashrc au démarrage
 *dépendances*: [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
