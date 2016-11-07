@@ -75,6 +75,7 @@
  '(org-checkbox-statistics-todo ((t (:foreground "#DDC5E5" :bold t))))
  '(org-table ((t (:foreground "WhiteSmoke"))))
  '(org-archived ((t (:foreground "#008f80"))))
+ '(org-ellipsis ((t (:underline nil))))
  '(org-link ((t (:foreground "cyan" :underline t :background "#2e3436")))))
 ;; org-priority
 (setq org-priority-faces '((?A . (:foreground "OrangeRed" :weight "bold" :background "#271363936393"))
