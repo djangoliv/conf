@@ -3723,8 +3723,8 @@ word3
   (add-hook 'less-css-mode-hook 'rainbow-mode)
   (add-hook 'css-mode-hook 'rainbow-mode)
 #+END_SRC
-**** Vrac: accents HTML/Apache/Rest
-*dépendances* [[http://www.emacswiki.org/emacs/html-accent.el][html-accent.el]] [[https://github.com/emacsmirror/emacswiki.org/blob/master/apache-mode.el][apache-mode.el]] [[https://github.com/pashky/restclient.el][restclient.el]]
+**** Vrac: accents HTML/Apache
+*dépendances* [[http://www.emacswiki.org/emacs/html-accent.el][html-accent.el]] [[https://github.com/emacsmirror/emacswiki.org/blob/master/apache-mode.el][apache-mode.el]]
 #+BEGIN_SRC emacs-lisp
   ;; accents html
   (autoload 'html-accents "htmlAccent" nil t)
@@ -3736,9 +3736,13 @@ word3
   (add-to-list 'auto-mode-alist '("srm\\.conf\\'"    . apache-mode))
   (add-to-list 'auto-mode-alist '("access\\.conf\\'" . apache-mode))
   (add-to-list 'auto-mode-alist '("sites-\\(available\\|enabled\\)/" . apache-mode))
-  ;; client REST
+#+END_SRC
+**** restclient [[https://github.com/pashky/restclient.el][restclient.el]] [[https://github.com/for-GET/know-your-http-well][know-your-http-well]] [[https://github.com/iquiw/company-restclient][company-restclient]]
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/know-your-http-well/emacs")
   (autoload 'restclient-mode "restclient" "" t)
   (add-to-list 'auto-mode-alist '("\\.restclient$" . restclient-mode))
+  (setq url-proxy-services '(("no_proxy" . "^\\(localhost\\|127.*\\|10.*\\)")))
 #+END_SRC
 **** nginx
 *dépendances* [[https://github.com/ajc/nginx-mode][nginx-mode]]
