@@ -22,9 +22,9 @@
  `(lazy-highlight ((t (:background "DarkSlateGray4"))))
  `(cua-rectangle ((t (:background "CornflowerBlue" :foreground "white"))))
  `(cursor ((t (:foreground "CadetBlue"))))
- `(header-line ((t (:foreground "white" :background "#0e3f4e" :box (:line-width -1 :style released-button))))))
-;;;;; comments
-(set-face-italic-p 'font-lock-comment-face t)
+ `(header-line ((t (:foreground "white" :background "#1f4f4f" :height 102 :box (:line-width -1 :style released-button)))))
+;;; comments
+ `(font-lock-comment-face  ((t (:foreground "chocolate1" :italic t)))))
 ;;;;; frame
 (add-to-list 'default-frame-alist '(background-color . "DarkSlateGray"))
 (add-to-list 'default-frame-alist '(foreground-color . "wheat"))
@@ -131,15 +131,6 @@
  '(rainbow-delimiters-depth-8-face ((t (:foreground "tomato"))))
  '(rainbow-delimiters-depth-9-face ((t (:foreground "firebrick"))))
  '(rainbow-delimiters-unmatched-face ((t (:foreground "red")))))
-(eval-after-load "rainbow-delimiters-mode"
-  '(progn
-	 (defface my-outermost-paren-face
-	   '((t (:weight bold)))
-	   "Face used for outermost parens.")
-	 (setq rainbow-delimiters-outermost-only-face-count 1)
-	 (set-face-attribute 'rainbow-delimiters-depth-1-face nil
-						 :foreground 'unspecified
-						 :inherit 'my-outermost-paren-face)))
 ;; split window
 (set-face-attribute 'vertical-border nil :foreground "CadetBlue")
 ;; calendar/diary
@@ -212,6 +203,82 @@
 (custom-set-faces '(font-lock-doc-face ((t (:foreground "sienna2")))))
 ;;;; modeline
 (setq line-number-mode nil) ;; deja affiché
+;; separator
+(defun interpolate (color1 color2)
+  "Interpolate between two hex colors, they must be supplied as
+hex colors with leading # - Note: this has been implemented
+independently, there are functions in hexrgb.el that would help
+this out a bit, but I wanted this to require only cl-lib (which
+it built in), and nothing else."
+  (let* (
+		 (c1 (replace-regexp-in-string "#" "" color1))
+		 (c2 (replace-regexp-in-string "#" "" color2))
+		 (c1r (string-to-number (substring c1 0 2) 16))
+		 (c1b (string-to-number (substring c1 2 4) 16))
+		 (c1g (string-to-number (substring c1 4 6) 16))
+		 (c2r (string-to-number (substring c2 0 2) 16))
+		 (c2b (string-to-number (substring c2 2 4) 16))
+		 (c2g (string-to-number (substring c2 4 6) 16))
+		 (red (/ (+ c1r c2r) 2))
+		 (grn (/ (+ c1g c2g) 2))
+		 (blu (/ (+ c1b c2b) 2)))
+	(format "#%02X%02X%02X" red grn blu)))
+(defun djangoliv-separator-right(color1 color2)
+  (djangoliv--state-mark-modeline-dot color1 (interpolate color1 color2) color2
+  "/* XPM */
+static char * data[] = {
+\"13 18 3 1\",
+\"@ c %s\",
+\"# c %s\",
+\" c %s\",
+\"@            \",
+\"@@@          \",
+\"@@@@         \",
+\"@@@@#        \",
+\"@@@@@        \",
+\"@@@@@#       \",
+\"@@@@@@       \",
+\"@@@@@@       \",
+\"@@@@@@#      \",
+\"@@@@@@@      \",
+\"@@@@@@@      \",
+\"@@@@@@@#     \",
+\"@@@@@@@@     \",
+\"@@@@@@@@     \",
+\"@@@@@@@@#    \",
+\"@@@@@@@@@@   \",
+\"@@@@@@@@@@@  \",
+\"@@@@@@@@@@@@#\"};"))
+(defun djangoliv-separator-left(color1 color2)
+  (djangoliv--state-mark-modeline-dot color1 (interpolate color1 color2) color2
+ "/* XPM */
+static char * data[] = {
+\"13 18 3 1\",
+\"@ c %s\",
+\"# c %s\",
+\" c %s\",
+\"            @\",
+\"          @@@\",
+\"         @@@@\",
+\"        #@@@@\",
+\"        @@@@@\",
+\"       #@@@@@\",
+\"       @@@@@@\",
+\"       @@@@@@\",
+\"      #@@@@@@\",
+\"      @@@@@@@\",
+\"      @@@@@@@\",
+\"     #@@@@@@@\",
+\"     @@@@@@@@\",
+\"     @@@@@@@@\",
+\"    #@@@@@@@@\",
+\"   @@@@@@@@@@\",
+\"  @@@@@@@@@@@\",
+\"#@@@@@@@@@@@@\"};"))
+
+(defun djangoliv--state-mark-modeline-dot (color1 color2 color3 img)
+  (propertize "    " 'display `(image :type xpm :data ,(format img color1 color2 color3) :ascent center)))
+
 (setq-default mode-line-format
 			  '("  "
 				;; Position, including warning for 200 columns
@@ -227,9 +294,6 @@
 				"/"
 				(:propertize "%I" face mode-line-col-face) ;; size
 				"]  "
-				;;emacsclient [default -- keep?]
-				mode-line-client
-				"  "
 				;; read-only or modified status
 				(:eval
 				 (cond (buffer-read-only
@@ -237,15 +301,17 @@
 					   ((buffer-modified-p)
 						(propertize " ** " 'face 'mode-line-modified-face))
 					   (t "      ")))
-				"  "
+				" "
+				(:eval (djangoliv-separator-left "#1f443f" "#1f4f4f"))
 				;; directory and buffer/file name
 				(:propertize (:eval (shorten-directory default-directory 26))
 							 face mode-line-folder-face)
 
-				(:eval (propertize "%b" 'face
+				(:eval (propertize " %b " 'face
 								   (if (not (eq major-mode 'dired-mode))
 									   'mode-line-filename-face
 									 'mode-line-dired-face)))
+				(:eval (djangoliv-separator-right "#1f443f" "#1f4f4f"))
 				" "
 				(:eval (propertize "(admin)" 'face (if (string-match "^/su\\(do\\)?:" default-directory)
 													   '(:background "darkred" :foreground "white")
@@ -254,12 +320,13 @@
 				" %n "
 				;;"  mode
 				" "
-				(:propertize mode-name face mode-line-col-face)
+                (:propertize mode-name face mode-line-lin-face)
 				" "
 				(:eval (if (boundp 'mode-icons-cached-mode-name) (propertize mode-icons-cached-mode-name)))
 				;; mode indicators: vc, recursive edit, major mode, minor modes, process, global
 				(vc-mode vc-mode)
 				"    "
+				(:eval (djangoliv-separator-left "#1f443f" "#1f4f4f"))
 				(:propertize (:eval
 							  (let* ((code (symbol-name buffer-file-coding-system))
 									 (eol-type (coding-system-eol-type buffer-file-coding-system))
@@ -267,8 +334,13 @@
 											(if (eq 1 eol-type) "DOS"
 											  (if (eq 2 eol-type) "MAC"
 												"")))))
-								(concat code " " eol " ")))
+								(concat code "  " eol " ")))
 							 face mode-line-black-face)
+				(:eval (djangoliv-separator-right "#1f443f" "#1f4f4f"))
+				" "
+				(:propertize mode-line-misc-info face mode-line-col-face)
+				" "
+				mode-line-end-spaces
 				))
 
 ;; Helper function
@@ -300,15 +372,17 @@
 					:inherit 'mode-line-face
 					:foreground "blue")
 (set-face-attribute 'mode-line-folder-face nil
-					:inherit 'mode-line-face)
+					:inherit 'mode-line-face
+					:background "#1f443f")
 (set-face-attribute 'mode-line-filename-face nil
 					:inherit 'mode-line-face
-					:foreground "WhiteSmoke")
+					:background "#1f443f" :foreground "WhiteSmoke")
 (set-face-attribute 'mode-line-dired-face nil ;; permet de rendre le filename invisible sous dired
 					:inherit 'mode-line-face
-					:foreground "#1f4f4f")
+					:background "#2f4f4f" :foreground "#1f4f4f")
 (set-face-attribute 'mode-line-black-face nil
 					:inherit 'mode-line-face
+					:background "#1f443f"
 					:weight 'bold :foreground "black")
 (set-face-attribute 'mode-line-mode-face nil
 					:inherit 'mode-line-face
@@ -327,22 +401,24 @@
 					:foreground "gray70" :background "#1f4f4f"
 					:inverse-video nil)
 (set-face-attribute 'mode-line-inactive nil
-					:foreground "gray70" :background "DarkSlateGray"
+					:foreground "gray70" :background "#2f4f4f"
 					:inverse-video nil)
-
+;; selected or not
 (defun toggle-mode-line-buffer-name-face (window)
   (with-current-buffer (window-buffer window)
 	(if (eq (current-buffer) (window-buffer (selected-window)))
 		(progn
+		  (face-remap-reset-base 'mode-line-folder-face)
 		  (face-remap-reset-base 'mode-line-filename-face)
 		  (face-remap-reset-base 'mode-line-col-face)
 		  (face-remap-reset-base 'mode-line-lin-face)
 		  (face-remap-reset-base 'mode-line-black-face))
 	  (progn
-		(face-remap-set-base 'mode-line-black-face '(:foreground "gray60"))
+		(face-remap-set-base 'mode-line-black-face '(:foreground "gray60" :background "#2f4f4f"))
+		(face-remap-set-base 'mode-line-folder-face '(:background "#2f4f4f"))
 		(face-remap-set-base 'mode-line-col-face '(:foreground "gray60"))
 		(face-remap-set-base 'mode-line-lin-face '(:foreground "gray60"))
-		(face-remap-set-base 'mode-line-filename-face '(:foreground "gray60"))))))
+		(face-remap-set-base 'mode-line-filename-face '(:foreground "gray60" :background "#2f4f4f"))))))
 (add-hook 'buffer-list-update-hook (lambda () (walk-windows #'toggle-mode-line-buffer-name-face nil t)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Fin mode line
