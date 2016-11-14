@@ -307,7 +307,7 @@ static char * data[] = {
 				(:propertize (:eval (shorten-directory default-directory 26))
 							 face mode-line-folder-face)
 
-				(:eval (propertize " %b " 'face
+				(:eval (propertize "%b " 'face
 								   (if (not (eq major-mode 'dired-mode))
 									   'mode-line-filename-face
 									 'mode-line-dired-face)))
@@ -334,7 +334,7 @@ static char * data[] = {
 											(if (eq 1 eol-type) "DOS"
 											  (if (eq 2 eol-type) "MAC"
 												"")))))
-								(concat code "  " eol " ")))
+								(concat code "  " eol "")))
 							 face mode-line-black-face)
 				(:eval (djangoliv-separator-right "#1f443f" "#1f4f4f"))
 				" "
