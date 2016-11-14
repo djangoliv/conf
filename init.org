@@ -2582,15 +2582,15 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "M-)") 'general-close)
 #+END_SRC
 ** flycheck/flyspell
-*dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]] [[https://github.com/xuchunyang/flyspell-popup][flyspell-popup]]
+*dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/xuchunyang/flyspell-popup][flyspell-popup]] [[https://github.com/flycheck/flycheck-pos-tip][flycheck-pos-tip]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'flycheck-mode "flycheck" nil t)
   (eval-after-load "flycheck"
     '(progn
-       (require 'flycheck-tip)
+       (require 'flycheck-pos-tip)
+       (flycheck-pos-tip-mode)
        (setq flycheck-pylintrc "~/.config/pylintrc")
        (setq flycheck-pylint-use-symbolic-id nil) ;; ID pylint
-       (flycheck-tip-use-timer 'verbose)
        (global-set-key (kbd "C-c <down>") 'flycheck-next-error)
        (global-set-key (kbd "C-c <up>") 'flycheck-previous-error)))
   ;; flyspell popup
