@@ -3600,61 +3600,65 @@ word3
 **** Web-mode
 *dépendances* [[https://github.com/fxbois/web-mode][web-mode.el]] [[https://github.com/osv/company-web][company-web]] [[https://github.com/osv/web-completion-data][web-completion-data]]
 #+BEGIN_SRC emacs-lisp
-  (autoload 'web-mode "web-mode" "" t)
-  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-  (setq web-mode-auto-close-style 1)
-  (setq web-mode-tag-auto-close-style t)
-  (setq web-mode-enable-auto-pairing t)
-  (setq web-mode-enable-auto-indentation t)
-  (setq web-mode-enable-indent-cycle t)
-  ;; hook
-  (add-hook 'web-mode-hook (lambda ()
-                             ;; indentation
-                             (setq indent-tabs-mode nil)
-                             (setq web-mode-markup-indent-offset 4)
-                             (setq web-mode-css-indent-offset 4)
-                             (setq web-mode-code-indent-offset 4)
-                             (setq web-mode-indent-style 4)
-                             ;; padding
-                             (setq web-mode-style-padding 1)
-                             (setq web-mode-script-padding 1)
-                             (setq web-mode-block-padding 0)
-                             ;; raccourcis
-                             (define-key web-mode-map (kbd "M-;") 'web-mode-comment-or-uncomment)
-                             (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
-                             (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
-                             ))
-  ;; company
-  (add-to-list 'load-path "~/.emacs.d/company-web")
-  (add-to-list 'load-path "~/.emacs.d/web-completion-data")
-  (require 'company-web-html)
-  (add-hook 'web-mode-hook
-                (lambda ()
-                  (add-to-list (make-local-variable 'company-backends)
-                               'company-nxml)
-                  (add-to-list (make-local-variable 'company-backends)
-                               'company-web-html)
-                  (add-to-list (make-local-variable 'company-backends)
-                               'company-css)
-                  ))
-  ;; force django engine for html
-  (setq web-mode-engines-alist
-        '(("django"    . "\\.html\\'"))
-        )
-  ;; force django engine (manual)
-  (defun web-mode-django ()
-    (interactive)
-    (web-mode-set-engine "django"))
-  (global-set-key (kbd "s-%") 'web-mode-django)
-  ;; force angular engine (manual)
-  (defun web-mode-angularJs ()
-    (interactive)
-    (web-mode-set-engine "angular"))
+    (autoload 'web-mode "web-mode" "" t)
+    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.jinja\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+    (setq web-mode-auto-close-style 1)
+    (setq web-mode-tag-auto-close-style t)
+    (setq web-mode-enable-auto-pairing t)
+    (setq web-mode-enable-auto-indentation t)
+    (setq web-mode-enable-indent-cycle t)
+    ;; hook
+    (add-hook 'web-mode-hook (lambda ()
+                               ;; indentation
+                               (setq indent-tabs-mode nil)
+                               (setq web-mode-markup-indent-offset 4)
+                               (setq web-mode-css-indent-offset 4)
+                               (setq web-mode-code-indent-offset 4)
+                               (setq web-mode-indent-style 4)
+                               ;; padding
+                               (setq web-mode-style-padding 1)
+                               (setq web-mode-script-padding 1)
+                               (setq web-mode-block-padding 0)
+                               ;; raccourcis
+                               (define-key web-mode-map (kbd "M-;") 'web-mode-comment-or-uncomment)
+                               (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
+                               (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
+                               ))
+    ;; company
+    (add-to-list 'load-path "~/.emacs.d/company-web")
+    (add-to-list 'load-path "~/.emacs.d/web-completion-data")
+    (require 'company-web-html)
+    (add-hook 'web-mode-hook
+                  (lambda ()
+                    (add-to-list (make-local-variable 'company-backends)
+                                 'company-nxml)
+                    (add-to-list (make-local-variable 'company-backends)
+                                 'company-web-html)
+                    (add-to-list (make-local-variable 'company-backends)
+                                 'company-css)
+                    ))
+    ;; force django engine for html
+    (setq web-mode-engines-alist
+          '(("django"    . "\\.html\\'")
+            ("jinja"    . "\\.jinja\\'")
+            ("jinja"    . "\\.jinja2\\'"))
+          )
+    ;; force django engine (manual)
+    (defun web-mode-django ()
+      (interactive)
+      (web-mode-set-engine "django"))
+    (global-set-key (kbd "s-%") 'web-mode-django)
+    ;; force angular engine (manual)
+    (defun web-mode-angularJs ()
+      (interactive)
+      (web-mode-set-engine "angular"))
   #+END_SRC
 **** Emmet
 *dépendances*: [[https://github.com/smihica/emmet-mode][emmet.el]]
