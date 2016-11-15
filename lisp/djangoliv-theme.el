@@ -306,11 +306,8 @@ static char * data[] = {
 				;; directory and buffer/file name
 				(:propertize (:eval (shorten-directory default-directory 26))
 							 face mode-line-folder-face)
-
-				(:eval (propertize "%b " 'face
-								   (if (not (eq major-mode 'dired-mode))
-									   'mode-line-filename-face
-									 'mode-line-dired-face)))
+				;; filename if not dired
+				(:eval (if (not (eq major-mode 'dired-mode)) (propertize "%b " 'face 'mode-line-filename-face)))
 				(:eval (djangoliv-separator-right "#1f443f" "#1f4f4f"))
 				" "
 				(:eval (propertize "(admin)" 'face (if (string-match "^/su\\(do\\)?:" default-directory)
@@ -365,7 +362,6 @@ static char * data[] = {
 (make-face 'mode-line-black-face)
 (make-face 'mode-line-mode-face)
 (make-face 'mode-line-80col-face)
-(make-face 'mode-line-dired-face)
 (make-face 'mode-line-col-face)
 (make-face 'mode-line-lin-face)
 (set-face-attribute 'mode-line-read-only-face nil
@@ -377,9 +373,6 @@ static char * data[] = {
 (set-face-attribute 'mode-line-filename-face nil
 					:inherit 'mode-line-face
 					:background "#1f443f" :foreground "WhiteSmoke")
-(set-face-attribute 'mode-line-dired-face nil ;; permet de rendre le filename invisible sous dired
-					:inherit 'mode-line-face
-					:background "#2f4f4f" :foreground "#1f4f4f")
 (set-face-attribute 'mode-line-black-face nil
 					:inherit 'mode-line-face
 					:background "#1f443f"
@@ -414,11 +407,11 @@ static char * data[] = {
 		  (face-remap-reset-base 'mode-line-lin-face)
 		  (face-remap-reset-base 'mode-line-black-face))
 	  (progn
-		(face-remap-set-base 'mode-line-black-face '(:foreground "gray60" :background "#2f4f4f"))
 		(face-remap-set-base 'mode-line-folder-face '(:background "#2f4f4f"))
+		(face-remap-set-base 'mode-line-filename-face '(:foreground "gray60" :background "#2f4f4f"))
 		(face-remap-set-base 'mode-line-col-face '(:foreground "gray60"))
 		(face-remap-set-base 'mode-line-lin-face '(:foreground "gray60"))
-		(face-remap-set-base 'mode-line-filename-face '(:foreground "gray60" :background "#2f4f4f"))))))
+		(face-remap-set-base 'mode-line-black-face '(:foreground "gray60" :background "#2f4f4f"))))))
 (add-hook 'buffer-list-update-hook (lambda () (walk-windows #'toggle-mode-line-buffer-name-face nil t)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Fin mode line
