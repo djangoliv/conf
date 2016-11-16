@@ -610,7 +610,7 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'peep-dired "peep-dired" nil t)
   (define-key dired-mode-map (kbd "P") 'peep-dired)
   (setq peep-dired-cleanup-on-disable t)
-  (setq peep-dired-ignored-extensions '("mkv" "iso" "mp4" "zip" "tgz"))
+  (setq peep-dired-ignored-extensions '("mkv" "iso" "mp4" "zip" "tgz" "odt"))
 #+END_SRC
 *** image-dired
 *dépendances* [[https://github.com/mhayashi1120/Emacs-image-diredx][image-dired+]]
