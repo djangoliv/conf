@@ -279,10 +279,18 @@ static char * data[] = {
 (defun djangoliv--state-mark-modeline-dot (color1 color2 color3 img)
   (propertize "    " 'display `(image :type xpm :data ,(format img color1 color2 color3) :ascent center)))
 
+(defvar djangoliv-selwin nil)
+
+(defun djangoliv-is-selected(windows)
+  (when (not (minibuffer-window-active-p (frame-selected-window)))
+    (setq djangoliv-selwin (selected-window))))
+
+(add-function :before pre-redisplay-function #'djangoliv-is-selected)
+
 (setq-default mode-line-format
 			  '("  "
 				;; Position, including warning for 200 columns
-				(:propertize "%5l" face mode-line-lin-face)
+				(:eval (propertize "%5l" 'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-lin-face 'mode-line-face)))
 				":"
 				(:eval (propertize "%3c" 'face
 								   (if (>= (current-column) 200)
@@ -302,13 +310,16 @@ static char * data[] = {
 						(propertize " ** " 'face 'mode-line-modified-face))
 					   (t "      ")))
 				" "
-				(:eval (djangoliv-separator-left "#1f443f" "#1f4f4f"))
+				(:eval (if (eq djangoliv-selwin (get-buffer-window))
+						   (djangoliv-separator-left "#1f443f" "#1f4f4f")
+						 (djangoliv-separator-left "#2f4f4f" "#2f4f4f")))
 				;; directory and buffer/file name
-				(:propertize (:eval (shorten-directory default-directory 26))
-							 face mode-line-folder-face)
+				(:eval (propertize (shorten-directory default-directory 26) 'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-folder-face 'mode-line-face)))
 				;; filename if not dired
-				(:eval (if (not (eq major-mode 'dired-mode)) (propertize "%b " 'face 'mode-line-filename-face)))
-				(:eval (djangoliv-separator-right "#1f443f" "#1f4f4f"))
+				(:eval (if (not (eq major-mode 'dired-mode)) (propertize "%b " 'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-filename-face 'mode-line-face))))
+				(:eval (if (eq djangoliv-selwin (get-buffer-window))
+						   (djangoliv-separator-right "#1f443f" "#1f4f4f")
+						 (djangoliv-separator-right "#2f4f4f" "#2f4f4f")))
 				" "
 				(:eval (propertize "(admin)" 'face (if (string-match "^/su\\(do\\)?:" default-directory)
 													   '(:background "darkred" :foreground "white")
@@ -323,17 +334,21 @@ static char * data[] = {
 				;; mode indicators: vc, recursive edit, major mode, minor modes, process, global
 				(vc-mode vc-mode)
 				"    "
-				(:eval (djangoliv-separator-left "#1f443f" "#1f4f4f"))
-				(:propertize (:eval
-							  (let* ((code (symbol-name buffer-file-coding-system))
-									 (eol-type (coding-system-eol-type buffer-file-coding-system))
-									 (eol (if (eq 0 eol-type) "UNIX"
-											(if (eq 1 eol-type) "DOS"
-											  (if (eq 2 eol-type) "MAC"
-												"")))))
-								(concat code "  " eol "")))
-							 face mode-line-black-face)
-				(:eval (djangoliv-separator-right "#1f443f" "#1f4f4f"))
+				(:eval (if (eq djangoliv-selwin (get-buffer-window))
+						   (djangoliv-separator-left "#1f443f" "#1f4f4f")
+						 (djangoliv-separator-left "#2f4f4f" "#2f4f4f")))
+				(:eval (propertize
+						(let* ((code (symbol-name buffer-file-coding-system))
+							   (eol-type (coding-system-eol-type buffer-file-coding-system))
+							   (eol (if (eq 0 eol-type) "UNIX"
+									  (if (eq 1 eol-type) "DOS"
+										(if (eq 2 eol-type) "MAC"
+										  "")))))
+						  (concat code "  " eol ""))
+						'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-black-face 'mode-line-face)))
+				(:eval (if (eq djangoliv-selwin (get-buffer-window))
+						   (djangoliv-separator-right "#1f443f" "#1f4f4f")
+						 (djangoliv-separator-right "#2f4f4f" "#2f4f4f")))
 				" "
 				(:propertize mode-line-misc-info face mode-line-col-face)
 				" "
@@ -394,25 +409,8 @@ static char * data[] = {
 					:foreground "gray70" :background "#1f4f4f"
 					:inverse-video nil)
 (set-face-attribute 'mode-line-inactive nil
-					:foreground "gray70" :background "#2f4f4f"
+					:foreground "#2f1f4f" :background "#2f4f4f"
 					:inverse-video nil)
-;; selected or not
-(defun toggle-mode-line-buffer-name-face (window)
-  (with-current-buffer (window-buffer window)
-	(if (eq (current-buffer) (window-buffer (selected-window)))
-		(progn
-		  (face-remap-reset-base 'mode-line-folder-face)
-		  (face-remap-reset-base 'mode-line-filename-face)
-		  (face-remap-reset-base 'mode-line-col-face)
-		  (face-remap-reset-base 'mode-line-lin-face)
-		  (face-remap-reset-base 'mode-line-black-face))
-	  (progn
-		(face-remap-set-base 'mode-line-folder-face '(:background "#2f4f4f"))
-		(face-remap-set-base 'mode-line-filename-face '(:foreground "gray60" :background "#2f4f4f"))
-		(face-remap-set-base 'mode-line-col-face '(:foreground "gray60"))
-		(face-remap-set-base 'mode-line-lin-face '(:foreground "gray60"))
-		(face-remap-set-base 'mode-line-black-face '(:foreground "gray60" :background "#2f4f4f"))))))
-(add-hook 'buffer-list-update-hook (lambda () (walk-windows #'toggle-mode-line-buffer-name-face nil t)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Fin mode line
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
