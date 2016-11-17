@@ -290,17 +290,17 @@ static char * data[] = {
 (setq-default mode-line-format
 			  '("  "
 				;; Position, including warning for 200 columns
-				(:eval (propertize "%5l" 'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-lin-face 'mode-line-face)))
+				(:eval (propertize "%5l" 'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-lin-face 'mode-line-inactive)))
 				":"
-				(:eval (propertize "%3c" 'face
-								   (if (>= (current-column) 200)
-									   'mode-line-80col-face
-									 'mode-line-col-face))) ;;font-lock-constant-face)))
+				(:eval (propertize "%3c" 'face (if (eq djangoliv-selwin (get-buffer-window))
+												   (if (>= (current-column) 200)
+													   'mode-line-80col-face
+													 'mode-line-col-face) 'mode-line-inactive)))
 				;; relative position, size of file
 				"  ["
 				(:propertize mode-line-position face mode-line-col-face)
 				"/"
-				(:propertize "%I" face mode-line-col-face) ;; size
+				(:eval (propertize "%I" 'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-col-face 'mode-line-inactive))) ;; size
 				"]  "
 				;; read-only or modified status
 				(:eval
@@ -314,9 +314,9 @@ static char * data[] = {
 						   (djangoliv-separator-left "#1f443f" "#1f4f4f")
 						 (djangoliv-separator-left "#2f4f4f" "#2f4f4f")))
 				;; directory and buffer/file name
-				(:eval (propertize (shorten-directory default-directory 26) 'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-folder-face 'mode-line-face)))
+				(:eval (propertize (shorten-directory default-directory 26) 'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-folder-face 'mode-line-inactive)))
 				;; filename if not dired
-				(:eval (if (not (eq major-mode 'dired-mode)) (propertize "%b " 'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-filename-face 'mode-line-face))))
+				(:eval (if (not (eq major-mode 'dired-mode)) (propertize "%b " 'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-filename-face 'mode-line-inactive))))
 				(:eval (if (eq djangoliv-selwin (get-buffer-window))
 						   (djangoliv-separator-right "#1f443f" "#1f4f4f")
 						 (djangoliv-separator-right "#2f4f4f" "#2f4f4f")))
@@ -345,7 +345,7 @@ static char * data[] = {
 										(if (eq 2 eol-type) "MAC"
 										  "")))))
 						  (concat code "  " eol ""))
-						'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-black-face 'mode-line-face)))
+						'face (if (eq djangoliv-selwin (get-buffer-window)) 'mode-line-black-face 'mode-line-inactive)))
 				(:eval (if (eq djangoliv-selwin (get-buffer-window))
 						   (djangoliv-separator-right "#1f443f" "#1f4f4f")
 						 (djangoliv-separator-right "#2f4f4f" "#2f4f4f")))
@@ -380,29 +380,24 @@ static char * data[] = {
 (make-face 'mode-line-col-face)
 (make-face 'mode-line-lin-face)
 (set-face-attribute 'mode-line-read-only-face nil
-					:inherit 'mode-line-face
+					:foreground "blue")
+(set-face-attribute 'mode-line-read-only-face nil
 					:foreground "blue")
 (set-face-attribute 'mode-line-folder-face nil
-					:inherit 'mode-line-face
 					:background "#1f443f")
 (set-face-attribute 'mode-line-filename-face nil
-					:inherit 'mode-line-face
 					:background "#1f443f" :foreground "WhiteSmoke")
 (set-face-attribute 'mode-line-black-face nil
-					:inherit 'mode-line-face
 					:background "#1f443f"
 					:weight 'bold :foreground "black")
 (set-face-attribute 'mode-line-mode-face nil
-					:inherit 'mode-line-face
 					:foreground "MediumBlue")
 (set-face-attribute 'mode-line-80col-face nil
 					:inherit 'mode-line-black-face
 					:foreground "black" :background "Gray50")
 (set-face-attribute 'mode-line-col-face nil
-					:inherit 'mode-line-face
 					:foreground "CadetBlue")
 (set-face-attribute 'mode-line-lin-face nil
-					:inherit 'mode-line-face
 					:foreground "aquamarine")
 ;; defaut
 (set-face-attribute 'mode-line nil
