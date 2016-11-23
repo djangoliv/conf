@@ -384,9 +384,11 @@ static char * data[] = {
 (set-face-attribute 'mode-line-read-only-face nil
 					:foreground "blue")
 (set-face-attribute 'mode-line-folder-face nil
-					:background "#1f443f")
+					:background "#1f443f"
+					:foreground "gray70")
 (set-face-attribute 'mode-line-filename-face nil
-					:background "#1f443f" :foreground "WhiteSmoke")
+					:inherit 'mode-line-folder-face
+					:foreground "WhiteSmoke")
 (set-face-attribute 'mode-line-black-face nil
 					:background "#1f443f"
 					:weight 'bold :foreground "black")
