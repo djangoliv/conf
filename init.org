@@ -3102,15 +3102,16 @@ C-. => goto definition
 **** python shell
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c !") 'python-shell-switch-to-shell)
-  (defun shell-compile ()
-	(interactive)
-	(shell-command (concat "python " (buffer-file-name)))
-	(if (<= (* 2 (window-height)) (frame-height))
-		(enlarge-window 20)
-      (/ (frame-height) 2)))
-  (add-hook 'python-mode-hook
+  (defun python-execute-buffer (arg)
+    (interactive "P")
+    (setq options "")
+    (if (not (equal arg nil))
+        (setq options (read-from-minibuffer "Args: ")))
+    (with-output-to-temp-buffer "*pyOutput*"
+      (shell-command (concat "python " (buffer-file-name) " " options) "*pyOutput*")))
+(add-hook 'python-mode-hook
 			'(lambda ()
-               (define-key python-mode-map (kbd "C-c C-c") 'shell-compile)))
+               (define-key python-mode-map (kbd "C-c C-c") 'python-execute-buffer)))
 #+END_SRC
 **** Insertion d'entete python
 #+BEGIN_SRC emacs-lisp
