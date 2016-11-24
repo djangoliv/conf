@@ -2698,14 +2698,11 @@ Avoir des tabs (et surtout des groupes)
 *** Git
 *dépendances*: [[https://github.com/magit/magit][magit]] [[https://github.com/tsgates/git-emacs][git-emacs-master]] [[https://github.com/syohex/emacs-git-messenger][git-messenger.el]] [[https://github.com/pidu/git-timemachine][git-timemachine]] [[https://github.com/magit/magit-svn][magit-svn]] [[https://github.com/magit/git-modes][gitconfig-mode]] [[https://github.com/jtatarik/magit-gitflow][magit-gitflow]] [[https://github.com/magit/with-editor][with-editor]]
 #+BEGIN_SRC emacs-lisp
+  ;; magit
 	(add-to-list 'load-path "~/.emacs.d/magit-master/lisp")
-	(autoload 'magit-status "magit" nil t)
-	(autoload 'magit-log-buffer-file "magit" nil t)
-	(autoload 'ediff-revision "magit" nil t)
-	(autoload 'magit-stash "magit" nil t)
-  (autoload 'magit-svn-rebase "magit" nil t)
-  ;; encoding
-  (add-to-list 'process-coding-system-alist '("git" iso-8859-1 . iso-8859-1))
+  (require 'magit)
+  (setq magit-repository-directories '(("~/workspaces" . 2)))
+  (global-set-key (kbd "C-x g a") 'magit-list-repositories)
 	;; pour le status dans la modeline
 	(add-to-list 'load-path "~/.emacs.d/git-emacs-master")
 	(setq git-keyboard-prefix "\C-x£") ;; keybinding improbable (ie desactivation)
@@ -2728,8 +2725,6 @@ Avoir des tabs (et surtout des groupes)
 	(autoload 'git-messenger:popup-message "git-messenger" nil t)
 	(setq git-messenger:show-detail t)
 	(global-set-key (kbd "C-x g m") 'git-messenger:popup-message)
-	;; remote editor
-	;; (add-hook 'term-mode-hook 'with-editor-export-editor)
 	;; raccourcis
 	(setq magit-keyboard-prefix (kbd "C-x g"))
 	(global-set-key (kbd "C-x g g") 'magit-status) ;; niveau de details => M-1, M-2, M-3, and M-4 ; l pour les logs
