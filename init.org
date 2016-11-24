@@ -3108,10 +3108,10 @@ C-. => goto definition
     (if (not (equal arg nil))
         (setq options (read-from-minibuffer "Args: ")))
     (with-output-to-temp-buffer "*pyOutput*"
-      (shell-command (concat "python " (buffer-file-name) " " options) "*pyOutput*")))
-(add-hook 'python-mode-hook
-			'(lambda ()
-               (define-key python-mode-map (kbd "C-c C-c") 'python-execute-buffer)))
+      (async-shell-command (concat "python " (buffer-file-name) " " options ";echo '\n >> job finish with status:' $?") "*pyOutput*")))
+  (add-hook 'python-mode-hook
+                '(lambda ()
+                   (define-key python-mode-map (kbd "C-c C-c") 'python-execute-buffer)))
 #+END_SRC
 **** Insertion d'entete python
 #+BEGIN_SRC emacs-lisp
