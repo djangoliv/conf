@@ -2289,6 +2289,11 @@ Avoir des tabs (et surtout des groupes)
                          '(logview-additional-timestamp-formats
                            (quote (("xxx" (regexp . "[0-9]\\{4\\}-[01][0-9]-[0-3][0-9] [012][0-9]:[0-5][0-9]:[0-9][0-9],[0-9]\\{3\\}") (aliases))))))
 #+END_SRC
+*** syslog
+*dépendances* [[https://github.com/vapniks/syslog-mode][sys-log-mode]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'syslog-mode "syslog-mode" nil t)
+#+END_SRC
 *** unaccent
 *dépendances* [[https://github.com/emacsmirror/unaccent][unaccent]]
 #+BEGIN_SRC emacs-lisp
@@ -2567,13 +2572,12 @@ Avoir des tabs (et surtout des groupes)
       (copy-yank-str msg)))
   (global-set-key (kbd "C-x ?") 'which-function-popup)
 #+END_SRC
-*** indent-guide
-*dépendance* [[https://github.com/zk-phi/indent-guide][indent-guide]]
+*** indent-line
+*dépendances*: [[https://github.com/DarthFennec/highlight-indent-guides][highlight-indent-guides]]
 #+BEGIN_SRC emacs-lisp
-  ;; indent-guide
-  (autoload 'indent-guide-mode "indent-guide" nil t)
-  ;; (add-hook 'prog-mode-hook 'indent-guide-mode)
-  (setq indent-guide-delay 0.5)
+  (require 'highlight-indent-guides)
+  (setq highlight-indent-guides-method 'character)
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 #+END_SRC
 *** generalClose
 #+BEGIN_SRC emacs-lisp
@@ -3099,7 +3103,7 @@ C-. => goto definition
       (highlight-regexp "TODO")))
   (add-hook 'python-mode-hook 'annotate-pdb)
 #+END_SRC
-**** python shell
+**** python exec
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c !") 'python-shell-switch-to-shell)
   (defun python-execute-buffer (arg)
