@@ -3712,6 +3712,9 @@ word3
     (interactive)
     (load-file "~/.emacs.d/lisp/angular-mode.elc")
     (load-file "~/.emacs.d/lisp/angular-html-mode.elc"))
+  ;; Commentaires dans jes json
+  (defconst json-mode-comments-re (rx (group "//" (zero-or-more nonl) line-end)))
+  (push (list json-mode-comments-re 1 font-lock-comment-face) json-font-lock-keywords-1)
   ;; Reformater un fichier json
   (defun pretty-json ()
     (interactive)
