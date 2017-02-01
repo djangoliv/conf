@@ -1835,6 +1835,12 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'docker-images "docker-images" nil t)
   (autoload 'docker-containers "docker-containers" nil t)
 #+End_SRC
+** puppet
+*dépendances*: [[https://github.com/voxpupuli/puppet-mode][puppet-mode]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'puppet-mode "puppet-mode" nil t)
+  (add-to-list 'auto-mode-alist '("\\.pp$" . puppet-mode))
+#+END_SRC
 ** epub
 *dépendances*: [[https://github.com/girzel/epub-mode][epub-mode.el]]
 #+BEGIN_SRC emacs-lisp
