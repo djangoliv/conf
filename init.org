@@ -3627,7 +3627,6 @@ word3
                                (setq web-mode-markup-indent-offset 4)
                                (setq web-mode-css-indent-offset 4)
                                (setq web-mode-code-indent-offset 4)
-                               (setq web-mode-indent-style 4)
                                ;; padding
                                (setq web-mode-style-padding 1)
                                (setq web-mode-script-padding 1)
