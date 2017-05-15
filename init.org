@@ -76,7 +76,13 @@ Configuration minimale (sans librairies externes)
   ;; on coupe les lignes
   (setq-default global-visual-line-mode t)
   ;; Diminution de la frequence du garbage collector (optimisation)
-  (setq gc-cons-threshold 20000000)
+  ;; (setq gc-cons-threshold 20000000)
+  (defun my-minibuffer-setup-hook ()
+    (setq gc-cons-threshold most-positive-fixnum))
+  (defun my-minibuffer-exit-hook ()
+    (setq gc-cons-threshold 800000))
+  (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+  (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
   ;; Un gros fichier est superieur à 35mb
   (setq large-file-warning-threshold (* 35 1024 1024))
   ;; historique
@@ -102,6 +108,8 @@ Configuration minimale (sans librairies externes)
   (setq-default tab-width 4)
   ;; ne pas charger un ancien fichier compile
   (setq load-prefer-newer t)
+  ;; silence
+  (setq ad-redefinition-action 'accept)
   ;; compilation scroll
   (setq compilation-scroll-output t)
  #+END_SRC
@@ -283,6 +291,7 @@ Collection of Emacs Development Environment Tools
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
   (add-to-list 'semantic-default-submodes 'global-srecode-minor-mode t)
   (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
+  (setq semantic-load-turn-everything-on t)
   (semantic-mode) ;; Active le mode semantic
   (require 'stickyfunc-enhance) ;; multilines concatene dans la header line
   (require 'cedet-cscope)
@@ -290,35 +299,45 @@ Collection of Emacs Development Environment Tools
 ** Initialize ECB
 *dépendances*: [[https://github.com/alexott/ecb/][ecb]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/ecb-master")
-  (require 'ecb)
+  (autoload 'ecb-activate "ecb" nil t)
   (setq ecb-layout-name "left15")
   (setq ecb-tip-of-the-day nil)
 #+END_SRC
 * Tabbar
 Avoir des tabs (et surtout des groupes)
 ** Initialisation
-*dépendances*: [[https://github.com/dholm/tabbar][tabbar.el]]
+*dépendances*: [[https://github.com/dholm/tabbar][tabbar.el]] [[https://github.com/mattfidler/tabbar-ruler.el][tabbar-ruler]]
 #+BEGIN_SRC emacs-lisp
+  (require 'tabbar-ruler)
   (setq tabbar-use-images nil)
   ;; permet de ne pas afficher les buffers non pertinents (comme *scratch* par exemple):
-  (when (require 'tabbar nil t)
-    (setq tabbar-buffer-groups-function
-          (lambda () (list "All Buffers")))
-    (setq tabbar-buffer-list-function
-          (lambda ()
-            (remove-if
-             (lambda(buffer)
-               (or (string-match-p "TAGS" (buffer-name buffer))
-                   (find (aref (buffer-name buffer) 0) " *" )))
-             (buffer-list))))
-    (tabbar-mode))
-  ;; ?
+  (setq tabbar-buffer-groups-function 'tabbar-buffer-groups)
+  (setq tabbar-buffer-groups-function
+        (lambda () (list "All Buffers")))
+  (setq tabbar-buffer-list-function
+        (lambda ()
+          (remove-if
+           (lambda(buffer)
+             (or (string-match-p "TAGS" (buffer-name buffer))
+                 (find (aref (buffer-name buffer) 0) " *" )))
+           (buffer-list))))
+  ;;
   (setq table-time-before-update 0.1)
+  (setq mode-icons-use-default-icon t)
+  ;; space around the label to make it looks less crowd.
+  (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
+    (setq ad-return-value
+          (if (and (buffer-modified-p (tabbar-tab-value tab))
+                   (buffer-file-name (tabbar-tab-value tab)))
+              (concat " " (concat ad-return-value " "))
+            (concat " " (concat ad-return-value " ")))))
   ;; raccourcis
   (global-set-key (kbd "C-<next>") 'tabbar-forward-tab)
   (global-set-key (kbd "C-<prior>") 'tabbar-backward-tab)
   (global-set-key (kbd "C-c C-t") 'tabbar-local-mode) ;; switch tabbar (header-line)
+  ;; supression raccourcis
+  (global-set-key (kbd "C-c C-<up>") nil)
+  (global-set-key (kbd "C-c C-<down>") nil)
  #+END_SRC
 ** groupes
 #+BEGIN_SRC emacs-lisp
@@ -350,6 +369,9 @@ Avoir des tabs (et surtout des groupes)
       ((eq major-mode 'text-mode)
        "text"
        )
+      ((eq major-mode 'logview-mode)
+       "Log"
+       )
       ((or (string-equal "." (substring (buffer-name) 0 1)) (eq major-mode 'emacs-lisp-mode))
        "Conf Buffer"
        )
@@ -364,31 +386,13 @@ Avoir des tabs (et surtout des groupes)
  #+END_SRC
 ** kill buffers
 #+BEGIN_SRC emacs-lisp
-  ;; tabbar close when kill-buffer
-  (defun resently-used-buffer ()
-    (other-buffer (current-buffer) 1))
-  (setq tabbar-groups-hash (make-hash-table :test 'equal))
-  (defun tabbar-init-groups-name ()
-    (interactive)
-    (setq tabbar-groups-hash (make-hash-table :test 'equal)))
-  (defun tabbar-remove-killed-buffers ()
-    (let ((entry (loop for k being the hash-keys
-                       in tabbar-groups-hash
-                       using (hash-values v)
-                       collect (cons k v))))
-      (tabbar-init-groups-name)
-      (mapcar (lambda (e)
-                (if (buffer-live-p (car e))
-                    (tabbar-set-group-name (car e) (cdr e))))
-              entry)))
   (global-set-key (kbd "C-x k") '(lambda ()
                        (interactive)
                        (tabbar-backward-tab) ; petite feinte pour rester dans le meme tabset
                        (tabbar-forward-tab)
                        (kill-buffer)
-                       (tabbar-remove-killed-buffers)
+                       ;;(tabbar-remove-killed-buffers)
                        ))
-  (remove-hook 'kill-buffer-hook 'tabbar-buffer-track-killed)
   ;; Fermeture de tous les buffer sauf le courant
   (defun kill-all-other-buffers ()
     "Kill all other buffers."
@@ -453,6 +457,8 @@ Avoir des tabs (et surtout des groupes)
   ;; récursivité
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'always)
+  ;; auto refresh dired when file changes
+  (add-hook 'dired-mode-hook 'auto-revert-mode)
  #+END_SRC
 *** tris dans Dired
 #+BEGIN_SRC emacs-lisp
@@ -504,11 +510,11 @@ Avoir des tabs (et surtout des groupes)
 *** Couleurs des fichiers
 *dépendances*: [[https://github.com/jixiuf/dired-filetype-face][dired-filetype-face.el]]
 #+BEGIN_SRC emacs-lisp
-  (require 'dired-filetype-face)
+  (eval-after-load 'dired '(require 'dired-filetype-face))
 #+END_SRC
 *** omit
 #+BEGIN_SRC emacs-lisp
-  (eval-after-load 'dired '(require 'dired-x)) ;; build-in librairie
+  (require 'dired-x) ;; build-in librairie
   (define-key dired-mode-map (kbd "M-o") 'dired-omit-mode)
   (setq-default dired-omit-files-p t)
   (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
@@ -610,7 +616,7 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'peep-dired "peep-dired" nil t)
   (define-key dired-mode-map (kbd "P") 'peep-dired)
   (setq peep-dired-cleanup-on-disable t)
-  (setq peep-dired-ignored-extensions '("mkv" "iso" "mp4" "zip" "tgz" "odt"))
+  (setq peep-dired-ignored-extensions '("mkv" "iso" "mp4" "zip" "tgz" "doc" "docx" "pdf" "odt"))
 #+END_SRC
 *** image-dired
 *dépendances* [[https://github.com/mhayashi1120/Emacs-image-diredx][image-dired+]]
@@ -676,10 +682,9 @@ Avoir des tabs (et surtout des groupes)
   (setq org-src-fontify-natively t)   ;; fontify code in code blocks
   (setq org-src-tab-acts-natively t)   ;; indentation des block sources
   (setq org-catch-invisible-edits 'show)
-  (setq org-return-follows-link t)
+  (setq org-startup-with-inline-images t)
   (modify-coding-system-alist 'file "\\.org\\'" 'utf-8)
   (setq org-cycle-separator-lines 0)
-  (setq org-startup-with-inline-images t)
   (add-hook 'ediff-prepare-buffer-hook #'outline-show-all) ;; edif in org-mode
   (add-hook 'org-mode-hook (lambda ()
                              (global-set-key (kbd "s-<escape>") 'hide-sublevels)   ;; tout plier
@@ -722,7 +727,7 @@ Avoir des tabs (et surtout des groupes)
           ("e" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC" "<src lang=\"emacs-lisp\">\n?\n</src>")))
 #+END_SRC
 *** babel
-*dépendances* [[https://github.com/gregsexton/ob-ipython][ob-ipython]] [[http://ditaa.sourceforge.net/][ditaa]] [[http://fr.plantuml.com/download.html][plantuml.jar]]
+*dépendances* [[http://ditaa.sourceforge.net/][ditaa]] [[http://fr.plantuml.com/download.html][plantuml.jar]]
 #+BEGIN_SRC emacs-lisp
   ;; execution
   (org-babel-do-load-languages
@@ -774,9 +779,19 @@ Avoir des tabs (et surtout des groupes)
   (setq org-html-postamble t)
   (setq org-html-postamble-format
         '(("en" "<p class=\"author\">Author: %a (%e)</p>\n<p class=\"date\">Date: %T</p>")))
+  ;; export table in csv
+  (defun export-table-to-csv (name)
+  "Search for table named `NAME` and export."
+  (interactive "s")
+  (show-all)
+  (let ((case-fold-search t))
+    (if (search-forward-regexp (concat "#\\+NAME: +" name) nil t)
+    (progn
+      (next-line)
+      (org-table-export (format "%s.csv" name) "orgtbl-to-csv")))))
 #+END_SRC
 *** presentation
-*dépendances* [[https://github.com/marsmining/ox-twbs][ox-twbs]] [[https://github.com/takaxp/org-tree-slide][org-tree-slide]] 
+*dépendances* [[https://github.com/marsmining/ox-twbs][ox-twbs]] [[https://github.com/takaxp/org-tree-slide][org-tree-slide]]
 #+BEGIN_SRC emacs-lisp
   ;; org-tree-slide-mode
   (eval-after-load "org-tree-slide"
@@ -786,7 +801,7 @@ Avoir des tabs (et surtout des groupes)
        (org-tree-slide-presentation-profile)))
   (autoload 'org-tree-slide-mode "org-tree-slide" nil t)
   ;; ox-twbs
-  (require 'ox-twbs)
+  (autoload 'org-twbs-export-to-html "ox-twbs" nil t)
   (defalias 'org-export 'org-twbs-export-to-html)
 #+END_SRC
 *** bloc generation
@@ -1212,13 +1227,13 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "M-Z") 'zop-to-char)
 #+END_SRC
 *** anzu
-*dépendances* [[https://github.com/syohex/emacs-anzu][anzu]] 
+*dépendances* [[https://github.com/syohex/emacs-anzu][anzu]]
 #+BEGIN_SRC emacs-lisp
-(require 'anzu)
-(global-anzu-mode +1)
+  (require 'anzu)
+  (global-anzu-mode +1)
 #+END_SRC
 ** Drag Stuff
-*dépendances*: [[https://github.com/rejeep/drag-stuff.el][drag-stuff.el]]
+ *dépendances*: [[https://github.com/rejeep/drag-stuff.el][drag-stuff.el]]
  #+BEGIN_SRC emacs-lisp
    ;; deplacement d'entitee mot region ligne...
    (require 'drag-stuff)
@@ -1288,11 +1303,11 @@ Avoir des tabs (et surtout des groupes)
           (when (and (buffer-file-name) (not (buffer-modified-p)))
             (revert-buffer t t t) )))
       (message "Refreshed open files."))
-    (global-set-key (kbd "S-<f12>") 'revert-all-buffers)
+    (global-set-key (kbd "S-<f5>") 'revert-all-buffers)
     (defun revert-buffer-no-confirm ()
       (interactive)
       (revert-buffer t t))
-    (global-set-key (kbd "<f12>") 'revert-buffer-no-confirm)
+    (global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
  #+END_SRC
 *** Créer un scratch Buffer
 #+BEGIN_SRC emacs-lisp
@@ -1312,6 +1327,7 @@ Avoir des tabs (et surtout des groupes)
   (setq recentf-filename-handler 'abbreviate-file-name)
   (setq recentf-max-saved-items 150)
   (setq recentf-auto-cleanup 'never)
+  (run-at-time nil (* 25 60) 'recentf-save-list) ;; save list every 25 minutes
   (recentf-mode 1)
   (require 'recentf-ext)
   (add-to-list 'recentf-exclude "\\.emacs-persistent\\'")
@@ -1320,6 +1336,7 @@ Avoir des tabs (et surtout des groupes)
   (add-to-list 'recentf-exclude "\\TAGS\\'")
   (add-to-list 'recentf-exclude ".pyc")
   (add-to-list 'recentf-exclude "~$")
+  (add-to-list 'recentf-exclude "\\.recentf\\'")
   (global-set-key (kbd "M-r") 'recentf-open-files)
   ;; reouvrir le dernier fichier tué
   (defun undo-kill-buffer ()
@@ -1461,7 +1478,7 @@ Avoir des tabs (et surtout des groupes)
     (shell-command "rm /tmp/tmp.ps")
     (message (concat "Saved to:  /tmp/" (buffer-name) ".pdf")))
 #+END_SRC
-** Open "not supported" files DOC/XLS/PDF
+** Open "not supported" files DOC/XLS
 *** doc-view
 *dépendances*: [[https://github.com/laysakura/doc-view-fit-to-page][doc-view-fit-page.el]]
 #+BEGIN_SRC emacs-lisp
@@ -1480,12 +1497,6 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   ;; Word documents
   (autoload 'no-word-find-file "no-word" nil t)
-  ;; pdf document
-  (defun no-pdf (arg)
-    (interactive "fpdf: ")
-    (shell-command
-     (format (concat "pdftotext " (replace-regexp-in-string " " "?\ " arg) " -layout")))
-    (find-file (replace-regexp-in-string "pdf" "txt" arg)))
 #+END_SRC
 *** trivial-mode
 #+BEGIN_SRC emacs-lisp
@@ -1558,7 +1569,7 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
 #+END_SRC
 *** zoom-window
-*dépendances* [[https://github.com/syohex/emacs-zoom-window][emacs-zopm-windows]]
+*dépendances* [[https://github.com/syohex/emacs-zoom-window][emacs-zoom-windows]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'zoom-window-zoom "zoom-window" nil t)
   (global-set-key (kbd "<f11>") 'zoom-window-zoom)
@@ -1796,35 +1807,34 @@ Avoir des tabs (et surtout des groupes)
  #+END_SRC
 ** Completion
   #+BEGIN_SRC emacs-lisp
-    ;; completion tuning
-    (setq dabbrev-abbrev-skip-leading-regexp "[<>=\"/\\:]")
-    ;;(setq dabbrev-abbrev-skip-leading-regexp "[<>=\"/]" t)
-    (global-set-key (kbd "s-/") 'dabbrev-expand)
-    (defconst dabbrev-always-check-other-buffers t) ;; ???
-    (defconst dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
-    (setq hippie-expand-try-functions-list
-          '(try-expand-dabbrev
-            try-expand-dabbrev-visible
-            try-expand-dabbrev-all-buffers
-            try-expand-dabbrev-from-kill
-            try-complete-file-name-partially
-            try-complete-file-name
-            try-expand-all-abbrevs
-            try-expand-list
-            try-expand-line
-            try-expand-whole-kill
-            ;;senator-try-expand-semantic
-            try-complete-lisp-symbol-partially
-            try-complete-lisp-symbol))
-    (global-set-key (kbd "M-/") 'hippie-expand)
-    ;; Exclude very large buffers from dabbrev
-    (defun exclude-big-friend-buffer (other-buffer)
-      (< (buffer-size other-buffer) (* 1 1024 1024)))
-    (setq dabbrev-friend-buffer-function 'exclude-big-friend-buffer)
-    ;; Ignorer la casse pour la copletion des chemins de fichiers
-    (setq read-file-name-completion-ignore-case t)
-    ;; completion case sensitive
-    (setq completion-ignore-case nil)
+        ;; completion tuning
+        (setq dabbrev-abbrev-skip-leading-regexp "[<>=\"/\\:]'")
+        ;;(setq dabbrev-abbrev-skip-leading-regexp "[<>=\"/]" t)
+        (global-set-key (kbd "s-/") 'dabbrev-expand)
+        (defconst dabbrev-always-check-other-buffers t) ;; ???
+        (defconst dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
+        (setq hippie-expand-try-functions-list
+              '(try-expand-dabbrev
+                try-expand-dabbrev-visible
+                try-complete-file-name-partially
+                try-complete-file-name
+                try-expand-dabbrev-all-buffers
+                try-expand-dabbrev-from-kill
+                try-expand-all-abbrevs
+                try-expand-list
+                try-expand-line
+                try-expand-whole-kill
+                try-complete-lisp-symbol-partially
+                try-complete-lisp-symbol))
+        (global-set-key (kbd "M-/") 'hippie-expand)
+        ;; Exclude very large buffers from dabbrev
+        (defun exclude-big-friend-buffer (other-buffer)
+          (< (buffer-size other-buffer) (* 1 1024 1024)))
+        (setq dabbrev-friend-buffer-function 'exclude-big-friend-buffer)
+        ;; Ignorer la casse pour la completion des chemins de fichiers
+        (setq read-file-name-completion-ignore-case t)
+        ;; completion case sensitive
+        (setq completion-ignore-case nil)
   #+END_SRC
 ** Docker
 *dépendances*: [[https://github.com/spotify/dockerfile-mode][dockerfile-mode.el]] [[https://github.com/Silex/docker.el][docker.el]] [[https://github.com/Silex/tabulated-list-extensions][tle]] [[https://github.com/politza/tablist][tabList]]
@@ -1930,7 +1940,7 @@ Avoir des tabs (et surtout des groupes)
     (set-buffer
      (find-file (format "%s" (concat begin "|sudo:root@" end)))))
   ;; refresh as sudo
-  (defun revert-buffer-with-sudo ()
+  (defun revert-sudo ()
     (interactive)
     (setq theLine (line-number-at-pos))
     (let ((f (buffer-file-name)))
@@ -1946,7 +1956,7 @@ Avoir des tabs (et surtout des groupes)
               (erase-buffer)
               (insert content))))))
     (forward-line (- theLine 1)))
-  (global-set-key (kbd "s-C-r") 'revert-buffer-with-sudo)
+  (global-set-key (kbd "s-C-r") 'revert-sudo)
 #+END_SRC
 ** Tiny-expand
 *dépendances* [[https://github.com/abo-abo/tiny][tiny.el]]
@@ -1955,7 +1965,7 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 ** Vrac
 *** restart emacs
-*dépendances:* [[https://github.com/iqbalansari/restart-emacs][restart-emacs]]
+*dépendances* [[https://github.com/iqbalansari/restart-emacs][restart-emacs]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'restart-emacs "restart-emacs" nil t)
   (global-set-key (kbd "C-x M-c") 'restart-emacs)
@@ -2131,7 +2141,7 @@ Avoir des tabs (et surtout des groupes)
   ;; pas de highlight-current-line sur quelques modes
   (add-hook 'after-change-major-mode-hook
             '(lambda ()
-               (highlight-current-line-minor-mode (if (or (equal major-mode 'text-mode) (equal major-mode 'term-mode) (equal major-mode 'palette-mode) (equal major-mode 'help-mode)) 0 1))))
+               (highlight-current-line-minor-mode (if (or (equal major-mode 'text-mode) (equal major-mode 'term-mode) (equal major-mode 'logview-mode) (equal major-mode 'palette-mode) (equal major-mode 'help-mode)) 0 1))))
   ;; changer la couleur
   (defun toggle-highlight-color ()
     (interactive)
@@ -2408,7 +2418,7 @@ Avoir des tabs (et surtout des groupes)
    (add-to-list 'auto-mode-alist '("sudoers" . conf-mode))
  #+END_SRC
 *** ssh-config-mode
-*dépendances* [[https://github.com/jhgorrell/ssh-config-mode-el][ssh-config-mode]] 
+*dépendances* [[https://github.com/jhgorrell/ssh-config-mode-el][ssh-config-mode]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'ssh-config-mode "ssh-config-mode" t)
   (autoload 'ssh-known-hosts-mode "ssh-config-mode" t)
@@ -2578,8 +2588,8 @@ Avoir des tabs (et surtout des groupes)
       (copy-yank-str msg)))
   (global-set-key (kbd "C-x ?") 'which-function-popup)
 #+END_SRC
-*** indent-line
-*dépendances*: [[https://github.com/DarthFennec/highlight-indent-guides][highlight-indent-guides]]
+*** indent-guide
+*dépendance* [[https://github.com/zk-phi/indent-guide][indent-guide]]
 #+BEGIN_SRC emacs-lisp
   (require 'highlight-indent-guides)
   (setq highlight-indent-guides-method 'character)
@@ -2587,12 +2597,11 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 *** generalClose
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/general-close")
-  (require 'general-close)
-  (global-set-key (kbd "M-)") 'general-close)
+  (require 'syntactic-close)
+  (global-set-key (kbd "M-)") 'syntactic-close)
 #+END_SRC
 ** flycheck/flyspell
-*dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/xuchunyang/flyspell-popup][flyspell-popup]] [[https://github.com/flycheck/flycheck-pos-tip][flycheck-pos-tip]]
+*dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]] [[https://github.com/xuchunyang/flyspell-popup][flyspell-popup]] [[https://github.com/flycheck/flycheck-pos-tip][flycheck-pos-tip]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'flycheck-mode "flycheck" nil t)
   (eval-after-load "flycheck"
@@ -2602,7 +2611,9 @@ Avoir des tabs (et surtout des groupes)
        (setq flycheck-pylintrc "~/.config/pylintrc")
        (setq flycheck-pylint-use-symbolic-id nil) ;; ID pylint
        (global-set-key (kbd "C-c <down>") 'flycheck-next-error)
-       (global-set-key (kbd "C-c <up>") 'flycheck-previous-error)))
+       (global-set-key (kbd "C-c <up>") 'flycheck-previous-error)
+       (global-set-key (kbd "C-c C-<down>") 'flycheck-next-error)
+       (global-set-key (kbd "C-c C-<up>") 'flycheck-previous-error)))
   ;; flyspell popup
   (eval-after-load "flyspell"
     '(progn
@@ -2613,14 +2624,12 @@ Avoir des tabs (et surtout des groupes)
     "Used for 'flyspell-generic-check-word-predicate' to ignore comments."
     (not (string-match "^ *#" (thing-at-point 'line t))))
   (put 'git-commit-mode 'flyspell-mode-predicate 'flyspell-ignore-comments)
-  (add-hook 'git-commit-setup-hook #'git-commit-turn-on-flyspell)
   ;; flyspell in markdown
   (defun flyspell-generic-textmode-verify () ;; ignore code block
     "Used for `flyspell-generic-check-word-predicate' in text modes."
     (let ((f (get-text-property (- (point) 1) 'face)))
       (not (memq f '(markdown-pre-face)))))
   (setq flyspell-generic-check-word-predicate 'flyspell-generic-textmode-verify)
-  (add-hook 'markdown-mode-hook 'flyspell-mode)
   ;; flyspell web-mode
   (defun web-mode-flyspell-verify ()
     (let ((f (get-text-property (- (point) 1) 'face))
@@ -2652,7 +2661,6 @@ Avoir des tabs (et surtout des groupes)
        (t t))
       rlt))
   (put 'web-mode 'flyspell-mode-predicate 'web-mode-flyspell-verify)
-  (add-hook 'web-mode-hook 'flyspell-mode)
  #+END_SRC
 ** Company
 *dépendances*: [[https://github.com/company-mode/company-mode][company-mode]] [[https://github.com/expez/company-quickhelp][company-quickhelp]] [[https://github.com/hlissner/emacs-company-dict][company-dict]]
@@ -2660,7 +2668,7 @@ Avoir des tabs (et surtout des groupes)
   (require 'company)
   (require 'company-quickhelp)
   (setq company-minimum-prefix-length 1
-        company-idle-delay 0.2
+        company-idle-delay 0.3
         company-tooltip-limit 20
         company-selection-wrap-around t
         company-dabbrev-downcase nil
@@ -2681,6 +2689,12 @@ Avoir des tabs (et surtout des groupes)
   (define-key text-mode-map (kbd "C-c <tab>") 'company-dict)
   #+END_SRC
 ** Gestion de versions
+*** Common
+#+BEGIN_SRC emacs-lisp
+  ;; no whitespace diff but context
+  (setq vc-diff-switches '("-b" "-B" "-u"))
+  (setq vc-git-diff-switches nil)
+#+END_SRC
 *** SVN
 *dépendances* [[https://github.com/emacsmirror/psvn][psvn.el]]
 #+BEGIN_SRC emacs-lisp
@@ -2706,24 +2720,20 @@ Avoir des tabs (et surtout des groupes)
   (global-set-key (kbd "C-x v u") 'revert-svn)
  #+END_SRC
 *** Git
-*dépendances*: [[https://github.com/magit/magit][magit]] [[https://github.com/tsgates/git-emacs][git-emacs-master]] [[https://github.com/syohex/emacs-git-messenger][git-messenger.el]] [[https://github.com/pidu/git-timemachine][git-timemachine]] [[https://github.com/magit/magit-svn][magit-svn]] [[https://github.com/magit/git-modes][gitconfig-mode]] [[https://github.com/jtatarik/magit-gitflow][magit-gitflow]] [[https://github.com/magit/with-editor][with-editor]]
+*dépendances*: [[https://github.com/magit/magit][magit]] [[https://github.com/tsgates/git-emacs][git-emacs]] [[https://github.com/syohex/emacs-git-messenger][git-messenger.el]] [[https://github.com/magit/magit-svn][magit-svn]] [[https://github.com/magit/git-modes][gitconfig-mode]] [[https://github.com/jtatarik/magit-gitflow][magit-gitflow]] [[https://github.com/magit/with-editor][with-editor]]
 #+BEGIN_SRC emacs-lisp
   ;; magit
 	(add-to-list 'load-path "~/.emacs.d/magit-master/lisp")
   (require 'magit)
   (setq magit-repository-directories '(("~/workspaces" . 2)))
   (global-set-key (kbd "C-x g a") 'magit-list-repositories)
-	;; pour le status dans la modeline
-	(add-to-list 'load-path "~/.emacs.d/git-emacs-master")
-	(setq git-keyboard-prefix "\C-x£") ;; keybinding improbable (ie desactivation)
-	(autoload 'git--update-all-state-marks "git-modeline" "Update the modelines of all git buffers" t)
-	(add-hook 'find-file-hook 'git-status-in-modeline t)
-	(defun git-status-in-modeline ()
-      (if (and vc-mode (string-match "^ Git" (substring-no-properties vc-mode)))
-          (git--update-all-state-marks)))
-	;; revisions
-	(autoload 'git-timemachine "git-timemachine" "" nil)
-	(global-set-key (kbd "C-x g t") 'git-timemachine)
+  ;; pour le status dans la modeline
+  (setq git-keyboard-prefix "\C-x£") ;; keybinding improbable (ie desactivation)
+  (autoload 'git--update-all-state-marks "git-modeline" "Update the modelines of all git buffers" t)
+  (add-hook 'find-file-hook 'git-status-in-modeline t)
+  (defun git-status-in-modeline ()
+    (if (and vc-mode (string-match "^ Git" (substring-no-properties vc-mode)))
+        (git--update-all-state-marks)))
   ;; git-svn / git-flow
   (eval-after-load "magit"
     '(progn
@@ -2731,43 +2741,46 @@ Avoir des tabs (et surtout des groupes)
        (add-hook 'magit-mode-hook 'magit-svn-mode)
        (require 'magit-gitflow)
        (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)))
-	;; messages de commit
-	(autoload 'git-messenger:popup-message "git-messenger" nil t)
-	(setq git-messenger:show-detail t)
-	(global-set-key (kbd "C-x g m") 'git-messenger:popup-message)
-	;; raccourcis
-	(setq magit-keyboard-prefix (kbd "C-x g"))
-	(global-set-key (kbd "C-x g g") 'magit-status) ;; niveau de details => M-1, M-2, M-3, and M-4 ; l pour les logs
-	(global-set-key (kbd "C-x g l") 'magit-log-buffer-file)
-	(global-set-key (kbd "C-x g b") 'vc-annotate)
-	(global-set-key (kbd "C-x g s") 'magit-stash)
-	(global-set-key (kbd "C-x g p") 'magit-stash-pop)
-	(global-set-key (kbd "C-x g =") 'ediff-revision)
-	(global-set-key (kbd "C-x g r") 'magit-svn-rebase)
-	(global-set-key (kbd "C-x g d") 'magit-svn-dcommit)
-	;; vc-annotate v => affiche juste le nom su commiter
-	(eval-after-load "vc-annotate"
-	'(defun vc-annotate-get-time-set-line-props ()
-      (let ((bol (point))
-			(date (vc-call-backend vc-annotate-backend 'annotate-time))
-			(inhibit-read-only t))
-		(assert (>= (point) bol))
-		(put-text-property bol (point) 'invisible 'vc-annotate-annotation)
-		(when (string-equal "Git" vc-annotate-backend)
-		(save-excursion
-          (goto-char bol)
-          (search-forward "(")
-          (let ((p1 (point)))
-			(re-search-forward " [0-9]")
-			(remove-text-properties p1 (1- (point)) '(invisible nil))
-			)))
-      date)))
-  ; optimisation
+  ;; messages de commit
+  (autoload 'git-messenger:popup-message "git-messenger" nil t)
+  (setq git-messenger:show-detail t)
+  (global-set-key (kbd "C-x g m") 'git-messenger:popup-message)
+  ;; remote editor
+  ;; (add-hook 'term-mode-hook 'with-editor-export-editor)
+  ;; raccourcis
+  (setq magit-keyboard-prefix (kbd "C-x g"))
+  (global-set-key (kbd "C-x g g") 'magit-status) ;; niveau de details => M-1, M-2, M-3, and M-4 ; l pour les logs
+  (global-set-key (kbd "C-x g l") 'magit-log-buffer-file)
+  (global-set-key (kbd "C-x g b") 'vc-annotate)
+  (global-set-key (kbd "C-x g s") 'magit-stash)
+  (global-set-key (kbd "C-x g p") 'magit-stash-pop)
+  (global-set-key (kbd "C-x g =") 'ediff-revision)
+  (global-set-key (kbd "C-x g r") 'magit-svn-rebase)
+  (global-set-key (kbd "C-x g d") 'magit-svn-dcommit)
+  (global-set-key (kbd "C-x g t") 'magit-blob-previous)
+  ;; vc-annotate v => affiche juste le nom su commiter
+  (eval-after-load "vc-annotate"
+    '(defun vc-annotate-get-time-set-line-props ()
+       (let ((bol (point))
+             (date (vc-call-backend vc-annotate-backend 'annotate-time))
+             (inhibit-read-only t))
+         (assert (>= (point) bol))
+         (put-text-property bol (point) 'invisible 'vc-annotate-annotation)
+         (when (string-equal "Git" vc-annotate-backend)
+           (save-excursion
+             (goto-char bol)
+             (search-forward "(")
+             (let ((p1 (point)))
+               (re-search-forward " [0-9]")
+               (remove-text-properties p1 (1- (point)) '(invisible nil))
+               )))
+         date)))
+  ;; optimisation
   (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
   (setq magit-diff-options '("-b")) ;; ignore whitespace
   (setq magit-push-always-verify nil)
   (setq magit-commit-show-diff nil)
-  (setq magit-revert-buffers 1)
+  (setq magit-revert-buffers nil)
   (setq auto-revert-buffer-list-filter 'magit-auto-revert-repository-buffers-p)
   (remove-hook 'server-switch-hook 'magit-commit-diff)
   ;; fichier de conf
@@ -2781,8 +2794,8 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   (require 'diff-hl)
   (require 'diff-hl-flydiff)
-  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
   (diff-hl-flydiff-mode)
+  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
   (global-diff-hl-mode)
   (global-set-key (kbd "C-x <up>") 'diff-hl-previous-hunk)
   (global-set-key (kbd "C-x <down>") 'diff-hl-next-hunk)
@@ -2798,7 +2811,7 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   ;; for xml files, use nxml-mode instead of sgml-mode
   (setq auto-mode-alist
-        (cons '("\\.\\(xml\\|XML\\|xsd\\|XSD\\|xsl\\|rng\\|xhtml\\)\\'" . nxml-mode)
+        (cons '("\\.\\(xml\\|XML\\|xsd\\|XSD\\|xsl\\|rng\\|xhtml\\|CR\\)\\'" . nxml-mode)
               auto-mode-alist))
   (defun my-nxml-hook ()
     (require 'smart-tabs-mode)
@@ -2858,7 +2871,7 @@ Avoir des tabs (et surtout des groupes)
       (indent-region begin end)))
   #+END_SRC
 **** XSD
-*dépendances* [[http://xsdvi.sourceforge.net/][xsdvi.jar]]
+*dépendances* [[http://xsdvi.sourceforge.net/][xsdvi.jar]] [[https://code.google.com/archive/p/jing-trang/downloads][trang]]
 #+BEGIN_SRC emacs-lisp
   ;; controle des xml par xsd
   (defun xsd-validation (xsd)
@@ -2885,6 +2898,10 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'yaml-mode "yaml-mode" nil t)
   (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
 #+END_SRC
+** VTL-template
+#+BEGIN_SRC emacs-lisp
+  (autoload 'turn-on-vtl-mode "vtl" nil t)
+#+END_SRC
 ** ldap
 *dépendances* [[https://github.com/emacsmirror/ldap-mode][ldap-mode]]
 #+BEGIN_SRC emacs-lisp
@@ -2905,20 +2922,6 @@ Avoir des tabs (et surtout des groupes)
         (csv-mode))
     (csv-align-fields nil (point-min) (point-max))
     (toggle-truncate-lines t))
-  (defun csv-highlight (&optional separator)
-    (require 'color)
-    (interactive (list (when current-prefix-arg (read-char "Separator: "))))
-    (next-line)
-    (font-lock-mode 1)
-    (let* ((separator (or separator ?\t))
-           (n (count-matches (string separator) (point-at-bol) (point-at-eol)))
-           (colors (loop for i from 0 to 1.0 by (/ 2.0 n)
-                         collect (apply #'color-rgb-to-hex
-                                        (color-hsl-to-rgb i 0.3 0.5)))))
-      (loop for i from 2 to n by 2
-            for c in colors
-            for r = (format "^\\([^%c\n]+%c\\)\\{%d\\}" separator separator i)
-            do (font-lock-add-keywords nil `((,r (1 '(face (:foreground ,c)))))))))
   (global-set-key (kbd "C-c C-s") 'csv-pretty)
   ;; deplacement
   (global-set-key (kbd "s-<tab>") 'csv-forward-field)
@@ -2999,6 +3002,8 @@ Avoir des tabs (et surtout des groupes)
   (add-to-list 'auto-mode-alist '("\\pylintrc\\'" . python-mode))
   ;; highlight-operators
   (autoload 'highlight-operators-mode "highlight-operators" nil t)
+  ;; fuzzy-format for this
+  (setq python-indent-guess-indent-offset nil)
   ;; hook
   (add-hook 'python-mode-hook
             (lambda ()
@@ -3009,11 +3014,14 @@ Avoir des tabs (et surtout des groupes)
               (setq python-indent-offset 4)
               ;; parentheses en couleurs
               (rainbow-delimiters-mode)
+              ;; sphinx-doc
+              (require 'sphinx-doc)
+              (sphinx-doc-mode t)
               ;; highlight operators
               (highlight-operators-mode)
               ;; indentation auto
               (require 'fuzzy-format)
-              (setq fuzzy-format-default-indent-tabs-mode 1)
+              ;;(setq fuzzy-format-default-indent-tabs-mode 1)
               (global-fuzzy-format-mode)))
   (defalias 'pylint 'flycheck-mode)  ;; raccourci pylint
 #+END_SRC
@@ -3031,10 +3039,7 @@ C-. => goto definition
  """
 #+BEGIN_SRC emacs-lisp
   ;; jedi
-  (add-to-list 'load-path "~/Outils/emacs/python/jedi24/emacs-python-environment-master")
-  (add-to-list 'load-path "~/Outils/emacs/python/jedi24/emacs-jedi-master")
-  (add-to-list 'load-path "~/Outils/emacs/python/emacs-deferred-master")
-  (setq jedi:server-command '("~/Outils/emacs/python/jedi24/emacs-jedi-master/jediepcserver.py"))
+  (setq jedi:server-command '("~/.emacs.d/emacs-jedi/jediepcserver.py"))
   (setq jedi:tooltip-method (quote (nil)))
   (setq jedi:tooltip-show nil)
   (defun my/python-mode-hook ()
@@ -3053,12 +3058,13 @@ C-. => goto definition
           (t   definition t  )
           (nil nil        t  )
           (t   nil        t  )))
-  (define-key python-mode-map (kbd "C-.") 'jedi:goto-definition)
-  (define-key python-mode-map (kbd "C-,") 'jedi:goto-definition-pop-marker)
   ;; Afficher la signature de la methode
   (add-hook 'python-mode-hook
             (lambda ()
-              (define-key python-mode-map (kbd "s-?") 'jedi:get-in-function-call)))
+              (define-key python-mode-map (kbd "C-.") 'jedi:goto-definition)
+              (define-key python-mode-map (kbd "C-,") 'jedi:goto-definition-pop-marker)
+              (define-key python-mode-map (kbd "s-?") 'jedi:get-in-function-call)
+              (define-key python-mode-map (kbd "C-s-?") 'jedi:show-doc)))
 #+END_SRC
 **** docstring
 *dépendances* [[https://github.com/glyph/python-docstring-mode][python-docstring-mode]]
@@ -3077,8 +3083,8 @@ C-. => goto definition
   (autoload 'info-lookup-symbol "pydoc-info" nil t)
   (defadvice pydoc-info-python-symbol-at-point
       (around jedi:pydoc-info-python-symbol-at-point activate)
-	"Use true \"full name\" to search for the symbol at point."
-	(or (setq ad-return-value (jedi:get-full-name-sync)) ad-do-it))
+    "Use true \"full name\" to search for the symbol at point."
+    (or (setq ad-return-value (jedi:get-full-name-sync)) ad-do-it))
   (global-set-key (kbd "s-d") 'info-lookup-symbol)
   ;; pylookup
   (setq pylookup-dir "~/Outils/emacs/python/pylookup-master")
@@ -3306,6 +3312,7 @@ word3
 *dépendances* [[https://github.com/cyberved/pyenv.el][pyenv]]
 #+BEGIN_SRC emacs-lisp
   (require 'pyvenv)
+  (pyvenv-activate "~/Outils/python/envs/python3.5/")
 #+END_SRC
 **** pip requirements
 *dépendances* [[https://github.com/emacsmirror/pip-requirements][pip-requirements]]
@@ -3374,7 +3381,7 @@ word3
 **** GDB
 #+BEGIN_SRC emacs-lisp
   ;; LD_LIBRAY_PATH (pour gdb) => pose pb avec psvn
-  (require 'gdb-mi) ;; buikd-in librairie
+  (require 'gdb-mi) ;; build-in librairie
   ;;(setq gdb-many-windows t)
   ;;(setq gdb-show-main t)
   (defun my-gdb (command-line)
@@ -3393,49 +3400,53 @@ word3
 **** CEDET for C++
 *dépendances*: [[https://www.emacswiki.org/emacs/eassist.el][eassist]] [[http://cedet.sourceforge.net/][cedet]] (voir init au dessus) [[https://github.com/randomphrase/company-c-headers][company-c-header]]s
  #+BEGIN_SRC emacs-lisp
-      (defun my-cedet-hook ()
-        ;; indentation
-        (setq c++-tab-always-indent t)
-        ;;(setq c-basic-offset 4)                  ;; Default is 2
-        (setq c-indent-level 4)                  ;; Default is 2
-        ;; semantic
-        (global-set-key (kbd "s-<tab>") 'semantic-ia-complete-symbol-menu)
-        (global-set-key (kbd "C-c ?") 'semantic-ia-complete-symbol)
-        (global-set-key (kbd "C-<tab>") 'semantic-complete-analyze-inline)
-        (global-set-key (kbd "M-i") 'semantic-decoration-include-visit)
-        (global-set-key (kbd "C-.") 'semantic-ia-fast-jump)
-        (global-set-key (kbd "C-c d") 'semantic-ia-show-doc)
-        (global-set-key (kbd "C-,") 'semantic-analyze-proto-impl-toggle)
-        (global-set-key (kbd "C-M-:") 'semantic-complete-jump)
-        (global-set-key (kbd "C-:") 'semantic-complete-jump-local)
-        (global-set-key (kbd "C-c s") 'semantic-ia-show-summary)
-        (global-set-key (kbd "C-c c") 'semantic-ia-describe-class)
-        (global-set-key (kbd "C-c B") 'semantic-ia-fast-jump-back)
-        ;; gtags
-        (global-set-key (kbd "C-s-.") 'ggtags-find-tag-dwim)
-        ;; deplacement de function en function
-        (global-set-key (kbd "M-s-<left>") 'senator-previous-tag)
-        (global-set-key (kbd "M-s-<right>") 'senator-next-tag)
-        (setq c-hungry-delete-key t)
-        (global-set-key (kbd "s-;") 'semantic-symref)
-        (global-set-key (kbd "s-:") 'semantic-symref-symbol)
-        ;; folding
-        (global-set-key (kbd "C-<kp-subtract>") 'senator-fold-tag)
-        (global-set-key (kbd "C-<kp-add>") 'senator-unfold-tag)
-        ;; company
-        (require 'company-c-headers)
-        (add-to-list 'company-backends 'company-c-headers)
-        (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.7/")
-        )
-      (add-hook 'c-mode-common-hook 'my-cedet-hook)
-      ;; extension <=> mode
-      (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-      (add-to-list 'auto-mode-alist '("\\.hpp\\'" . c++-mode))
-      (add-to-list 'auto-mode-alist '("\\.cc\\'" . c++-mode))
-      (add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
-      ;; cedet semantic
-      (semanticdb-enable-gnu-global-databases 'c-mode t)
-      (semanticdb-enable-gnu-global-databases 'c++-mode t)
+   (defun my-cedet-hook ()
+     ;; indentation
+     (require 'google-c-style)
+     (google-set-c-style)
+     (setq c++-tab-always-indent t
+           indent-tabs-mode t
+           c-basic-offset 4    ;; Default is 2
+           c-indent-level 4)   ;; Default is 2
+     ;; semantic
+     (global-set-key (kbd "s-<tab>") 'semantic-ia-complete-symbol-menu)
+     (global-set-key (kbd "C-c ?") 'semantic-ia-complete-symbol)
+     (global-set-key (kbd "C-<tab>") 'company-complete)
+     (global-set-key (kbd "M-s-<tab>") 'semantic-complete-analyze-inline)
+     (global-set-key (kbd "M-i") 'semantic-decoration-include-visit)
+     (global-set-key (kbd "C-.") 'semantic-ia-fast-jump)
+     (global-set-key (kbd "C-c d") 'semantic-ia-show-doc)
+     (global-set-key (kbd "C-,") 'semantic-analyze-proto-impl-toggle)
+     (global-set-key (kbd "C-M-:") 'semantic-complete-jump)
+     (global-set-key (kbd "C-:") 'semantic-complete-jump-local)
+     (global-set-key (kbd "C-c s") 'semantic-ia-show-summary)
+     (global-set-key (kbd "C-c c") 'semantic-ia-describe-class)
+     (global-set-key (kbd "C-c B") 'semantic-ia-fast-jump-back)
+     ;; gtags
+     (global-set-key (kbd "C-s-.") 'ggtags-find-tag-dwim)
+     ;; deplacement de function en function
+     (global-set-key (kbd "M-s-<left>") 'senator-previous-tag)
+     (global-set-key (kbd "M-s-<right>") 'senator-next-tag)
+     (setq c-hungry-delete-key t)
+     (global-set-key (kbd "s-;") 'semantic-symref)
+     (global-set-key (kbd "s-:") 'semantic-symref-symbol)
+     ;; folding
+     (global-set-key (kbd "C-<kp-subtract>") 'senator-fold-tag)
+     (global-set-key (kbd "C-<kp-add>") 'senator-unfold-tag)
+     ;; company
+     (require 'company-c-headers)
+     (add-to-list 'company-backends 'company-c-headers)
+     (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.7/ /usr/include/boost/")
+     )
+   (add-hook 'c-mode-common-hook 'my-cedet-hook)
+   ;; extension <=> mode
+   (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+   (add-to-list 'auto-mode-alist '("\\.hpp\\'" . c++-mode))
+   (add-to-list 'auto-mode-alist '("\\.cc\\'" . c++-mode))
+   (add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
+   ;; cedet semantic
+   (semanticdb-enable-gnu-global-databases 'c-mode t)
+   (semanticdb-enable-gnu-global-databases 'c++-mode t)
    #+END_SRC
 **** eassist/xcscope/function-args
 *dépendances*:  [[http://cedet.sourceforge.net/][cedet]] [[https://github.com/dkogan/xcscope.el][xcscope.el]]
@@ -3511,6 +3522,9 @@ word3
   (global-set-key (kbd "S-<left>") 'backward-sexp)
   (global-set-key (kbd "S-<up>") 'beginning-of-defun)
   (global-set-key (kbd "S-<down>") 'end-of-defun)
+  ;; for org-mode
+  (define-key org-mode-map (kbd "S-<right>") 'forward-sexp)
+  (define-key org-mode-map (kbd "S-<left>") 'backward-sexp)
 #+END_SRC
 **** cmake
 *dépendances* [[https://github.com/Kitware/CMake/tree/master/Auxiliary][cmake-mode.el]]
@@ -3534,7 +3548,8 @@ word3
             (lambda ()
               (global-set-key (kbd "C-.") 'meghanada-jump-declaration)
               (global-set-key (kbd "C-,") 'meghanada-back-jump)
-              (meghanada-mode t)))
+              (meghanada-mode t)
+              (flycheck-mode)))
   #+END_SRC
 **** javadoc
 #+BEGIN_SRC emacs-lisp
@@ -3665,12 +3680,18 @@ word3
       (interactive)
       (web-mode-set-engine "angular"))
   #+END_SRC
+**** jquery
+#+BEGIN_SRC emacs-lisp
+  (require 'jquery-doc)
+  (add-hook 'js2-mode-hook 'jquery-doc-setup)
+#+END_SRC
 **** Emmet
 *dépendances*: [[https://github.com/smihica/emmet-mode][emmet.el]]
 #+BEGIN_SRC emacs-lisp
-  ;; emmet pour css-mode
+  ;; emmet pour le css-mode
+  (autoload 'emmet-mode "emmet-mode" nil t)
   (add-hook 'css-mode-hook 'emmet-mode)
-  ;; emmet pour web-mode
+  ;; emmet pout le web-mode
   (eval-after-load "web-mode"
     '(progn
        (autoload 'emmet-expand-line "emmet-mode" "" t)
@@ -3699,35 +3720,53 @@ word3
 **** Javascript/json
 *dépendances*: [[https://github.com/mooz/js2-mode][js2-mode.el]] [[https://github.com/joshwnj/json-mode][json-mode.el]] [[https://github.com/gongo/json-reformat][json-reformat]] [[https://github.com/Sterlingg/json-snatcher][json-snatcher]]  [[https://github.com/omouse/angularjs-mode][angularjs-mode.el]]
 #+BEGIN_SRC emacs-lisp
-  ;; javascript
-  (autoload 'js2-mode "js2-mode" "Start js2-mode" t)
-  (autoload 'json-mode "json-mode" "" t)
-  (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-  (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
-  (setq js2-highlight-level 3)
+    ;; javascript
+    (autoload 'js2-mode "js2-mode" "Start js2-mode" t)
+    (autoload 'json-mode "json-mode" "" t)
+    (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+    (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
+    (setq js2-highlight-level 3)
+    (add-hook 'js2-mode-hook
+              (lambda ()
+                ;; parentheses en couleurs
+                (rainbow-delimiters-mode)
+                ;; doubleclick selection
+                (define-key js2-mode-map [mouse-1] 'mouse-set-point)
+                ;; goto definition
+                (define-key js2-mode-map (kbd "C-.") 'js2-jump-to-definition))
+                ;; company
+                (delq 'company-etags company-backends))
+    (defun angular-js ()
+      (interactive)
+      (load-file "~/.emacs.d/lisp/angular-mode.elc")
+      (load-file "~/.emacs.d/lisp/angular-html-mode.elc"))
+    ;; Commentaires dans jes json
+    (add-hook 'json-mode-hook
+            (lambda ()
+              (defconst json-mode-comments-re (rx (group "//" (zero-or-more nonl) line-end)))
+              (push (list json-mode-comments-re 1 font-lock-comment-face) json-font-lock-keywords-1)))
+  ;; Reformater un fichier json
+  (defun json-pretty ()
+      (interactive)
+      (json-pretty-print (point-min) (point-max))
+      (indent-region (point-min) (point-max)))
+  (require 'typescript-mode)
+  ;; eslint
   (add-hook 'js2-mode-hook
             (lambda ()
-              ;; parentheses en couleurs
-              (rainbow-delimiters-mode)
-              ;; doubleclick selection
-              (define-key js2-mode-map [mouse-1] 'mouse-set-point) 
-              ;; goto definition
-              (define-key js2-mode-map (kbd "C-.") 'js2-jump-to-definition)))
-  (defun angular-js ()
-    (interactive)
-    (load-file "~/.emacs.d/lisp/angular-mode.elc")
-    (load-file "~/.emacs.d/lisp/angular-html-mode.elc"))
-  ;; Commentaires dans les json
-  (add-hook 'json-mode-hook
-          (lambda ()
-            (defconst json-mode-comments-re (rx (group "//" (zero-or-more nonl) line-end)))
-            (push (list json-mode-comments-re 1 font-lock-comment-face) json-font-lock-keywords-1)))
-  ;; Reformater un fichier json
-  (defun pretty-json ()
-    (interactive)
-    (let ((b (if mark-active (min (point) (mark)) (point-min)))
-          (e (if mark-active (max (point) (mark)) (point-max))))
-      (shell-command-on-region b e "python -mjson.tool" (current-buffer) t)))
+              (require 'flycheck)
+              ;; disable jshint since we prefer eslint checking
+              (setq-default flycheck-disabled-checkers
+                            (append flycheck-disabled-checkers
+                                    '(javascript-jshint)))
+              (setq-default flycheck-disabled-checkers
+                            (append flycheck-disabled-checkers
+                                    '(json-jsonlist)))
+              ;; use eslint with web-mode and javascript-mode
+              (flycheck-add-mode 'javascript-eslint 'web-mode)
+              (flycheck-add-mode 'javascript-eslint 'js2-mode)))
+  ;; jhintrc
+  ;;(setq flycheck-jshintrc "~/.emacs.d/.jshintrc")
 #+END_SRC
 **** css and less-css
 *dépendances* [[https://github.com/purcell/less-css-mode][less-css-mode]]
@@ -3843,18 +3882,18 @@ word3
 #+END_SRC
 ** delete enclose text
 #+BEGIN_SRC emacs-lisp
-  ;; delete enclose text
-  ;; returns the enclosing character for the character "c"
-  (defun get-enc-char (c) (cond
-                           ((string= c "(") ")")
-                           ((string= c "[") "]")
-                           ((string= c "{") "}")
-                           ((string= c ">") "<")
-                           ((string= c "<") ">")
-                           ((string= c "'") "'")
-                           ((string= c "\"") "\"")
-                           (t nil)
-                           ))
+      ;; delete enclose text
+      ;; returns the enclosing character for the character "c"
+      (defun get-enc-char (c) (cond
+                               ((string= c "(") ")")
+                               ((string= c "[") "]")
+                               ((string= c "{") "}")
+                               ((string= c ">") "<")
+                               ((string= c "<") ">")
+                               ((string= c "'") "'")
+                               ((string= c "\"") "\"")
+                               (t nil)
+                               ))
   (defvar empty-enclose 0)
   (defun delete-enclosed-text ()
     "Delete texts between any pair of delimiters."
@@ -3901,7 +3940,7 @@ word3
 ** flip bool at point
 #+BEGIN_SRC emacs-lisp
   ;; A list of opposite boolean pairs.
-  (defvar bools '(("true" . "false") ("True" . "False") ("#t" . "#f") ("yes" . "no") ("Yes" . "No")))
+  (defvar bools '(("true" . "false") ("True" . "False") ("TRUE" . "FALSE") ("#t" . "#f") ("yes" . "no") ("Yes" . "No") ("YES" . "NO")))
   (defun flip-bool-at-point ()
     "Flips the boolean literal at point, changing true to false and vice-versa."
     (interactive)
