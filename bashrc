@@ -40,10 +40,6 @@ shopt -s histappend
 export HISTSIZE=10000
 export HISTFILESIZE=${HISTSIZE}
 
-# variable/to/.../shorten/long_paths
-PROMPT_COMMAND='DIR=`pwd|sed -e "s!$HOME!~!"`; if [ ${#DIR} -gt 28 ]; then CurDir=${DIR:0:9}...${DIR:${#DIR}-22}; else CurDir=$DIR; fi'
-# the prompt
-PS1="\[\033[0;36m\]\u@\h\[\033[0;m\]:\[\e[1m\]\${CurDir}\$\[\033[0;m\] "
 export ALTERNATE_EDITOR=""
 
 # completion
@@ -167,3 +163,35 @@ export PYTHONSTARTUP="/home/giorgis/.pythonrc.py"
 diffEmacs () {
     emacsclient -e "(ediff-files \"$1\" \"$2\")"
 }
+
+# PROMPT
+
+# variable/to/.../shorten/long_paths
+PROMPT_COMMAND='DIR=`pwd|sed -e "s!$HOME!~!"`; if [ ${#DIR} -gt 28 ]; then CurDir=${DIR:0:9}...${DIR:${#DIR}-22}; else CurDir=$DIR; fi'
+
+# git branch
+# change prompt when in a git repository
+if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    c_reset=`tput sgr0`
+    c_git_clean=`tput setaf 2`
+    c_git_dirty=`tput setaf 4`
+else
+    c_reset=
+    c_git_clean=
+    c_git_dirty=
+fi
+git_prompt ()
+{
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
+        return 0
+    fi
+    git_branch=$(git branch 2>/dev/null| sed -n '/^\*/s/^\* //p')
+    if git diff --quiet 2>/dev/null >&2; then
+        git_color="${c_git_clean}"
+    else
+        git_color=${c_git_dirty}
+    fi
+    echo " [$git_color$git_branch${c_reset}]"
+}
+
+PS1='\[\033[0;36m\]\u@\h\[\033[0;m\]\[\033[1;33m\]${c_reset}$(git_prompt):\[\e[1m\]${CurDir}\$\[\033[0;m\] '
