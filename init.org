@@ -1970,6 +1970,10 @@ Avoir des tabs (et surtout des groupes)
   (autoload 'restart-emacs "restart-emacs" nil t)
   (global-set-key (kbd "C-x M-c") 'restart-emacs)
 #+END_SRC
+*** toogle emacs size
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-z") 'toggle-frame-maximized)
+#+END_SRC
 *** palette and eyedropper
 *dépendances*: [[https://github.com/emacsmirror/emacswiki.org/blob/master/palette.el][palette.el]] [[https://github.com/emacsmirror/emacswiki.org/blob/master/eyedropper.el][eyedropper]]
 #+BEGIN_SRC emacs-lisp
