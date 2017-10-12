@@ -2793,6 +2793,24 @@ Avoir des tabs (et surtout des groupes)
   (require 'gitignore-mode)
   (require 'gitattributes-mode)
 #+END_SRC
+*** mercurial
+*dépendances*: [[https://github.com/emacsmirror/ahg][ahg]] [[https://searchcode.com/file/116589788/lisp/scm/hg-status.el][hg-status.el]]
+#+BEGIN_SRC emacs-lisp
+  ;; ahg
+  (require 'ahg)
+  (global-unset-key (kbd "C-x m"))
+  (global-set-key (kbd "C-x m m") 'ahg-glog)
+  (global-set-key (kbd "C-x m h") 'ahg-glog-hidden)
+  (global-set-key (kbd "C-x m b") 'ahg-annotate-cur-file)
+  (global-set-key (kbd "C-x m =") 'ahg-diff-ediff-cur-file)
+  (global-set-key (kbd "C-x m l") 'ahg-log-cur-file)
+  ;; mercurial status in modeline
+  (require 'hg-status)
+  (add-hook 'find-file-hook 'hg-status-in-modeline t)
+  (defun hg-status-in-modeline ()
+    (if (and vc-mode (string-match "^ Hg" (substring-no-properties vc-mode)))
+        (hg-status-update-modeline)))
+#+END_SRC
 *** diff-hl
 *dépendances*: [[https://github.com/dgutov/diff-hl][diff-hl.el]]
 #+BEGIN_SRC emacs-lisp
