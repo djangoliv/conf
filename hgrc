@@ -1,0 +1,83 @@
+# example user config (see 'hg help config' for more info)
+[ui]
+username = Djangoliv <olivier.giorgis@logilab.fr>
+
+ignore = ~/.hgignore
+
+merge = internal:merge
+
+editor = emacsclient
+
+[diff]
+git = true
+showfunc = true
+
+[templates]
+git = '\033[0;33mcommit: {rev} {node}\n\033[0mAuthor: {author}\nDate:   {date|rfc822date}\nBranch: {branch}\nPhase:  {phase}\n\n\t{desc|strip|fill68|tabindent}\n\n'
+gitshort = '\033[31m{shortest(node, 7)}\033[0m - \033[95m{ifeq(phase, "public", "", "({phase}) ")}\033[33m{if(tags, "(tags: {tags}) ")}{ifcontains(rev, revset("head()"), "(branch: {branch}) ")}{if(topics, "(topics: {topics}) ")}\033[0m{desc|firstline} \033[32m({age(date)}) \033[94m<{author|person}> {ifeq(rev, revset('.'), '*')}\n'
+
+[pager]
+attend-help = true
+attend-show = true
+attend-lg = true
+
+[extensions]
+pager =
+hgext.convert =
+shelve =
+color =
+rebase =
+patchbomb =
+histedit =
+strip =
+purge =
+
+[email]
+method = smtp
+
+[smtp]
+host = mail
+
+[patchbomb]
+intro = never
+confirm = true
+
+[color]
+mode=terminfo
+
+#Custom colours
+color.orange=202
+color.lightyellow=191
+color.darkorange=220
+color.brightyellow=226
+
+#Colours for each label
+log.branch=cyan
+log.summary=lightyellow
+log.description=lightyellow
+log.bookmark=green
+log.tag=darkorange
+log.activebookmark = green bold underline
+log.parent = white
+
+changeset.public=green bold
+changeset.secret=blue bold
+changeset.draft=yellow
+
+desc.here=bold blue_background
+
+[diff]
+git = true
+showfunc = true
+
+[alias]
+shortlog = log --graph --template gitshort
+grrep = ! $HG files -0 $2 $3 $4 $5 $6 $7 $8 $9 | xargs -0 grep --color=always -n -H '$1' | $PAGER
+show = log --stat -v -p --template=phases -r $1
+contains = log -r $1 --template="{latesttag}\n"
+wdiff = ! $HG diff $@ | wdiff -n -d -w '[31m' -x '[0m' -y '[32m' -z '[0m' | sed -e 's:^@@:[35m@@:' -e 's:@@$:@@[0m:' -e 's:^diff -r:[35;1mdiff -r:' | $PAGER
+review = show-review -r 'ancestors(.) and draft()'
+revert = revert --no-backup
+
+[experimental]
+graphshorten=true
