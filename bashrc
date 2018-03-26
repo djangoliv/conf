@@ -41,6 +41,7 @@ export HISTSIZE=10000
 export HISTFILESIZE=${HISTSIZE}
 
 export ALTERNATE_EDITOR=""
+export GIT_EDITOR=emacsclient
 
 # completion
 complete -cf sudo
