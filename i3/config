@@ -152,6 +152,9 @@ bindsym $mod+r mode "resize"
 # focus
 focus_follows_mouse no
 
+# network
+exec --no-startup-id nm-applet
+
 # status bar
 bar {
     font pango:Economica, FontAwesome 10
@@ -171,23 +174,23 @@ client.unfocused #000000 #000000 #606060 #000000
 
 # workspace 1
 exec --no-startup-id i3-msg 'workspace 1; append_layout /home/ogiorgis/.config/i3/workspace-1.json'
-exec --no-startup-id i3-msg 'workspace 1; exec /home/ogiorgis/Tools/emacs/emacs-git-26/src/emacs --name emacs'
-exec --no-startup-id i3-msg 'workspace 1; exec /home/ogiorgis/Tools/emacs/emacs-git-26/src/emacs -q -l ~/.emacs-terms --name emacsTerm'
+exec --no-startup-id i3-msg 'workspace 1; exec /home/ogiorgis/Tools/emacs/emacs/src/emacs --name emacs'
+exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/emacs -q -l ~/.emacs-terms --name emacsTerm'
 #exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/xterm --name xterm'
+# # workspace2: mail
+exec --no-startup-id i3-msg 'workspace 3; exec /usr/bin/thunderbird'
 # workspace3: firefox
 exec --no-startup-id i3-msg 'workspace 2; exec /home/ogiorgis/Tools/firefox/firefox/firefox'
-# workspace2: mail
-exec --no-startup-id i3-msg 'workspace 3; exec /usr/bin/thunderbird'
-# workspace4: jabber
-exec --no-startup-id i3-msg 'workspace 4; exec /usr/bin/gajim'
+# # workspace4: jabber
+# exec --no-startup-id i3-msg 'workspace 4; exec /usr/bin/gajim'
 
 # shortcuts
 
 # calendar
 bindsym $mod+c exec zenity --calendar
 # emacs
-bindsym --release $mod+x exec --no-startup-id /home/ogiorgis/Tools/emacs/emacs-git-26/src/emacs --name emacs
-bindsym --release $mod+t exec --no-startup-id "/home/ogiorgis/Tools/emacs/emacs-git-26/src/emacs -q -l ~/.emacs-terms"
+bindsym --release $mod+x exec --no-startup-id /home/ogiorgis/Tools/emacs/emacs/src/emacs --name emacs
+bindsym --release $mod+t exec --no-startup-id "/usr/bin/emacs -q -l ~/.emacs-terms"
 # workspaces
 bindsym $mod+Tab workspace next
 bindsym $mod+oe workspace prev
@@ -195,11 +198,21 @@ bindsym $mod+oe workspace prev
 bindsym $mod+Shift+Escape exec "i3lock; systemctl hibernate"
 bindsym $mod+Escape exec "i3lock -c 000033"
 # mount USB
-bindsym $mod+m exec --no-startup-id "udisksctl mount -b /dev/sdc1 /media/$USER/"
+bindsym $mod+m exec --no-startup-id "udisksctl mount -b /dev/sdb1 /media/$USER/"
 # kill workspace
 bindsym $mod+Control+Shift+k focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, kill
 # firefox
 bindsym --release $mod+Shift+f exec --no-startup-id /home/ogiorgis/Tools/firefox/firefox/firefox
 # auto i3lock
 # exec xautolock -time 1 -locker "i3lock -d -c 000070" -notify 30 -notifier "notify-send -u critical -t 10000 -- 'LOCKING screen in 30 seconds'"
-exec xautolock -detectsleep -time 5 -locker "i3lock -c 000033"
+exec xautolock -detectsleep -time 15 -locker "i3lock -c 000033"
+
+#exec xrandr --output eDP-1 --auto --output HDMI1 --auto --left-of eDP1
+# workspace 1 output eDP-1
+# workspace 2 output eDP-1
+# workspace 3 output eDP-1
+# workspace 4 output eDP-1
+# workspace 5 output HDMI-1
+# workspace 6 output HDMI-1
+
+
