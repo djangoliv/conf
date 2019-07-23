@@ -11,9 +11,6 @@
 ** init Configuration
 Configuration minimale (sans librairies externes)
 #+BEGIN_SRC emacs-lisp
-  (require 'cl) ;; build-in librairie
-  ;; path
-  (add-to-list 'load-path "~/.emacs.d/lisp")
   ;; message de depart desactive
   (setq inhibit-startup-message t)
   ;; menu-bar desactive
@@ -64,7 +61,7 @@ Configuration minimale (sans librairies externes)
   ;; Recherche automatique des fermetures et ouvertures des parentheses
   (show-paren-mode 1)
   ;; Le chemin du fichier et son mode majeur dans la barre de titre
-  (setq-default frame-title-format `( "%f [%m]"))
+  (setq-default frame-title-format `( " %b [%m]"))
   ;; Pour ne par taper sur 'inser' par erreur
   (put 'overwrite-mode 'disabled t)
   ;; reutiliser la frame de gauche si presente
@@ -75,14 +72,17 @@ Configuration minimale (sans librairies externes)
   (setq make-pointer-invisible t)
   ;; on coupe les lignes
   (setq-default global-visual-line-mode t)
-  ;; Diminution de la frequence du garbage collector (optimisation)
-  ;; (setq gc-cons-threshold 20000000)
-  (defun my-minibuffer-setup-hook ()
-    (setq gc-cons-threshold most-positive-fixnum))
-  (defun my-minibuffer-exit-hook ()
-    (setq gc-cons-threshold 800000))
-  (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
-  (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
+  ;;; Temporarily reduce garbage collection during startup. Inspect `gcs-done'.
+  (defun ambrevar/reset-gc-cons-threshold ()
+    (setq gc-cons-threshold (car (get 'gc-cons-threshold 'standard-value))))
+  (setq gc-cons-threshold (* 64 1024 1024))
+  (add-hook 'after-init-hook #'ambrevar/reset-gc-cons-threshold)
+  ;;; Temporarily disable the file name handler.
+  (setq default-file-name-handler-alist file-name-handler-alist)
+  (setq file-name-handler-alist nil)
+  (defun ambrevar/reset-file-name-handler-alist ()
+    (setq file-name-handler-alist default-file-name-handler-alist))
+  (add-hook 'after-init-hook #'ambrevar/reset-file-name-handler-alist)
   ;; Un gros fichier est superieur à 35mb
   (setq large-file-warning-threshold (* 35 1024 1024))
   ;; historique
@@ -112,15 +112,20 @@ Configuration minimale (sans librairies externes)
   (setq ad-redefinition-action 'accept)
   ;; compilation scroll
   (setq compilation-scroll-output t)
+  ;; font
+  (set-frame-font "DejaVuSansMono 8" nil t)
+  ;; auto revert
+  (global-auto-revert-mode)
+  ;; auto-fill
+  (auto-fill-mode -1)
  #+END_SRC
 ** auto tangle init file
 *dépendances*: [[https://github.com/jwiegley/emacs-async][emacs-async]]
 #+BEGIN_SRC emacs-lisp
-  ;; async tangle init.org at save
-  (add-to-list 'load-path "~/.emacs.d/emacs-async/")
-  (require 'async)
+  ;; async tangle init.org at save  dependnace https://github.com/jwiegley/emacs-async
   (defun tangle-init-async ()
     "If the current buffer is 'emacs-init.org' the code-blocks are tangled."
+    (require 'async)
     (when (equal (buffer-file-name) (expand-file-name (concat user-emacs-directory "init.org")))
       (async-start
        `(lambda ()
@@ -132,7 +137,7 @@ Configuration minimale (sans librairies externes)
          (let ((buf (get-buffer "*Compile-Log*")))
            (set-window-point (get-buffer-window buf) (buffer-size buf)))
          (message "Tangled file compiled.")))))
-  (add-hook 'after-save-hook 'tangle-init-async)
+  (add-hook 'after-save-hook 'tangle-init-async);
 #+END_SRC
 ** source du bashrc au démarrage
 *dépendances*: [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
@@ -146,6 +151,21 @@ Configuration minimale (sans librairies externes)
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/")
   (load-theme 'djangoliv t)
+#+END_SRC
+** dimmer (contraste)
+#+BEGIN_SRC emacs-lisp
+  (setq dimmer-fraction 0.18)
+  (require 'dimmer)
+  (dimmer-mode)
+#+END_SRC
+** source du bashrc au démarrage
+*dépendances*: [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
+#+BEGIN_SRC emacs-lisp
+  (require 'exec-path-from-shell)
+  (setq exec-path-from-shell-variables '("PATH"))
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "PYTHONPATH")
+  (exec-path-from-shell-copy-env "WORKON_HOME")
 #+END_SRC
 ** Registres
   #+BEGIN_SRC emacs-lisp
@@ -173,7 +193,11 @@ Configuration minimale (sans librairies externes)
   (setq version-control t       ;; activation
         vc-make-backup-files t  ;; Faire aussi des backups des fichiers sous control de version
         backup-by-copying t     ;; on ne copie pas des liens
-        delete-old-versions -1) ;; On garde tout
+        make-backup-files t     ;; backup of a file the first time it is saved.
+        delete-old-versions t   ;; delete excess backup files silently
+        kept-old-versions 6     ;; oldest versions to keep when a new numbered backup is made
+        kept-new-versions 6     ;; newest versions to keep when a new numbered backup is made
+        )
 #+END_SRC
 ** Persistance
 #+BEGIN_SRC emacs-lisp
@@ -247,6 +271,52 @@ Configuration minimale (sans librairies externes)
         (delete-char (length (current-kill 0)))))
   (ad-activate 'yank)
 #+END_SRC
+** buffers
+#+BEGIN_SRC emacs-lisp
+ ;; kill buffers
+  (global-set-key (kbd "C-x k") 'kill-this-buffer)
+  ;; Fermeture de tous les buffer sauf le courant
+  (defun kill-all-other-buffers ()
+     "Kill all other buffers."
+     (interactive)
+     (mapc 'kill-buffer (delq (current-buffer) (buffer-list))))
+
+  (defun kill-current-mode-buffers ()
+     "Kill all buffers that major mode same with current mode."
+     (interactive)
+     (kill-special-mode-buffers-internal major-mode))
+     (global-set-key (kbd "C-x C-k") 'kill-current-mode-buffers)
+
+  (defun kill-special-mode-buffers-internal (mode &optional except-current-buffer)
+    "Kill all buffers that major MODE same with special.
+    If option EXCEPT-CURRENT-BUFFER is `non-nil',
+    kill all buffers with MODE except current buffer."
+    (interactive)
+    (let ((current-buf (current-buffer))
+          (count 0))
+      (dolist (buffer (buffer-list))
+        (set-buffer buffer)
+        (when (and (equal major-mode mode)
+                   (or (not except-current-buffer)
+                       (not (eq current-buf buffer))))
+          (incf count)
+          (kill-buffer buffer)))
+      (message "Killed %s buffer%s" count (if (> count 1) "s" ""))))
+#+END_SRC
+** zoom
+#+BEGIN_SRC emacs-lisp
+;; control+wheel for zooming the text.
+  (global-set-key [(control mouse-4)] (lambda () (interactive) (text-scale-increase 1)))
+  (global-set-key [(control mouse-5)] (lambda () (interactive) (text-scale-decrease 1)))
+  ;; mouse wheel for image-mode
+  (add-hook
+   'image-mode-hook
+   (lambda ()
+     (local-set-key [mouse-4] (lambda () (interactive) (image-previous-line 1)))
+     (local-set-key [mouse-5] (lambda () (interactive) (image-next-line 1)))
+     (local-set-key [(control mouse-4)] (lambda () (interactive) (image-increase-size 1)))
+     (local-set-key [(control mouse-5)] (lambda () (interactive) (image-decrease-size 1)))))
+#+END_SRC
 ** isearch
 #+BEGIN_SRC emacs-lisp
   ;; sensible a la casse
@@ -266,16 +336,61 @@ Configuration minimale (sans librairies externes)
   (setq find-grep-options "-q -i")
   (setq grep-command "grep -nH -r --exclude-dir='svn' ")
 #+END_SRC
-** navigation
+* Centaur-tabs
 #+BEGIN_SRC emacs-lisp
-  ;; syntax-subword
-  (require 'syntax-subword)
-  (setq syntax-subword-skip-spaces t)
-  (global-set-key (kbd "s-<backspace>") 'syntax-subword-backward-kill)
-  (global-set-key (kbd "s-<left>") 'syntax-subword-backward)
-  (global-set-key (kbd "s-<right>") 'syntax-subword-forward)
-  (global-set-key (kbd "s-<up>") 'backward-paragraph)
-  (global-set-key (kbd "s-<down>") 'forward-paragraph)
+  (require 'centaur-tabs)
+  (require 'all-the-icons)
+  (centaur-tabs-mode t)
+  (global-set-key (kbd "C-<prior>")  'centaur-tabs-backward)
+  (global-set-key (kbd "C-<next>") 'centaur-tabs-forward)
+  (global-set-key (kbd "M-+")  'centaur-tabs-backward-group)
+  (global-set-key (kbd "M--") 'centaur-tabs-forward-group)
+  (setq centaur-tabs-background-color (face-background 'default))
+  (setq centaur-tabs-height 22)
+  (setq centaur-tabs-style "box")
+  (setq centaur-tabs-set-icons t)
+  (setq centaur-tabs-set-modified-marker t)
+  ;; (setq centaur-tabs-modified-marker "`")
+  (setq centaur-tabs-gray-out-icons 'buffer)
+  (setq centaur-tabs-cycle-scope 'tabs)
+  (setq centaur-tabs-set-bar 'over)
+  ;; exclude
+  (defun centaur-tabs-hide-tab (x)
+    (let ((name (format "%s" x)))
+      (or
+       (string-prefix-p "*" name)
+       (and (string-prefix-p "magit" name)
+            (not (file-name-extension name)))
+       )))
+  ;; groups
+  (defun centaur-tabs-buffer-groups ()
+    (list
+     (cond
+      ((derived-mode-p 'prog-mode) "Editing")
+      ((derived-mode-p 'dired-mode) "Dired")
+      ((derived-mode-p 'image-mode) "Image")
+      ((derived-mode-p 'nxml-mode) "nXml")
+      ((derived-mode-p 'logview-mode) "Logs")
+      ((memq major-mode '(org-mode
+                          org-agenda-clockreport-mode
+                          org-src-mode
+                          org-agenda-mode
+                          org-beamer-mode
+                          org-indent-mode
+                          org-bullets-mode
+                          org-cdlatex-mode
+                          org-agenda-log-mode
+                          diary-mode))
+       "OrgMode")
+      ((memq major-mode '(csv-mode
+                          text-mode
+                          latex-mode
+                          rst-mode
+                          markdown-mode
+                          fundamental-mode))
+       "textMode")
+      (t
+       (centaur-tabs-get-group-name (current-buffer))))))
 #+END_SRC
 * CEDET
 Collection of Emacs Development Environment Tools
@@ -285,16 +400,16 @@ Collection of Emacs Development Environment Tools
   (global-ede-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode 1)
-  (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode 1)
+  ;; (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
   (add-to-list 'semantic-default-submodes 'global-srecode-minor-mode t)
   (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
   (setq semantic-load-turn-everything-on t)
-  (semantic-mode) ;; Active le mode semantic
-  (require 'stickyfunc-enhance) ;; multilines concatene dans la header line
-  (require 'cedet-cscope)
+  ;; (semantic-mode) ;; Active le mode semantic
+  ;; (require 'stickyfunc-enhance) ;; multilines concatene dans la header line
+  ;; (require 'cedet-cscope)
 #+END_SRC
 ** Initialize ECB
 *dépendances*: [[https://github.com/alexott/ecb/][ecb]]
@@ -303,128 +418,6 @@ Collection of Emacs Development Environment Tools
   (setq ecb-layout-name "left15")
   (setq ecb-tip-of-the-day nil)
 #+END_SRC
-* Tabbar
-Avoir des tabs (et surtout des groupes)
-** Initialisation
-*dépendances*: [[https://github.com/dholm/tabbar][tabbar.el]] [[https://github.com/mattfidler/tabbar-ruler.el][tabbar-ruler]]
-#+BEGIN_SRC emacs-lisp
-  (require 'tabbar-ruler)
-  (setq tabbar-use-images nil)
-  ;; permet de ne pas afficher les buffers non pertinents (comme *scratch* par exemple):
-  (setq tabbar-buffer-groups-function 'tabbar-buffer-groups)
-  (setq tabbar-buffer-groups-function
-        (lambda () (list "All Buffers")))
-  (setq tabbar-buffer-list-function
-        (lambda ()
-          (remove-if
-           (lambda(buffer)
-             (or (string-match-p "TAGS" (buffer-name buffer))
-                 (find (aref (buffer-name buffer) 0) " *" )))
-           (buffer-list))))
-  ;;
-  (setq table-time-before-update 0.1)
-  (setq mode-icons-use-default-icon t)
-  ;; space around the label to make it looks less crowd.
-  (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
-    (setq ad-return-value
-          (if (and (buffer-modified-p (tabbar-tab-value tab))
-                   (buffer-file-name (tabbar-tab-value tab)))
-              (concat " " (concat ad-return-value " "))
-            (concat " " (concat ad-return-value " ")))))
-  ;; raccourcis
-  (global-set-key (kbd "C-<next>") 'tabbar-forward-tab)
-  (global-set-key (kbd "C-<prior>") 'tabbar-backward-tab)
-  (global-set-key (kbd "C-c C-t") 'tabbar-local-mode) ;; switch tabbar (header-line)
-  ;; supression raccourcis
-  (global-set-key (kbd "C-c C-<up>") nil)
-  (global-set-key (kbd "C-c C-<down>") nil)
- #+END_SRC
-** groupes
-#+BEGIN_SRC emacs-lisp
-  ;; tabbar group
-  (defun tabbar-buffer-groups ()
-    (list
-     (cond
-      ((eq major-mode 'dired-mode)
-       "Dired"
-       )
-      ((eq major-mode 'image-dired-thumbnail)
-       "Image-Dired"
-       )
-      ((eq major-mode 'term-mode)
-       "term"
-       )
-      ((eq major-mode 'org-mode)
-       "org"
-       )
-      ((eq major-mode 'nxml-mode)
-       "nXml"
-       )
-      ((eq major-mode 'image-mode)
-       "image"
-       )
-      ((eq major-mode 'csv-mode)
-       "CSV"
-       )
-      ((eq major-mode 'text-mode)
-       "text"
-       )
-      ((eq major-mode 'logview-mode)
-       "Log"
-       )
-      ((or (string-equal "." (substring (buffer-name) 0 1)) (eq major-mode 'emacs-lisp-mode))
-       "Conf Buffer"
-       )
-      ((eq major-mode 'fundamental-mode)
-       "Unknown"
-       )
-      (t
-       "User Buffer"))))
-  (setq tabbar-buffer-groups-function 'tabbar-buffer-groups)
-  (global-set-key (kbd "M-+") 'tabbar-backward-group)
-  (global-set-key (kbd "M--") 'tabbar-forward-group)
- #+END_SRC
-** kill buffers
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-x k") '(lambda ()
-                       (interactive)
-                       (tabbar-backward-tab) ; petite feinte pour rester dans le meme tabset
-                       (tabbar-forward-tab)
-                       (kill-buffer)
-                       ;;(tabbar-remove-killed-buffers)
-                       ))
-  ;; Fermeture de tous les buffer sauf le courant
-  (defun kill-all-other-buffers ()
-    "Kill all other buffers."
-    (interactive)
-    (mapc 'kill-buffer (delq (current-buffer) (buffer-list))))
-  (global-set-key (kbd "s-k") 'kill-all-other-buffers)
-  ;; kill all current major mode
-  (defun kill-current-major-mode-buffers ()
-    (interactive)
-    (let ((current-mode  major-mode))
-      (mapc (lambda (buffer)
-              (when (eq current-mode (buffer-local-value 'major-mode buffer))
-                (kill-buffer buffer)))
-            (buffer-list))))
-  (global-set-key (kbd "C-c k") 'kill-current-major-mode-buffers)
- #+END_SRC
-** Terminal dans des tabs
-*dépendances*: [[https://github.com/emacsmirror/multi-term][multi-term.el]]
-#+BEGIN_SRC emacs-lisp
-  ;; Permet d'avoir un term dans une tab de tabbar
-  (defun my-run-term ()
-    "Lance le terminal dans la fenetre courante nom 'Term #', donc il est possible de lancer plusieurs terminaux"
-    (interactive)
-    (require 'multi-term)
-    (command-execute 'multi-term)
-    (setq-default truncate-lines nil)
-    (if (not (boundp 'term-number))
-        (defvar term-number 1 "term index in the current emacs session") )
-    (rename-buffer (concat "Term " (int-to-string term-number)))
-    (setq term-number (+ 1 term-number)))
-  (global-set-key (kbd "M-&") 'my-run-term) ;; mappe sur M-&
- #+END_SRC
 * Major-modes
 ** Text-mode
  #+BEGIN_SRC emacs-lisp
@@ -956,18 +949,6 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
    (autoload 'crontab-mode "crontab-mode" "" t)
  #+END_SRC
-** Goby
-*dépendances*: [[https://github.com/kazu-yamamoto/Goby/commits/master/goby.el][goby]]
-#+BEGIN_SRC emacs-lisp
-  ;;;;;;; GOBY http://www.mew.org/~kazu/proj/goby/en/usage.html
-  ;; M-x goby => find-file sample.gby => C-c ; v
-  (add-to-list 'load-path "~/.emacs.d/Goby-master")
-  (autoload 'goby "goby" nil t)
-  (setq goby-helvetica "arial")
-  (setq goby-times "times new roman")
-  (setq goby-courier "courier new")
-  (setq goby-use-advanced-window-manager t)
-#+END_SRC
 ** Markdown
 *dépendances*: [[https://github.com/defunkt/markdown-mode][markdown-mode.el]] [[https://github.com/skeeto/emacs-web-server][simple-httpd]] [[https://github.com/mola-T/flymd][flymd]]
 #+BEGIN_SRC emacs-lisp
@@ -995,6 +976,14 @@ Avoir des tabs (et surtout des groupes)
   ;; Org-struct minor mode active in markdown mode.
   (add-hook 'markdown-mode-hook 'turn-on-orgstruct)
 #+END_SRC
+** RST
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'rst-mode-hook
+            (lambda ()
+              (setq fill-column 102)
+              (require 'sphinx-mode)
+              (sphinx-mode)))
+#+END_SRC
 ** eimp (manipulation d'image)
 *dépendances*: [[https://github.com/nicferrier/eimp][eimp.el]]
 #+BEGIN_SRC emacs-lisp
@@ -1007,6 +996,15 @@ Avoir des tabs (et surtout des groupes)
 #+BEGIN_SRC emacs-lisp
   (autoload 'ereader-mode "ereader" nil t)
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . ereader-mode))
+#+END_SRC
+** debian
+#+BEGIN_SRC emacs-lisp
+  (require 'debian-control-mode)
+#+END_SRC
+** dotenv
+#+BEGIN_SRC emacs-lisp
+  (require 'dotenv-mode)
+  (add-to-list 'auto-mode-alist '("\\.env\\..*\\'" . dotenv-mode))
 #+END_SRC
 * Minor-Modes and Helper Functions
 ** undo-tree
@@ -1083,6 +1081,11 @@ Avoir des tabs (et surtout des groupes)
          (delete-char -1))))
    (global-set-key (kbd "s-<backspace>") 'hungry-backspace)
  #+END_SRC
+** beginend
+#+BEGIN_SRC emacs-lisp
+  (require 'beginend)
+  (beginend-global-mode)
+#+END_SRC
 ** copy/delete/kill line
 *** copie sans couper
 #+BEGIN_SRC emacs-lisp
@@ -1836,15 +1839,6 @@ Avoir des tabs (et surtout des groupes)
         ;; completion case sensitive
         (setq completion-ignore-case nil)
   #+END_SRC
-** Docker
-*dépendances*: [[https://github.com/spotify/dockerfile-mode][dockerfile-mode.el]] [[https://github.com/Silex/docker.el][docker.el]] [[https://github.com/Silex/tabulated-list-extensions][tle]] [[https://github.com/politza/tablist][tabList]]
-#+BEGIN_SRC emacs-lisp
-  (autoload 'dockerfile-mode "dockerfile-mode" nil t)
-  (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
-  (add-to-list 'load-path "~/.emacs.d/docker.el-master")
-  (autoload 'docker-images "docker-images" nil t)
-  (autoload 'docker-containers "docker-containers" nil t)
-#+End_SRC
 ** puppet
 *dépendances*: [[https://github.com/voxpupuli/puppet-mode][puppet-mode]]
 #+BEGIN_SRC emacs-lisp
@@ -2380,14 +2374,6 @@ Avoir des tabs (et surtout des groupes)
 #+END_SRC
 * Developpement
 ** Common
-*** insert un shebang
-#+BEGIN_SRC emacs-lisp
-  (defun insert-shebang (lang)
-    "Insert a shebang for some language at that point."
-    (interactive "slang: ")
-    (insert
-     (concat "#!/usr/bin/env " lang)))
-#+END_SRC
 *** Analyse de code
 *dépendances* [[https://github.com/cosmicexplorer/cloc-emacs][cloc.el]] [[http://kitchingroup.cheme.cmu.edu/media/2015-07-28-A-highlight-annotation-mode-for-Emacs-using-font-lock/highlights.el][highlights.el]] [[https://github.com/bastibe/annotate.el][annotate.el]]
 #+BEGIN_SRC emacs-lisp
@@ -2493,17 +2479,6 @@ Avoir des tabs (et surtout des groupes)
   ;; folding
   (setq outline-regexp "\\(?:\\([ \t]*.*\\(class\\|interface\\)[ \t]+[a-zA-Z0-9_]+[ \t\n]*\\({\\|extends\\|implements\\)\\)\\|[ \t]*\\(public\\|private\\|static\\|final\\|native\\|synchronized\\|transient\\|volatile\\|strictfp\\| \\|\t\\)*[ \t]+\\(\\([a-zA-Z0-9_]\\|\\( *\t*< *\t*\\)\\|\\( *\t*> *\t*\\)\\|\\( *\t*, *\t*\\)\\|\\( *\t*\\[ *\t*\\)\\|\\(]\\)\\)+\\)[ \t]+[a-zA-Z0-9_]+[ \t]*(\\(.*\\))[ \t]*\\(throws[ \t]+\\([a-zA-Z0-9_, \t\n]*\\)\\)?[ \t\n]*{\\)" )
   #+END_SRC
-*** minimap (sublime text)
-*dépendances* [[https://github.com/dustinlacewell/emacs-minimap][minimap.el]]
-#+BEGIN_SRC emacs-lisp
-  (autoload 'minimap-create "minimap")
-  (setq minimap-window-location 'right)
-  (define-prefix-command 'mini-map) ;; prefix key
-  (global-set-key (kbd "C-x m") 'mini-map)
-  (global-set-key (kbd "C-x m k") 'minimap-kill)
-  (global-set-key (kbd "C-x m t") 'minimap-toggle)
-  (global-set-key (kbd "C-x m c") 'minimap-create)
- #+END_SRC
 *** iedit
 *dépendances*: [[https://github.com/victorhge/iedit][iedit.el]]
 #+BEGIN_SRC emacs-lisp
@@ -2599,30 +2574,43 @@ Avoir des tabs (et surtout des groupes)
   (setq highlight-indent-guides-method 'character)
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 #+END_SRC
-*** generalClose
+*** syntactic-close
 #+BEGIN_SRC emacs-lisp
-  (require 'syntactic-close)
+  (autoload 'syntactic-close "syntactic-close" "" t)
   (global-set-key (kbd "M-)") 'syntactic-close)
+#+END_SRC
+*** dumb-smart-jump
+#+BEGIN_SRC emacs-lisp
+  (require 'dumb-jump)
+  (setq dumb-jump-prefer-searcher 'ag)
+  (global-set-key (kbd "C-:") 'dumb-jump-go)
 #+END_SRC
 ** flycheck/flyspell
 *dépendances*: [[https://github.com/flycheck/flycheck][flycheck.el]] [[https://github.com/yuutayamada/flycheck-tip][flycheck-tip]] [[https://github.com/xuchunyang/flyspell-popup][flyspell-popup]] [[https://github.com/flycheck/flycheck-pos-tip][flycheck-pos-tip]]
 #+BEGIN_SRC emacs-lisp
-  (autoload 'flycheck-mode "flycheck" nil t)
+  (require 'flycheck)
   (eval-after-load "flycheck"
     '(progn
+       (setq flycheck-pylintrc "/home/ogiorgis/.config/pylintrc")
+       (setq flycheck-pylint-use-symbolic-id nil) ;; ID pylint
        (require 'flycheck-pos-tip)
        (flycheck-pos-tip-mode)
-       (setq flycheck-pylintrc "~/.config/pylintrc")
-       (setq flycheck-pylint-use-symbolic-id nil) ;; ID pylint
        (global-set-key (kbd "C-c <down>") 'flycheck-next-error)
        (global-set-key (kbd "C-c <up>") 'flycheck-previous-error)
        (global-set-key (kbd "C-c C-<down>") 'flycheck-next-error)
-       (global-set-key (kbd "C-c C-<up>") 'flycheck-previous-error)))
-  ;; flyspell popup
-  (eval-after-load "flyspell"
-    '(progn
-       (require 'flyspell-popup)
-       (add-hook 'flyspell-mode-hook #'flyspell-popup-auto-correct-mode)))
+       (global-set-key (kbd "C-c C-<up>") 'flycheck-previous-error)
+       ;; smartrep
+       (smartrep-define-key
+           global-map "C-c"
+         '(("<down>" . flycheck-next-error)
+           ("<up>" . flycheck-previous-error)))
+       ))
+  ;; flycheck in comment code
+  ;;(add-hook 'prog-mode-hook #'flyspell-prog-mode)
+  ;; auto detect language
+  (require 'guess-language)
+  (setq guess-language-languages '(en fr))
+  (add-hook 'text-mode-hook (lambda () (guess-language-mode 1)))
   ;; flyspell in git commit
   (defun flyspell-ignore-comments ()
     "Used for 'flyspell-generic-check-word-predicate' to ignore comments."
@@ -2665,6 +2653,15 @@ Avoir des tabs (et surtout des groupes)
        (t t))
       rlt))
   (put 'web-mode 'flyspell-mode-predicate 'web-mode-flyspell-verify)
+  ;; restructure-text ??
+  (add-hook 'rst-mode-hook
+            (lambda ()
+              (setq-local flycheck-disabled-checkers '(rst-sphinx))
+              (setq-local flycheck-pycheckers-checkers '(rst))))
+  ;; text
+  (add-hook 'text-mode-hook
+            (lambda ()
+              (setq flycheck-pycheckers-checkers '(proselint))))
  #+END_SRC
 ** Company
 *dépendances*: [[https://github.com/company-mode/company-mode][company-mode]] [[https://github.com/expez/company-quickhelp][company-quickhelp]] [[https://github.com/hlissner/emacs-company-dict][company-dict]]
@@ -2686,6 +2683,10 @@ Avoir des tabs (et surtout des groupes)
   (delq 'company-gtags company-backends)
   (delq 'company-etags company-backends)
   (delq 'company-oddmuse company-backends)
+  (setq company-frontends '(company-pseudo-tooltip-frontend
+                            company-echo-metadata-frontend))
+  ;; aligns annotation to the right hand side
+  (setq company-tooltip-align-annotations t)
   ;; company-dict
   (autoload 'company-dict "company-dict" nil t)
   (setq company-dict-dir (concat user-emacs-directory "dict/"))
@@ -3044,9 +3045,50 @@ Avoir des tabs (et surtout des groupes)
               ;; indentation auto
               (require 'fuzzy-format)
               ;;(setq fuzzy-format-default-indent-tabs-mode 1)
-              (global-fuzzy-format-mode)))
-  (defalias 'pylint 'flycheck-mode)  ;; raccourci pylint
-#+END_SRC
+              (global-fuzzy-format-mode)
+              (require 'flycheck-pycheckers)  ;; config file ~/.pycheckers
+              (setq flycheck-pycheckers-ignore-codes '("C0411" "C0413" "W503"))
+              (with-eval-after-load 'flycheck
+                (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)
+              (defun flake8 ()
+                (interactive)
+                (if (bound-and-true-p flycheck-mode)
+                    (progn
+                      (setq flycheck-pycheckers-checkers '(mypy3 flake8 pylint pep8))
+                      (flycheck-mode -1))
+                  (progn
+                    (setq flycheck-pycheckers-checkers '(flake8))
+                    (flycheck-mode))))
+              (defun pep8 ()
+                (interactive)
+                (if (bound-and-true-p flycheck-mode)
+                    (progn
+                      (setq flycheck-pycheckers-checkers '(mypy3 flake8 pylint pep8))
+                      (flycheck-mode -1))
+                  (progn
+                    (setq flycheck-pycheckers-checkers '(pep8))
+                    (flycheck-mode))))
+              (defun pylint ()
+                (interactive)
+                (if (bound-and-true-p flycheck-mode)
+                    (progn
+                      (setq flycheck-pycheckers-checkers '(mypy3 flake8 pylint pep8))
+                      (flycheck-mode -1))
+                  (progn
+                    (setq flycheck-pycheckers-checkers '(pylint))
+                    (flycheck-mode))))
+              (defun mypy ()
+                (interactive)
+                (if (bound-and-true-p flycheck-mode)
+                    (progn
+                      (setq flycheck-pycheckers-checkers '(mypy3 flake8 pylint pep8))
+                      (flycheck-mode -1))
+                  (progn
+                    (setq flycheck-pycheckers-checkers '(mypy3))
+                    (flycheck-mode))))
+
+  )))
+  #+END_SRC
 **** jedi
 *dépendances* [[https://github.com/tkf/emacs-jedi][jedi]] [[https://github.com/kiwanami/emacs-deferred][deferred]] [[https://github.com/tkf/emacs-python-environment][python-environment]] [[https://github.com/syohex/emacs-company-jedi][emacs-company-jedi]]
 C-. => goto definition
@@ -3061,6 +3103,9 @@ C-. => goto definition
  """
 #+BEGIN_SRC emacs-lisp
   ;; jedi
+  (setq jedi:server-args
+        '("--sys-path" "/home/djangoliv/workspaces/"
+          "--sys-path" "/home/djangoliv/workspaces/project/"))
   (setq jedi:server-command '("~/.emacs.d/emacs-jedi/jediepcserver.py"))
   (setq jedi:tooltip-method (quote (nil)))
   (setq jedi:tooltip-show nil)
@@ -3833,6 +3878,35 @@ word3
     (load "ess-site")
     (revert-buffer))
 #+END_SRC
+** Docker
+*dépendances*: [[https://github.com/spotify/dockerfile-mode][dockerfile-mode.el]] [[https://github.com/Silex/docker.el][docker.el]] [[https://github.com/Silex/tabulated-list-extensions][tle]] [[https://github.com/politza/tablist][tabList]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'dockerfile-mode "dockerfile-mode" nil t)
+  (add-to-list 'auto-mode-alist '("\\Dockerfile\\'" . dockerfile-mode))
+  (autoload 'docker-images "docker-images" nil t)
+  (autoload 'docker-containers "docker-containers" nil t)
+  ;; docker-compose
+  (require 'docker-compose-mode)
+#+End_SRC
+** database SPARQL/RQL
+#+BEGIN_SRC emacs-lisp
+  ;; SPARQL
+  (autoload 'sparql-mode "sparql-mode.el" "Major mode for editing SPARQL files" t)
+  (add-to-list 'auto-mode-alist '("\\.sparql$" . sparql-mode))
+  (add-hook 'sparql-mode-hook 'company-completion-mode)
+  ;; RQL
+  (require 'rql-mode)
+  ;; Turtle RDF
+  (autoload 'n3-mode "n3-mode" "Major mode for OWL or N3 files" t)
+  ;; Turn on font lock when in n3 mode
+  (add-hook 'n3-mode-hook 'turn-on-font-lock)
+  (setq auto-mode-alist
+        (append
+         (list
+          '("\\.n3" . n3-mode)
+          '("\\.owl" . n3-mode))
+         auto-mode-alist))
+#+END_SRC
 * Perso
 ** eswap
 *dépendances* [[https://github.com/djangoliv/eswap][eswap-mode]]
@@ -3976,6 +4050,41 @@ word3
         (backward-kill-word 1)
         (insert wrd))))
   (global-set-key (kbd "C-c b") 'flip-bool-at-point)
+#+END_SRC
+** scratch perso
+#+BEGIN_SRC emacs-lisp
+(setq initial-scratch-message "
+      ;;                                                                                                     ,---,
+      ;;                                                                                                  ,`--,' |
+      ;;            ,---,                                                          ,--,                   |   :  :
+      ;;          ,'  ,' `.                                                      ,--,'|     ,--,          |   |  '
+      ;;        ,---,'     `.  ,--,                   ,---,               ,---,  |  | :   ,--,'|          '   :  |
+      ;;        |   |  /`.  |,--,/|               ,---, /  |  ,----,_,,  '   ,'` :  : '   |  |,      ,---,;   |,'
+      ;;        :   : |  :  ||  |/    ,--,--,    ,--,'|'   | /   /  ' / /   /   ||  ' |   '--'_    /,  ,/|'---'
+      ;;        |   : :  ;  :'--`_   /       `  |   |  ,-' ||   :     |,   ; ,, :'  | |   ,' ,'| ,-' , ' |
+      ;;        :   | ;  :  |,--,'| ,--,  ,-, | |   | /  | ||   | ,`  ,'   | |: :|  | :   '  | |/___/ `: |
+      ;;        |   | :  |  '|  | '  `__`/: , , |   | |  | |,   ; ';  |'   | ,; :'  : |__ |  | :,   `  ' ,
+      ;;        :   : | /  ; :  | |  ,' ,--,; | |   | |  |/ '   ,   , ||   :    ||  | ','|'  : |_`   `   '
+      ;;        |   | '` ,/__|  : ' /  /  ,,  | |   | |--'   `---`-'| | `   `  / ;  :    ;|  | ','`   `  |
+      ;;        ;   :  ,','__/-_: |;  :   ,'   `|   |/       ,'__/`_: |  '----'  |  ,   / ;  :    ;`   ` |
+      ;;        |   ,,'  |   :    :|  ,     ,-,/'---'        |   :    :           ---`-'  |  ,   /  '---'
+      ;;        '---'     `   :  /  '--*---'                  `   |  /                     ---`-'
+      ;;                   `--`-'                              `--`-'")
+#+END_SRC
+** time-tracker
+#+BEGIN_SRC emacs-lisp
+  (autoload 'org-week-tracker-goto-current-entry "org-week-tracker" nil t)
+  (setq org-week-tracker-exclude-day-list '(0 6)) ;; exclude day 0=sunday 6=saturday
+  (setq org-week-tracker-file "~/.emacs-org/time-tracker.org")
+  (global-set-key (kbd "s-<end>") 'org-week-tracker-goto-current-entry)
+#+END_SRC
+** pyutils
+#+BEGIN_SRC emacs-lisp
+  (autoload 'pyutils-mode "pyutils" "python extend" t)
+  (add-hook 'python-mode-hook '(lambda ()
+                                 (pyutils-mode)
+                                 (define-key python-mode-map (kbd "<f8>") 'pyutils-shebang-insert)
+                                 (define-key python-mode-map (kbd "s-w") 'pyutils-where)))
 #+END_SRC
 * Final
 ** Custum file
