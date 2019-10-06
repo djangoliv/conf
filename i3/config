@@ -176,7 +176,7 @@ client.unfocused #000000 #000000 #606060 #000000
 exec --no-startup-id i3-msg 'workspace 1; append_layout /home/ogiorgis/.config/i3/workspace-1.json'
 exec --no-startup-id i3-msg 'workspace 1; exec /home/ogiorgis/Tools/emacs/emacs/src/emacs --name emacs'
 exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/emacs -q -l ~/.emacs-terms --name emacsTerm'
-#exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/xterm --name xterm'
+exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/xterm'
 # # workspace2: mail
 exec --no-startup-id i3-msg 'workspace 3; exec /usr/bin/thunderbird'
 # workspace3: firefox
