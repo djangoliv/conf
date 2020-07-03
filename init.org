@@ -1,15 +1,21 @@
 * Emacs Congfiguration                                     :noexport:ARCHIVE:
 #+AUTHOR: Djangoliv'
+#+TITLE: Djangoliv' Emacs Configuration 
 #+EMAIL: djangoliv@mailoo.org
 #+LANGUAGE:  fr
+#+DESCRIPTION:
+#+KEYWORDS:
 #+EXPORT_SELECT_TAGS: export
 #+EXPORT_EXCLUDE_TAGS: noexport notangle
-#+OPTIONS: ^:nil
-#+TITLE: .emacs
-#+OPTIONS: toc:3
+#+OPTIONS:   H:3 num:t toc:3 \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:nil
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+LINK_UP:
+#+LINK_HOME:
+#+XSLT:
 * Initialisation
 ** init Configuration
-Configuration minimale (sans librairies externes)
+Configuration Minimal (sans librairies externes)
 #+BEGIN_SRC emacs-lisp
   ;; message de depart desactive
   (setq inhibit-startup-message t)
@@ -89,13 +95,13 @@ Configuration minimale (sans librairies externes)
   (setq-default history-length 1000)
   (setq history-delete-duplicates t)
   ;; taille de la kill-ring
-  (setq kill-ring-max 100)
+  (setq kill-ring-max 1000)
   ;; Pour que la fenêtre de compilation ne soit pas trop grande
   (setq compilation-window-height 10)
   ;; tronque les lignes lors d'un split window
   ;;(setq truncate-partial-width-windows 150)
   ;; raccourcis supplémentaires
-  (global-set-key (kbd "s-e") 'eval-region)                ;; lisp evaluation
+  (global-set-key (kbd "C-c e") 'eval-region)                ;; lisp evaluation
   (global-set-key (kbd "M-SPC") 'cycle-spacing)            ;; cycle des espaces  init => 1 => 0 => init
   (global-set-key (kbd "<f1>") 'find-file-literally)       ;; Ouvrir un fichier sans son mode majeur
   (global-set-key (kbd "C-<return>") 'rectangle-mark-mode) ;; rectangle
@@ -118,7 +124,153 @@ Configuration minimale (sans librairies externes)
   (global-auto-revert-mode)
   ;; auto-fill
   (auto-fill-mode -1)
+  ;; display keystrokes
+  (setq echo-keystrokes 0.02)
+  ;; Enable features that are disabled by default.
+  (put 'dired-find-alternate-file 'disabled nil)
+  (put 'narrow-to-region 'disabled nil)
+  (put 'scroll-left 'disabled nil)
  #+END_SRC
+** init-path
+#+BEGIN_SRC emacs-lisp
+  ;; lib path
+  (add-to-list 'load-path "~/.emacs.d/lisp")
+  (add-to-list 'load-path "~/.emacs.d/magit/lisp") ;;*
+  (add-to-list 'load-path "~/.emacs.d/centaur-tabs")
+  (add-to-list 'load-path "~/.emacs.d/ahg");;
+ #+END_SRC
+** emacsit
+#+BEGIN_SRC emacs-lisp
+    (add-to-list 'load-path "~/.emacs.d/packages/SidharthArya/emacsit")
+    (setq emacsit::cask-path "~/.cask/bin/")
+    (require 'emacsit)
+    (setq emacsit::packages '(
+                              alphapapa/matrix-client.el
+                              integral-dw/org-superstar-mode
+                              SidharthArya/emacsit
+                              domtronn/all-the-icons.el
+                              bastibe/annotate.el
+                              tkg/ant-mode
+                              Malabarba/beacon
+                              DamienCassou/beginend
+                              proofit404/blacken
+                              ;;ema2159/centaur-tabs
+                              company-mode/company-mode
+                              proofit404/company-tern
+                              osv/company-web
+                              magnars/dash.el
+                              doublep/datetime
+                              dgutov/diff-hl
+                              gonewest818/dimmer.el
+                              meqif/docker-compose-mode
+                              Silex/docker.el
+                              jacktasia/dumb-jump
+                              alexott/ecb
+                              jcollard/elm-mode
+                              jorgenschaefer/elpy
+                              manateelazycat/emacs-application-framework
+                              jwiegley/emacs-async
+                              szermatt/emacs-bash-completion
+                              kiwanami/emacs-calfw
+                              syohex/emacs-company-jedi
+                              kiwanami/emacs-deferred
+                              preetpalS/emacs-dotenv-mode
+                              bddean/emacs-ereader
+                              hniksic/emacs-htmlize
+                              millejoh/emacs-ipython-notebook
+                              tkf/emacs-jedi
+                              tkf/emacs-request
+                              syohex/emacs-sourcemap
+                              skeeto/emacs-web-server
+                              smihica/emmet-mode.git
+                              cask/epl
+                              emacs-ess/ESS.git
+                              magnars/expand-region.el
+                              flycheck/flycheck-color-mode-line
+                              bsermons/flycheck-elm
+                              flycheck/flycheck
+                              msherry/flycheck-pycheckers
+                              purcell/flymake-easy
+                              purcell/flymake-python-pyflakes
+                              d12frosted/flyspell-correct
+                              magnars/fold-this.el
+                              ;;abo-abo/function-args
+                              magit/ghub
+                              tsgates/git-emacs
+                              magit/git-modes
+                              atykhonov/google-translate
+                              vermiculus/graphql.el
+                              davazp/graphql-mode
+                              ppareit/graphviz-dot-mode
+                              Groovy-Emacs-Modes/groovy-emacs-modes
+                              tmalsburg/guess-language.el
+                              abo-abo/hydra
+                              victorhge/iedit
+                              Lindydancer/ini-mode
+                              casouri/isolate
+                              ananthakumaran/jquery-doc.el
+                              mooz/js2-mode
+                              joshwnj/json-mode
+                              for-GET/know-your-http-well
+                              Emacs-Kotlin-Mode-Maintainers/kotlin-mode
+                              chrisbarrett/kubernetes-el
+                              magit/libegit2
+                              libgit2/libgit2.git
+                              jiahaowork/lines-at-once.el
+                              doublep/logview
+                              ;;magit/magit
+                              jrblevin/markdown-mode
+                              kazu-yamamoto/Mew.git
+                              purcell/mmm-mode
+                              ryuslash/mode-icons
+                              ;;djcb/mu
+                              manateelazycat/multi-term
+                              gregsexton/ob-ipython
+                              dengste/org-caldav
+                              msnoigrs/ox-rst
+                              joostkremers/pandoc-mode
+                              politza/pdf-tools
+                              lunaryorn/pkg-info.el
+                              skuro/plantuml-mode
+                              polymode/poly-markdown
+                              polymode/polymode
+                              milkypostman/powerline
+                              prettier/prettier-emacs
+                              pretty-mode/pretty-mode
+                              mattharrison/pycoverage.el
+                              Wilfred/pyimport
+                              glyph/python-docstring-mode
+                              jorgenschaefer/pyvenv
+                              emacsmirror/rainbow-mode
+                              rust-lang/rust-mode
+                              glynnforrest/salt-mode
+                              rolandwalker/simpleclip
+                              ljos/sparql-mode
+                              naiquevin/sphinx-doc.el
+                              Fuco1/sphinx-mode
+                              google/styleguide
+                              abo-abo/swiper
+                              emacs-berlin/syntactic-close
+                              politza/tablist
+                              ananthakumaran/tide
+                              magit/transient
+                              volrath/treepy.el
+                              emacs-typescript/typescript.el
+                              jwiegley/use-package
+                              porterjamesj/virtualenvwrapper.el
+                              m00natic/vlfi
+                              wanderlust/wanderlust
+                              osv/web-completion-data
+                              fxbois/web-mode
+                              magit/with-editor
+                              capitaomorte/yasnippet
+                              AndreaCrotti/yasnippet-snippets
+                              fourier/ztree
+                              https://git.deparis.io/flycheck-grammalecte
+                              ))
+  (setq emacsit::savedir "~/.emacs.d/packages")
+  (emacsit::load)
+#+END_SRC
 ** auto tangle init file
 *dépendances*: [[https://github.com/jwiegley/emacs-async][emacs-async]]
 #+BEGIN_SRC emacs-lisp
@@ -137,20 +289,21 @@ Configuration minimale (sans librairies externes)
          (let ((buf (get-buffer "*Compile-Log*")))
            (set-window-point (get-buffer-window buf) (buffer-size buf)))
          (message "Tangled file compiled.")))))
-  (add-hook 'after-save-hook 'tangle-init-async);
-#+END_SRC
-** source du bashrc au démarrage
-*dépendances*: [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
-#+BEGIN_SRC emacs-lisp
-  (require 'exec-path-from-shell)
-  (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-env "PYTHONPATH")
+  (add-hook 'after-save-hook 'tangle-init-async)
 #+END_SRC
 ** Theme (couleurs, modeline)
 *dépendances*: [[https://github.com/djangoliv/conf][djangoliv-theme.el]]
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/")
   (load-theme 'djangoliv t)
+#+END_SRC
+** beacon
+#+BEGIN_SRC emacs-lisp
+  (require 'beacon)
+  (beacon-mode 1)
+  (setq beacon-blink-when-focused t)
+  (setq beacon-size 3)
+  (setq beacon-color "lightblue")
 #+END_SRC
 ** dimmer (contraste)
 #+BEGIN_SRC emacs-lisp
@@ -176,12 +329,12 @@ Configuration minimale (sans librairies externes)
     (set-register ?i '(file . "~/.emacs.d/init.org"))
     (set-register ?o '(file . "~/.emacs-org/memo.org"))
     (set-register ?t '(file . "~/.emacs-org/tel.org"))
-    (set-register ?s '(file . "~/.emacs-org/suivis.org"))
     (set-register ?p '(file . "~/.emacs-org/perso.org"))
     (set-register ?b '(file . "~/.bashrc"))
-    (set-register ?c '(file . "~/.emacs.d/lisp/custom.el"))
+    (set-register ?k '(file . "~/.emacs-org/keys.org"))
+    (set-register ?c '(file . "~/.config/i3/config"))
     (set-register ?x '(file . "/tmp/scratch.org"))
-    (set-register ?h '(file . "~/.emacs-org/shortcuts.org"))
+    (set-register ?d '(file . "~/.emacs.d/lisp/djangoliv-theme.el"))
   #+END_SRC
 ** Sauvegarde auto
 #+BEGIN_SRC emacs-lisp
@@ -195,16 +348,18 @@ Configuration minimale (sans librairies externes)
         backup-by-copying t     ;; on ne copie pas des liens
         make-backup-files t     ;; backup of a file the first time it is saved.
         delete-old-versions t   ;; delete excess backup files silently
-        kept-old-versions 6     ;; oldest versions to keep when a new numbered backup is made
+        kept-old-versions 2     ;; oldest versions to keep when a new numbered backup is made
         kept-new-versions 6     ;; newest versions to keep when a new numbered backup is made
         )
+  ;; backup-walker
+  (autoload 'backup-walker-start "backup-walker" "" t)
 #+END_SRC
 ** Persistance
 #+BEGIN_SRC emacs-lisp
   ;; savegarde de l'historique entre les sessions
   (setq savehist-save-minibuffer-history 1)
   (setq savehist-additional-variables
-        '(kill-ring search-ring regexp-search-ring compile-history log-edit-comment-ring)
+        '(kill-ring search-ring regexp-search-ring log-edit-comment-ring shell-command-history last-kbd-macro)
         savehist-file "~/.emacs.d/savehist")
   (savehist-mode t)
 #+END_SRC
@@ -220,56 +375,54 @@ Configuration minimale (sans librairies externes)
   ;; copie du clipboard
   (autoload 'simpleclip-get-contents "simpleclip" nil t)
   (defun paste-from-x-clipboard()
-	"Paste string clipboard"
-	(interactive)
-	(insert (simpleclip-get-contents)))
+    "Paste string clipboard"
+    (interactive)
+    (insert (simpleclip-get-contents)))
   (global-set-key (kbd "S-<mouse-2>") 'paste-from-x-clipboard)
   ;; reverse pop kill ring
   (defun yank-pop-forwards (arg)
-	(interactive "p")
-	(yank-pop (- arg)))
+    (interactive "p")
+    (yank-pop (- arg)))
   (global-set-key (kbd "M-Y") 'yank-pop-forwards) ; M-Y (Meta-Shift-Y)
   ;; browse-kill-ring
   (autoload 'browse-kill-ring "browse-kill-ring" "" t)
   (global-set-key (kbd "C-x C-y") 'browse-kill-ring)
   (setq browse-kill-ring-highlight-current-entry t)
   (setq browse-kill-ring-highlight-inserted-item 'pulse)
-  ;; indent automatiquement au collage
-  (defadvice yank (after indent-region activate)
-	(if (member major-mode '(emacs-lisp-mode scheme-mode lisp-mode c-mode c++-mode
-											 objc-mode latex-mode plain-tex-mode));; python-mode))
-		(indent-region (region-beginning) (region-end) nil)))
-  (defadvice yank-pop (after indent-region activate)
-	(if (member major-mode '(emacs-lisp-mode scheme-mode lisp-mode c-mode c++-mode
-											 objc-mode latex-mode plain-tex-mode));; python-mode))
-		(indent-region (region-beginning) (region-end) nil)))
   ;; yank rectangle end-of-line
   (defun yank-rectangle-append-lines (&optional without-space)
-	"Yank each line of the current kill at the end of each subsequent line.
-	A space will be added between each line unless WITHOUT-SPACE which can
-	be passed in via a prefix arg."
-	(interactive "P")
-	(save-excursion
-	  (let ((lines (split-string (current-kill 0) "\n")))
-		(dolist (line lines)
-		  (goto-char (line-end-position))
-		  (unless without-space
-			(just-one-space))
-		  (insert line)
-		  (unless (zerop (forward-line))
-			(insert "\n"))))))
+    "Yank each line of the current kill at the end of each subsequent line.
+    A space will be added between each line unless WITHOUT-SPACE which can
+    be passed in via a prefix arg."
+    (interactive "P")
+    (save-excursion
+      (let ((lines (split-string (current-kill 0) "\n")))
+        (dolist (line lines)
+          (goto-char (line-end-position))
+          (unless without-space
+            (just-one-space))
+          (insert line)
+          (unless (zerop (forward-line))
+            (insert "\n"))))))
   ;; efface la ligne si la region est inactive
   (defadvice kill-region (before slick-cut activate compile)
-	"When called interactively with no active region, kill a single line instead."
-	(interactive
-	 (if mark-active (list (region-beginning) (region-end))
-	   (list (line-beginning-position)
-			 (line-beginning-position 2)))))
+    "When called interactively with no active region, kill a single line instead."
+    (interactive
+     (if mark-active (list (region-beginning) (region-end))
+       (list (line-beginning-position)
+             (line-beginning-position 2)))))
   ;; yank in overwrite-mode
   (defadvice yank (before yank-if-overwrite)
     (if (bound-and-true-p overwrite-mode)
         (delete-char (length (current-kill 0)))))
   (ad-activate 'yank)
+  ;; kill-word
+  (defun daedreth/kill-inner-word ()
+    "Kills the entire word your cursor is in. Equivalent to 'ciw' in vim."
+    (interactive)
+    (backward-word)
+    (kill-word 1))
+  (global-set-key (kbd "C-c k") 'daedreth/kill-inner-word)
 #+END_SRC
 ** buffers
 #+BEGIN_SRC emacs-lisp
@@ -336,6 +489,11 @@ Configuration minimale (sans librairies externes)
   (setq find-grep-options "-q -i")
   (setq grep-command "grep -nH -r --exclude-dir='svn' ")
 #+END_SRC
+** restart emacs
+*dépendances* [[https://github.com/iqbalansari/restart-emacs][restart-emacs]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'restart-emacs "restart-emacs" nil t)
+#+END_SRC
 * Centaur-tabs
 #+BEGIN_SRC emacs-lisp
   (require 'centaur-tabs)
@@ -343,17 +501,19 @@ Configuration minimale (sans librairies externes)
   (centaur-tabs-mode t)
   (global-set-key (kbd "C-<prior>")  'centaur-tabs-backward)
   (global-set-key (kbd "C-<next>") 'centaur-tabs-forward)
+  (global-set-key (kbd "C-S-<prior>")  'centaur-tabs-move-current-tab-to-left)
+  (global-set-key (kbd "C-S-<next>") 'centaur-tabs-move-current-tab-to-right)
   (global-set-key (kbd "M-+")  'centaur-tabs-backward-group)
   (global-set-key (kbd "M--") 'centaur-tabs-forward-group)
   (setq centaur-tabs-background-color (face-background 'default))
-  (setq centaur-tabs-height 22)
+  ;;(setq centaur-tabs-height 22)
   (setq centaur-tabs-style "box")
   (setq centaur-tabs-set-icons t)
   (setq centaur-tabs-set-modified-marker t)
-  ;; (setq centaur-tabs-modified-marker "`")
   (setq centaur-tabs-gray-out-icons 'buffer)
   (setq centaur-tabs-cycle-scope 'tabs)
   (setq centaur-tabs-set-bar 'over)
+  (setq centaur-tabs-icon-scale-factor 0.8)
   ;; exclude
   (defun centaur-tabs-hide-tab (x)
     (let ((name (format "%s" x)))
@@ -377,7 +537,6 @@ Configuration minimale (sans librairies externes)
                           org-agenda-mode
                           org-beamer-mode
                           org-indent-mode
-                          org-bullets-mode
                           org-cdlatex-mode
                           org-agenda-log-mode
                           diary-mode))
@@ -400,16 +559,16 @@ Collection of Emacs Development Environment Tools
   (global-ede-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode 1)
-  ;; (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode 1)
+  (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode 1)
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
   (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
   (add-to-list 'semantic-default-submodes 'global-srecode-minor-mode t)
   (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
   (setq semantic-load-turn-everything-on t)
-  ;; (semantic-mode) ;; Active le mode semantic
-  ;; (require 'stickyfunc-enhance) ;; multilines concatene dans la header line
-  ;; (require 'cedet-cscope)
+  ;;(semantic-mode) ;; Active le mode semantic
+  (require 'stickyfunc-enhance) ;; multilines concatene dans la header line
+  ;;(require 'cedet-cscope)
 #+END_SRC
 ** Initialize ECB
 *dépendances*: [[https://github.com/alexott/ecb/][ecb]]
@@ -430,6 +589,10 @@ Collection of Emacs Development Environment Tools
    (modify-syntax-entry ?. "w" text-mode-syntax-table)
    (modify-syntax-entry ?- "w" text-mode-syntax-table)
    (modify-syntax-entry ?~ "w" text-mode-syntax-table)
+   (add-hook 'text-mode-hook 'turn-on-auto-fill)
+   (defun auto-fill-hook ()
+     (auto-fill-mode 1)
+     (setq fill-column 72))
  #+END_SRC
 ** Dired
 *** Initialisation
@@ -457,34 +620,35 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   (defvar dired-sort-map (make-sparse-keymap))
   (define-key dired-mode-map "s" dired-sort-map)
+  (defvar sort-params)
   (defun dired-sort-by-size (arg)
     "sort by Size"
     (interactive "P")
     (if (null arg)
-        (setq params " -S")
-      (setq params " -Sr"))
-    (dired-sort-other (concat dired-listing-switches params)))
+        (setq sort-params " -S")
+      (setq sort-params " -Sr"))
+    (dired-sort-other (concat dired-listing-switches sort-params)))
   (defun dired-sort-by-extension (arg)
     "sort by eXtension"
     (interactive "P")
     (if (null arg)
-        (setq params " -X")
-      (setq params " -Xr"))
-    (dired-sort-other (concat dired-listing-switches params)))
+        (setq sort-params " -X")
+      (setq sort-params " -Xr"))
+    (dired-sort-other (concat dired-listing-switches sort-params)))
   (defun dired-sort-by-time (arg)
     "sort by Time"
     (interactive "P")
     (if (null arg)
-        (setq params " -t")
-      (setq params " -tr"))
-    (dired-sort-other (concat dired-listing-switches params)))
+        (setq sort-params " -t")
+      (setq sort-params " -tr"))
+    (dired-sort-other (concat dired-listing-switches sort-params)))
   (defun dired-sort-by-Name (arg)
     "sort by Name"
     (interactive "P")
     (if (null arg)
-        (setq params " -N")
-      (setq params " -Nr"))
-    (dired-sort-other (concat dired-listing-switches params)))
+        (setq sort-params " -N")
+      (setq sort-params " -Nr"))
+    (dired-sort-other (concat dired-listing-switches sort-params)))
   (define-key dired-sort-map "s" 'dired-sort-by-size)
   (define-key dired-sort-map "x" 'dired-sort-by-extension)
   (define-key dired-sort-map "t" 'dired-sort-by-time)
@@ -531,6 +695,19 @@ Collection of Emacs Development Environment Tools
   (define-key dired-mode-map (kbd "^") '(lambda () (interactive) (find-alternate-file "..")))
   ;; eww in dired
   (define-key dired-mode-map "e" (lambda () (interactive) (eww-open-file (dired-get-file-for-visit))))
+  ;; mouse
+  (defun dired-mouse-find-alternate-file (event)
+    "In dired, visit the file or directory you click on instead of the dired buffer."
+    (interactive "e")
+    (let (file)
+      (save-excursion
+        (set-buffer (window-buffer (posn-window (event-end event))))
+        (save-excursion
+          (goto-char (posn-point (event-end event)))
+          (setq file (dired-get-filename nil t))))
+      (select-window (posn-window (event-end event)))
+      (find-alternate-file (file-name-sans-versions file t))))
+  (define-key dired-mode-map [mouse-2] 'dired-mouse-find-alternate-file)
 #+END_SRC
 *** dired-isearch
 *dépendances*: [[http://www.emacswiki.org/emacs/dired-isearch.el][dired-isearch.el]]
@@ -544,6 +721,22 @@ Collection of Emacs Development Environment Tools
   (define-key dired-mode-map (kbd "C-r") 'dired-isearch-backward)
   (define-key dired-mode-map (kbd "ESC C-s") 'dired-isearch-forward-regexp)
   (define-key dired-mode-map (kbd "ESC C-r") 'dired-isearch-backward-regexp)
+  ;; ;; filtrer dired comme avec isearch
+  ;; (defun dired-filter-on-names(filter-regexp)
+  ;;   (interactive "s(only show matched):")
+  ;;   (let ((dired-marker-char 16)
+  ;;         (files (directory-files default-directory t)))
+  ;;     (save-excursion
+  ;;       (dolist (file files)
+  ;;         (when (and (dired-goto-file  (expand-file-name file))
+  ;;                    (not (string= "" filter-regexp))
+  ;;                    (string-match filter-regexp (file-name-nondirectory file)))
+  ;;           (dired-mark 1)
+  ;;           )))
+  ;;     (dired-toggle-marks)
+  ;;     (dired-do-kill-lines nil (concat "Filter:'" filter-regexp "' omitted %d line%s"))
+  ;;     (dired-move-to-filename)))
+  ;; (define-key dired-mode-map (kbd "f") 'dired-filter-on-names)
  #+END_SRC
 *** ediff sur deux fichiers marqués
 #+BEGIN_SRC emacs-lisp
@@ -609,7 +802,7 @@ Collection of Emacs Development Environment Tools
   (autoload 'peep-dired "peep-dired" nil t)
   (define-key dired-mode-map (kbd "P") 'peep-dired)
   (setq peep-dired-cleanup-on-disable t)
-  (setq peep-dired-ignored-extensions '("mkv" "iso" "mp4" "zip" "tgz" "doc" "docx" "pdf" "odt"))
+  (setq peep-dired-ignored-extensions '("mkv" "iso" "mp4" "zip" "tgz" "doc" "docx" "odt"))
 #+END_SRC
 *** image-dired
 *dépendances* [[https://github.com/mhayashi1120/Emacs-image-diredx][image-dired+]]
@@ -618,6 +811,7 @@ Collection of Emacs Development Environment Tools
   (eval-after-load 'image-dired+ '(image-diredx-async-mode 1))
   (setq image-dired-track-movement nil)
   ;; multiple dired-image
+  (defvar img-number)
   (defun my-image-dired (Dir)
     (interactive "DDir: ")
     (image-dired Dir)
@@ -626,45 +820,11 @@ Collection of Emacs Development Environment Tools
     (rename-buffer (concat "Image-Dired-" (int-to-string img-number)))
     (setq img-number (+ 1 img-number)))
 #+END_SRC
-*** rsync copy
-#+BEGIN_SRC emacs-lisp
-  (defun dired-copy-with-rsync (dest)
-    (interactive
-     (list
-      (expand-file-name
-       (read-file-name
-        "Rsync to:"
-        (dired-dwim-target-directory)))))
-    ;; store all selected files into "files" list
-    (let ((files (dired-get-marked-files
-                  nil current-prefix-arg))
-          ;; the rsync command
-          (tmtxt/rsync-command
-           "rsync -arvz --progress "))
-      ;; add all selected file names as arguments
-      ;; to the rsync command
-      (dolist (file files)
-        (setq tmtxt/rsync-command
-              (concat tmtxt/rsync-command
-                      (shell-quote-argument file)
-                      " ")))
-      ;; append the destination
-      (setq tmtxt/rsync-command
-            (concat tmtxt/rsync-command
-                    (shell-quote-argument dest)))
-      ;; run the async shell command
-      (async-shell-command tmtxt/rsync-command "*rsync*")
-      ;; finally, switch to that window
-      (other-window 1)))
-  (define-key dired-mode-map (kbd "M-c") 'dired-copy-with-rsync)
-#+END_SRC
 ** Org-Mode
 *** init
 *dépendances*: [[http://orgmode.org/][org-mode]] [[http://ditaa.sourceforge.net/][ditaa]]
 #+BEGIN_SRC emacs-lisp
   ;; initialisation
-  (add-to-list 'load-path "~/Outils/emacs/org-mode/org-8.3.4/lisp/")
-  (add-to-list 'load-path "~/Outils/emacs/org-mode/org-8.3.4/contrib/lisp/")
   (require 'org)
   (setq org-ellipsis " ••• ")
   (setq org-startup-indented t)
@@ -680,17 +840,23 @@ Collection of Emacs Development Environment Tools
   (setq org-cycle-separator-lines 0)
   (add-hook 'ediff-prepare-buffer-hook #'outline-show-all) ;; edif in org-mode
   (add-hook 'org-mode-hook (lambda ()
+                             (turn-off-auto-fill)
                              (global-set-key (kbd "s-<escape>") 'hide-sublevels)   ;; tout plier
                              (defadvice org-open-at-point (around org-open-at-point-choose-browser activate)
                                (let ((browse-url-browser-function 'browse-url-generic))
                                  ad-do-it))
                              (setq indent-tabs-mode nil)
                              (setq-local line-spacing '0.1)
-                             (setq-local company-minimum-prefix-length 5)))
+                             (setq-local company-minimum-prefix-length 5)
+                             ;; math-symbol
+                             (require 'xah-math-input)
+                             (xah-math-input-mode-on)))
   ;; bullets
-  (require 'org-bullets)
-  (setq org-bullets-bullet-list '("☯" "○" "✸" "✿" "~"))
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  ;; (require 'org-bullets)
+  ;; (setq org-bullets-bullet-list '("☯" "○" "✸" "✿" "◎" "☉" "◌" "◦"))
+  ;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (require 'org-superstar)
+  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
   ;; keywords
   (setq org-todo-keyword-faces
         (quote
@@ -707,18 +873,23 @@ Collection of Emacs Development Environment Tools
   (eval-after-load "org"
     '(progn
        (define-key org-mode-map (kbd "C-M-<return>") 'org-insert-heading-after-current)
-       (define-key org-mode-map (kbd "s-<tab>") 'outline-hide-subtree)
+       (define-key org-mode-map (kbd "S-<tab>") 'outline-hide-subtree)
        (define-key org-mode-map (kbd "C-c s") 'org-goto)
        (define-key org-mode-map (kbd "M-s-<up>") 'drag-stuff-up)
-       (define-key org-mode-map (kbd "M-s-<down>") 'drag-stuff-down)))
+       (define-key org-mode-map (kbd "M-s-<down>") 'drag-stuff-down)
+       (define-key org-mode-map (kbd "<S-C-up>") nil)
+       (define-key org-mode-map (kbd "<S-C-down>") nil)
+       (define-key org-mode-map (kbd "<S-C-right>") nil)
+       (define-key org-mode-map (kbd "<S-C-left>") nil)))
   ;; org-find-tag
   (push '(tags-tree . local) org-show-context-detail)
   (define-key org-mode-map (kbd "C-x r J") 'org-tags-sparse-tree)
   ;; org-template (<s TAB, <e TAB)
-  (setq org-structure-template-alist
-        '(("s" "#+BEGIN_SRC ?\n\n#+END_SRC" "<src lang=\"?\">\n\n</src>")
-          ("e" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC" "<src lang=\"emacs-lisp\">\n?\n</src>")))
-#+END_SRC
+  (add-to-list 'org-structure-template-alist
+               '("m" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC" "<src lang=\"emacs-lisp\">\n?\n</src>"))
+  ;; Variable-pitch support for org-mod
+  ;;(add-hook 'org-mode-hook 'org-variable-pitch-minor-mode)
+  #+END_SRC
 *** babel
 *dépendances* [[http://ditaa.sourceforge.net/][ditaa]] [[http://fr.plantuml.com/download.html][plantuml.jar]]
 #+BEGIN_SRC emacs-lisp
@@ -726,6 +897,7 @@ Collection of Emacs Development Environment Tools
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((shell . t)
+     (awk . t)
      (latex . t)
      (emacs-lisp . nil)
      (ditaa . t)
@@ -733,18 +905,18 @@ Collection of Emacs Development Environment Tools
      (plantuml . t)
      (calc . t)
      (gnuplot . t)
+     (R . t)
      (python . t)))
   ;; dita
-  (setq org-ditaa-jar-path "~/Outils/ditaa/ditaa0_9.jar")
+  (setq org-ditaa-jar-path "/home/logilab/Tools/ditaa/ditaa0_9.jar")
   ;; plantuml
-  (setq org-plantuml-jar-path "~/.emacs.d/plantuml/plantuml.jar")
-  ;; ipython
-  (add-to-list 'load-path "~/Outils/emacs/ob-ipython-master")
-  (require 'ob-ipython)
+  (setq org-plantuml-jar-path "/home/logilab/.emacs.d/plantuml/plantuml.jar")
   ;; don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)
   ;; display/update images in the buffer after I evaluate
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
+  ;; for elisp
+  (define-key org-mode-map (kbd "C-.") 'find-function)
 #+END_SRC
 *** export
 #+BEGIN_SRC emacs-lisp
@@ -782,20 +954,36 @@ Collection of Emacs Development Environment Tools
     (progn
       (next-line)
       (org-table-export (format "%s.csv" name) "orgtbl-to-csv")))))
+  ;; latex pdf
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (require 'ox-latex)
+              (add-to-list 'org-latex-classes
+                           '("djarticle"
+                             "\\documentclass{article}
+                             \\usepackage[utf8]{inputenc}
+                             \\usepackage[T1]{fontenc}
+                             \\usepackage{graphicx}
+                             \\usepackage{longtable}
+                             \\usepackage{hyperref}
+                             \\usepackage{natbib}
+                             \\usepackage{amssymb}
+                             \\usepackage{amsmath}
+                             \\usepackage{geometry}
+                             \\geometry{a4paper,left=2cm,top=2cm,right=2.5cm,bottom=2cm,marginparsep=7pt, marginparwidth=.6in}"
+                             ("\\section{%s}" . "\\section*{%s}")
+                             ("\\subsection{%s}" . "\\subsection*{%s}")
+                             ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                             ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                             ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+              ))
 #+END_SRC
 *** presentation
 *dépendances* [[https://github.com/marsmining/ox-twbs][ox-twbs]] [[https://github.com/takaxp/org-tree-slide][org-tree-slide]]
 #+BEGIN_SRC emacs-lisp
-  ;; org-tree-slide-mode
-  (eval-after-load "org-tree-slide"
-    '(progn
-       (global-set-key (kbd "<f8>") 'org-tree-slide-mode)
-       (global-set-key (kbd "S-<f8>") 'org-tree-slide-skip-done-toggle)
-       (org-tree-slide-presentation-profile)))
-  (autoload 'org-tree-slide-mode "org-tree-slide" nil t)
-  ;; ox-twbs
-  (autoload 'org-twbs-export-to-html "ox-twbs" nil t)
-  (defalias 'org-export 'org-twbs-export-to-html)
+  (autoload 'org-re-reveal-export-to-html-and-browse "org-re-reveal" "" t)
+  (setq org-re-reveal-root "file:///home/logilab/Tools/revealjs/reveal.js/")
+  (setq org-re-reveal-title-slide nil)
 #+END_SRC
 *** bloc generation
 #+BEGIN_SRC emacs-lisp
@@ -848,16 +1036,17 @@ Collection of Emacs Development Environment Tools
       (save-excursion
         (outline-previous-visible-heading 1)
         (org-show-subtree))))
-  (defadvice diff-hl-next-hunk (after unfold-tree activate)
-    (when (outline-invisible-p)
-      (save-excursion
-        (outline-previous-visible-heading 1)
-        (org-show-subtree))))
-  (defadvice undo-tree-undo (after unfold-tree activate)
-    (when (outline-invisible-p)
-      (save-excursion
-        (outline-previous-visible-heading 1)
-        (org-show-subtree))))
+#+END_SRC
+*** org-crypt
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load "org"
+      '(progn
+         (require 'org-crypt)
+         (org-crypt-use-before-save-magic)
+         (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+         (setq org-crypt-key nil)
+         ;;(setq epa-pinentry-mode 'loopback)
+         (define-key org-mode-map (kbd "M-?") 'org-decrypt-entry)))
 #+END_SRC
 ** Calendrier/Agenda
 *dépendances*: [[https://github.com/matthieucan/dotfiles/blob/master/emacs/.emacs.d/french-holidays.el][french-holidays.el]]
@@ -877,7 +1066,7 @@ Collection of Emacs Development Environment Tools
         ["janvier" "fevrier" "mars" "avril" "mai" "juin"
          "juillet" "aout" "septembre" "octobre" "novembre" "decembre"])
   ;; vacances
-  (require 'french-holidays)
+  (eval-after-load 'calendar '(require 'french-holidays))
   (setq calendar-holidays holiday-french-holidays)
   (setq mark-holidays-in-calendar t)
   (setq calendar-mark-holidays-flag t)
@@ -908,27 +1097,27 @@ Collection of Emacs Development Environment Tools
   (calendar-show-week t)
 #+END_SRC
 ** latex (auctex)
-*dépendances*: https://www.gnu.org/software/auctex/
+*dépendances*: [[https://www.gnu.org/software/auctex/][auctex]]
 #+BEGIN_SRC emacs-lisp
-  (when (locate-library "auctex.el")
-    (load "auctex.el" nil t t)
-    (load "preview-latex.el" nil t t)
-    (setq TeX-auto-save t)
-    (setq TeX-parse-self t)
-    (setq-default TeX-master nil)
-    (setq TeX-PDF-mode t))
+    (when (locate-library "auctex.el")
+      (load "auctex.el" nil t t)
+      (load "preview-latex.el" nil t t)
+      (setq TeX-auto-save t)
+      (setq TeX-parse-self t)
+      (setq-default TeX-master nil)
+      (setq TeX-PDF-mode t))
  #+END_SRC
 ** plantuml
 *dépendances*: [[https://github.com/zwz/plantuml-mode][plantuml-mode.el]] [[http://fr.plantuml.com/download.html][plantuml.jar]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'plantuml-mode "plantuml-mode" "" t)
   (add-to-list 'auto-mode-alist '("\\.uml\\'" . plantuml-mode))
-  (setq plantuml-jar-path "~/.emacs.d/plantuml/plantuml.jar")
+  (setq plantuml-jar-path "/home/logilab/.emacs.d/plantuml/plantuml.jar")
  #+END_SRC
 ** gnuplot
 *dépendances*: [[https://github.com/bruceravel/gnuplot-mode][gnuplot-mode]]
 #+Begin_SRC emacs-lisp
-  (setq gnuplot-program "/usr/local/bin/gnuplot")
+  (setq gnuplot-program "/usr/bin/gnuplot")
   (setq auto-mode-alist (append '(("\\.\\(gp\\|gnuplot\\)$" . gnuplot-mode)) auto-mode-alist))
   (autoload 'gnuplot-mode "gnuplot" "" t)
  #+END_SRC
@@ -953,9 +1142,9 @@ Collection of Emacs Development Environment Tools
 *dépendances*: [[https://github.com/defunkt/markdown-mode][markdown-mode.el]] [[https://github.com/skeeto/emacs-web-server][simple-httpd]] [[https://github.com/mola-T/flymd][flymd]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'markdown-mode "markdown-mode" "Major mode for editing Markdown files" t)
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   ;; preview in eww
   (autoload 'eww-mode "eww" "" t) ;; build-in
   (defun markdown-preview-eww ()
@@ -970,11 +1159,17 @@ Collection of Emacs Development Environment Tools
       (shr-render-buffer buf-html)
       (kill-buffer buf-html)))
   ;; live preview in firefox
-  (add-to-list 'load-path "~/.emacs.d/flymd/")
   (autoload 'flymd-flyit "flymd" nil t)
   (defalias 'markdown-live 'flymd-flyit)
   ;; Org-struct minor mode active in markdown mode.
   (add-hook 'markdown-mode-hook 'turn-on-orgstruct)
+  (add-hook 'markdown-mode-hook
+            (lambda ()
+              (setq fill-column 102)))
+  ;; pandoc
+  ;; (load "pandoc-mode")
+  ;; (add-hook 'markdown-mode-hook 'pandoc-mode)
+  ;; (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings)
 #+END_SRC
 ** RST
 #+BEGIN_SRC emacs-lisp
@@ -983,6 +1178,7 @@ Collection of Emacs Development Environment Tools
               (setq fill-column 102)
               (require 'sphinx-mode)
               (sphinx-mode)))
+  (autoload 'org-rst-export-to-rst "ox-rst")
 #+END_SRC
 ** eimp (manipulation d'image)
 *dépendances*: [[https://github.com/nicferrier/eimp][eimp.el]]
@@ -1006,16 +1202,35 @@ Collection of Emacs Development Environment Tools
   (require 'dotenv-mode)
   (add-to-list 'auto-mode-alist '("\\.env\\..*\\'" . dotenv-mode))
 #+END_SRC
+** pdf-tool
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/pdf-tools/lisp") ;;build/pdf-tools-0.90")
+  (load "~/.emacs.d/pdf-tools/lisp/pdf-occur")
+  (load "~/.emacs.d/pdf-tools/lisp/pdf-history")
+  (load "~/.emacs.d/pdf-tools/lisp/pdf-links")
+  (load "~/.emacs.d/pdf-tools/lisp/pdf-outline")
+  (load "~/.emacs.d/pdf-tools/lisp/pdf-annot")
+  (load "~/.emacs.d/pdf-tools/lisp/pdf-sync")
+  (require 'pdf-tools)
+  (pdf-tools-install)
+#+END_SRC
 * Minor-Modes and Helper Functions
 ** undo-tree
 *dépendances*: [[https://github.com/emacsmirror/undo-tree][undo-tree.el]]
 #+BEGIN_SRC emacs-lisp
   (require 'undo-tree)
   (global-undo-tree-mode 1)
-  (setq undo-tree-visualizer-timestamps t)
-  (setq undo-tree-visualizer-diff t)
   (setq undo-tree-auto-save-history 1)
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-enable-undo-in-region nil)
   (setq-default undo-tree-history-directory-alist (quote (("." . "~/.emacs-undo-files/"))))
+  (defun undo-toggle-diff ()
+    (interactive)
+    (if (equal undo-tree-visualizer-diff t)
+        (setq undo-tree-visualizer-diff nil)
+      (setq undo-tree-visualizer-diff t))
+    )
+  (global-set-key (kbd "C-c u") 'undo-toggle-diff)
 #+END_SRC
 ** FFAP amelioration
 #+BEGIN_SRC emacs-lisp
@@ -1046,25 +1261,23 @@ Collection of Emacs Development Environment Tools
                 (find-file (substitute-in-file-name path))
               (if (file-exists-p (concat path ".el"))
                   (find-file (concat path ".el"))
-                (if (file-exists-p (replace-regexp-in-string ":" "" path ))
-                    (find-file (replace-regexp-in-string ":" "" path ))
-                  (if (file-exists-p (replace-regexp-in-string "TRAVAIL" "DEBUG" path ))
-                      (find-file (replace-regexp-in-string "TRAVAIL" "DEBUG" path ))
-                    (if (file-exists-p (replace-regexp-in-string "TRAVAIL" "DEBUG" path ))
-                        (find-file (replace-regexp-in-string "TRAVAIL" "KEEP" path ))
-                      (if (file-exists-p (replace-regexp-in-string "$i" "0" path ))
-                          (find-file (replace-regexp-in-string "$i" "0" path ))
-                        (if (file-exists-p (concat "~/workspaces/proj1/trunk/" path))
-                            (find-file (concat "~/workspaces/proj1/trunk/" path))
-                          (if (file-exists-p (concat "~/workspaces/proj1/trunk/src/main" path))
-                              (find-file (concat "~/workspaces/proj1/trunk/src/main" path))
-                            (if (file-exists-p (concat "~/workspaces/PROJ3/" path))
-                                (find-file (concat "~/workspaces/PROJ3/" path))
-                              (if (file-exists-p (concat "~/workspaces/proj2/trunk/" path))
-                                  (find-file (concat "~/workspaces/proj2/trunk/" path))
+                (if (file-exists-p (replace-regexp-in-string ":.*" "" path ))
+                    (find-file (replace-regexp-in-string ":.*" "" path ))
+                  (if (file-exists-p (replace-regexp-in-string "$i" "0" path ))
+                      (find-file (replace-regexp-in-string "$i" "0" path ))
+                    (if (file-exists-p (replace-regexp-in-string "a/" "" path ))
+                        (find-file (replace-regexp-in-string "a/" "" path ))
+                      (if (file-exists-p (replace-regexp-in-string "b/" "" path ))
+                          (find-file (replace-regexp-in-string "b/" "" path ))
+                        (if (file-exists-p (concat "/home/logilab/workspaces/logilab/formation2" path))
+                            (find-file (concat "/home/logilab/workspaces/logilab/formation2" path))
+                          (if (file-exists-p (concat "/home/logilab/workspaces/" path))
+                              (find-file (concat "/home/logilab/workspaces/" path))
+                            (if (file-exists-p (concat "/home/logilab/workspaces/TYMPAN/code_Tympan_Logilab/" path))
+                                (find-file (concat "/home/logilab/workspaces/TYMPAN/code_Tympan_Logilab/" path))
                               (when (y-or-n-p (format "file doesn't exist: '%s'. Create?" path))
-                                (find-file path ))))))))))))))))
-    (forward-line (- (string-to-number line-number) 1)))
+                                (find-file path )))))))))))))))
+        (forward-line (- (string-to-number line-number) 1)))
   (global-set-key (kbd "C-<f1>") 'find-file-at-cursor-replace)
   ;; ffap avec la sourie (Ctrl click-droit)
   (global-set-key [S-mouse-3] 'ffap-at-mouse)
@@ -1176,26 +1389,6 @@ Collection of Emacs Development Environment Tools
         (isearch-update))
       (define-key isearch-mode-map (kbd "<backspace>") 'isearch-delete-something)
    #+END_SRC
-*** isearch-use-region
-#+BEGIN_SRC emacs-lisp
-  (defun region-as-string ()
-    (buffer-substring (region-beginning)
-                      (region-end)))
-  (defun isearch-forward-use-region ()
-    (interactive)
-    (when (region-active-p)
-      (add-to-history 'search-ring (region-as-string))
-      (deactivate-mark))
-    (call-interactively 'isearch-forward))
-  (global-set-key (kbd "C-S-s") 'isearch-forward-use-region)
-  (defun isearch-backward-use-region ()
-    (interactive)
-    (when (region-active-p)
-      (add-to-history 'search-ring (region-as-string))
-      (deactivate-mark))
-    (call-interactively 'isearch-backward))
-  (global-set-key (kbd "C-S-r") 'isearch-forward-use-region)
-#+END_SRC
 *** isearch-occur
 #+BEGIN_SRC emacs-lisp
   ;; occur a partir de la recherche
@@ -1204,21 +1397,6 @@ Collection of Emacs Development Environment Tools
     (interactive)
     (let ((case-fold-search isearch-case-fold-search))
       (occur (if isearch-regexp isearch-string (regexp-quote isearch-string)))))
-#+END_SRC
-*** occur dwim
-#+BEGIN_SRC emacs-lisp
-  (defun occur-dwim ()
-    "Call `occur' with a sane default."
-    (interactive)
-    (push (if (region-active-p)
-              (buffer-substring-no-properties
-               (region-beginning)
-               (region-end))
-            (let ((sym (thing-at-point 'symbol)))
-              (when (stringp sym)
-                (regexp-quote sym))))
-          regexp-history)
-    (call-interactively 'occur))
 #+END_SRC
 *** zap-to-char
 *dépendances*: [[https://github.com/cute-jumper/avy-zap][avy-zap.el]] [[https://github.com/thierryvolpiatto/zop-to-char][zop-to-char.el]]
@@ -1247,7 +1425,6 @@ Collection of Emacs Development Environment Tools
 *dépendances*: [[https://github.com/magnars/expand-region.el][expand-region]]
 #+BEGIN_SRC emacs-lisp
   ;; expand region
-  (add-to-list 'load-path "~/.emacs.d/expand-region.el-master")
   (autoload 'er/expand-region "expand-region" nil t)
   (global-set-key (kbd "C-@") 'er/expand-region)
   (global-set-key (kbd "C-M-@") 'er/contract-region)
@@ -1296,7 +1473,7 @@ Collection of Emacs Development Environment Tools
   (global-set-key (kbd "C-S-s-SPC") 'ediff-trees-examine-previous-regexp)
 #+END_SRC
 ** Buffer
-*** Revert-buffer
+*** Revert buffers
   #+BEGIN_SRC emacs-lisp
     ;; Revert-buffer
     (defun revert-all-buffers ()
@@ -1312,14 +1489,6 @@ Collection of Emacs Development Environment Tools
       (revert-buffer t t))
     (global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
  #+END_SRC
-*** Créer un scratch Buffer
-#+BEGIN_SRC emacs-lisp
-  ;; Creer un scratch buffer
-  (defun scratch-buffer nil
-    (interactive)
-    (switch-to-buffer (get-buffer-create "*scratch*"))
-    (text-mode))
-#+END_SRC
 *** Recentf
 *dépendances*: [[https://github.com/emacsmirror/recentf-ext][recentf-ext.el]]
 #+BEGIN_SRC emacs-lisp
@@ -1332,23 +1501,52 @@ Collection of Emacs Development Environment Tools
   (setq recentf-auto-cleanup 'never)
   (run-at-time nil (* 25 60) 'recentf-save-list) ;; save list every 25 minutes
   (recentf-mode 1)
-  (require 'recentf-ext)
+  ;;(autoload 'recentf-open-files "recentf-ext")
   (add-to-list 'recentf-exclude "\\.emacs-persistent\\'")
   (add-to-list 'recentf-exclude "\\.elc\\'")
   (add-to-list 'recentf-exclude "\\@\\'")
   (add-to-list 'recentf-exclude "\\TAGS\\'")
   (add-to-list 'recentf-exclude ".pyc")
   (add-to-list 'recentf-exclude "~$")
-  (add-to-list 'recentf-exclude "\\.recentf\\'")
+  (add-to-list 'recentf-exclude "\\recentf\\'")
   (global-set-key (kbd "M-r") 'recentf-open-files)
-  ;; reouvrir le dernier fichier tué
-  (defun undo-kill-buffer ()
+  ;; gérer les répertoires
+  (defun recentd-track-opened-file ()
+    "Insert the name of the directory just opened into the recent list."
+    (and (derived-mode-p 'dired-mode) default-directory
+         (recentf-add-file default-directory)) nil)
+  (defun recentd-track-closed-file ()
+    "Update the recent list when a dired buffer is killed.
+  That is, remove a non kept dired from the recent list."
+    (and (derived-mode-p 'dired-mode) default-directory
+         (recentf-remove-if-non-kept default-directory)))
+  (add-hook 'dired-after-readin-hook 'recentd-track-opened-file)
+  (add-hook 'kill-buffer-hook 'recentd-track-closed-file)
+  ;; reouvrir le dernier fichier tué à la bonne ligne
+  (require 'saveplace)
+  (defun always-save-place-to-alist ()
+    (let ((save-place t))
+      (save-place-to-alist)))
+  (add-hook 'kill-buffer-hook #'always-save-place-to-alist)
+  (defun restore-save-place ()
+    (save-place-find-file-hook)
+    (setq save-place nil))
+  (defvar killed-buffer-list nil
+    "List of recently killed files.")
+  (defun add-file-to-killed-file-list ()
+    "If buffer is associated with a file name, add that file to the
+     `killed-file-list' when killing the buffer."
+    (when buffer-file-name
+      (push buffer-file-name killed-buffer-list)))
+  (add-hook 'kill-buffer-hook #'add-file-to-killed-file-list)
+  (defun reopen-killed-file ()
+    "Reopen the most recently killed file, if one exists."
     (interactive)
-    (let ((active-files (loop for buf in (buffer-list)
-                              when (buffer-file-name buf) collect it)))
-      (loop for file in recentf-list
-            unless (member file active-files) return (find-file file))))
-  (global-set-key (kbd "C-x K") 'undo-kill-buffer)
+    (when killed-buffer-list
+      (find-file (pop killed-buffer-list))
+      (restore-save-place)
+      ))
+  (global-set-key (kbd "C-x K") 'reopen-killed-file)
   ;; iterer entre les 2 buffers les plus récemment ouverts
   (defun switch-to-recent-buffer ()
     (interactive)
@@ -1389,36 +1587,6 @@ Collection of Emacs Development Environment Tools
              (lambda ()
                (ibuffer-switch-to-saved-filter-groups "default")))
  #+END_SRC
-*** Suprimer tous les buffer du mode courant
-#+BEGIN_SRC emacs-lisp
-	(defun kill-current-mode-buffers ()
-	  "Kill all buffers that major mode same with current mode."
-	  (interactive)
-	  (kill-special-mode-buffers-internal major-mode))
-	(defun kill-current-mode-buffers-except-current ()
-	  "Kill all buffers that major mode same with current mode.
-	And don't kill current buffer."
-	  (interactive)
-	  (kill-special-mode-buffers-internal major-mode t))
-	(defun kill-special-mode-buffers-internal (mode &optional except-current-buffer)
-	  "Kill all buffers that major MODE same with special.
-	If option EXCEPT-CURRENT-BUFFER is `non-nil',
-	kill all buffers with MODE except current buffer."
-	  (interactive)
-	  (let ((current-buf (current-buffer))
-			(count 0))
-		(dolist (buffer (buffer-list))
-		  (set-buffer buffer)
-		  (when (and (equal major-mode mode)
-					 (or (not except-current-buffer)
-						 (not (eq current-buf buffer))))
-			(incf count)
-			(kill-buffer buffer)))
-		(message "Killed %s buffer%s" count (if (> count 1) "s" ""))))
-	;; raccourcis
-  (global-set-key (kbd "C-x C-k k") 'kill-current-mode-buffers-except-current)
-  (global-set-key (kbd "C-x C-k K") 'kill-current-mode-buffers)
-#+END_SRC
 ** Minibuffer
 *** miniedit
 *dépendances*: [[https://github.com/emacsmirror/miniedit][miniedit.el]]
@@ -1434,12 +1602,14 @@ Collection of Emacs Development Environment Tools
     ;; Completion minibuffer
     (interactive)
     (backward-char 3)
-    (setq found t)
+    (defvar found t)
     (cond
      ((looking-at "hom") (setq directory "~/"))
      ((looking-at "doc") (setq directory "~/doc/"))
      ((looking-at "dev") (setq directory "~/dev/"))
-     ((looking-at "pr1") (setq directory "~/workspaces/proj1/trunk/"))
+     ((looking-at "for") (setq directory "~/workspaces/logilab/formation2"))
+     ((looking-at "aff") (setq directory "~/workspaces/logilab/affaires"))
+     ((looking-at "too") (setq directory "~/Tools"))
      ((looking-at "lis") (setq directory "~/.emacs.d/lisp/"))
      (t (setq found nil)))
     (cond (found (end-of-line)
@@ -1457,17 +1627,6 @@ Collection of Emacs Development Environment Tools
 #+END_SRC
 ** Impression
 #+BEGIN_SRC emacs-lisp
-  ;; redefine `ps-print-buffer' to save to file and invoke the viewer on it
-  (defadvice ps-print-buffer (around my/ps-print-buffer activate)
-    (interactive "P")
-    (if filename
-        ;; do std Emacs print-to-file
-        ad-do-it
-      ;; else print to temp file and display that
-      (let ((outfile (make-temp-file "emacs-ps-print-" nil ".ps")))
-        (setq filename outfile)
-        ad-do-it
-        (start-process "printing" " *Printing*" "evince" outfile))))
   ;; imprimier en pdf
   (defun print-to-pdf ()
     (interactive)
@@ -1476,7 +1635,7 @@ Collection of Emacs Development Environment Tools
     (switch-to-buffer "*PostScript*")
     (write-file "/tmp/tmp.ps")
     (kill-buffer "tmp.ps")
-    (setq cmd (concat "ps2pdf14 /tmp/tmp.ps /tmp/" (buffer-name) ".pdf"))
+    (defvar cmd (concat "ps2pdf14 /tmp/tmp.ps /tmp/" (buffer-name) ".pdf"))
     (shell-command cmd)
     (shell-command "rm /tmp/tmp.ps")
     (message (concat "Saved to:  /tmp/" (buffer-name) ".pdf")))
@@ -1517,17 +1676,16 @@ Collection of Emacs Development Environment Tools
                  (set-buffer obuf)
                  (kill-buffer kbuf))))
       (add-to-list 'auto-mode-alist (cons file-regexp mode-command))))
-  (define-trivial-mode "xls" "\\.xls$" "oocalc")
-  (define-trivial-mode "xlsx" "\\.xlsx$" "oocalc")
-  (define-trivial-mode "ods" "\\.ods$" "oocalc")
-  (define-trivial-mode "odt" "\\.odt$" "oowriter")
-  (define-trivial-mode "doc" "\\.doc$" "oowriter")
-  (define-trivial-mode "docx" "\\.docx$" "oowriter")
-  (define-trivial-mode "ppt" "\\.ppt$" "ooimpress")
-  (define-trivial-mode "pptx" "\\.pptx$" "ooimpress")
-  (define-trivial-mode "odp" "\\.odp$" "ooimpress")
-  (define-trivial-mode "pdf" "\\.pdf$" "xpdf")
-  (define-trivial-mode "pdf" "\\.PDF$" "xpdf")
+  (define-trivial-mode "xls" "\\.xls$" "libreoffice")
+  (define-trivial-mode "xlsx" "\\.xlsx$" "libreoffice")
+  (define-trivial-mode "ods" "\\.ods$" "libreoffice")
+  (define-trivial-mode "odt" "\\.odt$" "libreoffice")
+  (define-trivial-mode "odt" "\\.odg$" "libreoffice")
+  (define-trivial-mode "doc" "\\.doc$" "libreoffice")
+  (define-trivial-mode "docx" "\\.docx$" "libreoffice")
+  (define-trivial-mode "ppt" "\\.ppt$" "libreoffice")
+  (define-trivial-mode "pptx" "\\.pptx$" "libreoffice")
+  (define-trivial-mode "odp" "\\.odp$" "libreoffice")
 #+END_SRC
 ** Gestion Fenetres
 *** taille
@@ -1541,10 +1699,10 @@ Collection of Emacs Development Environment Tools
 *** selection
 #+BEGIN_SRC emacs-lisp
   ;; windmove
-  (global-set-key (kbd "s-<left>") 'windmove-left)
-  (global-set-key (kbd "s-<right>") 'windmove-right)
-  (global-set-key (kbd "s-<down>") 'windmove-down)
-  (global-set-key (kbd "s-<up>") 'windmove-up)
+  ;; (global-set-key (kbd "s-<left>") 'windmove-left)
+  ;; (global-set-key (kbd "s-<right>") 'windmove-right)
+  ;; (global-set-key (kbd "s-<down>") 'windmove-down)
+  ;; (global-set-key (kbd "s-<up>") 'windmove-up)
 #+END_SRC
 *** Echanger les fenetres
 #+BEGIN_SRC emacs-lisp
@@ -1581,7 +1739,7 @@ Collection of Emacs Development Environment Tools
 ** Gestion Fichiers
 *** Renomer le fichier courant
 #+BEGIN_SRC emacs-lisp
-  (defun rename-current-buffer-file ()
+  (defun rename-current-file-and-buffer ()
     "Renames current buffer and file it is visiting."
     (interactive)
     (let ((name (buffer-name))
@@ -1664,22 +1822,36 @@ Collection of Emacs Development Environment Tools
 *** Ispell
 #+BEGIN_SRC emacs-lisp
   (setq-default ispell-program-name "aspell")
-  (ispell-change-dictionary "francais")
-  (setq ispell-personal-dictionary "~/.emacs.d/.ispell-dico-perso_fr")
+  (setq ispell-local-dictionary "english")
+  (ispell-change-dictionary "english")
+  (setq ispell-personal-dictionary "~/.emacs.d/.ispell-dico-perso_en")
   (setq ispell-silently-savep t)
   (setq ispell-skip-sgml t)
   (add-to-list 'ispell-skip-region-alist '("\\[\\[" . "\\]\\]"))
-  ;; francais ou English
-  (defun toggleDictionary ()
+  (defun toggleDictionary()
     (interactive)
-    (if (string= ispell-local-dictionary "english")
-        (progn
-          (ispell-change-dictionary "francais")
-          (setq ispell-personal-dictionary "~/.emacs.d/.ispell-dico-perso_fr"))
-      (progn
-        (ispell-change-dictionary "english")
-        (setq ispell-personal-dictionary "~/.emacs.d/.ispell-dico-perso_en"))))
+    (let* ((dic ispell-current-dictionary)
+           (change (if (string= dic "francais") "english" "francais")))
+      (ispell-change-dictionary change)
+      (if (string= ispell-local-dictionary "english")
+          (setq ispell-personal-dictionary "~/.emacs.d/.ispell-dico-perso_en")
+        (setq ispell-personal-dictionary "~/.emacs.d/.ispell-dico-perso_fr"))
+      (message "Dictionary switched from %s to %s" dic change)
+      ))
   (global-set-key (kbd "s-$") 'toggleDictionary)
+  ;; ;; ;; francais ou English
+  ;; (defun toggleDictionary ()
+  ;;   (interactive)
+  ;;   (if (string= ispell-local-dictionary "english")
+  ;;       (progn
+  ;;         (ispell-change-dictionary "fr")
+  ;;         (setq ispell-local-dictionary "fr")
+  ;;         (setq ispell-personal-dictionary "~/.emacs.d/.ispell-dico-perso_fr"))
+  ;;     (progn
+  ;;       (ispell-change-dictionary "en")
+  ;;         (setq ispell-local-dictionary "en")
+  ;;       (setq ispell-personal-dictionary "~/.emacs.d/.ispell-dico-perso_en"))))
+  ;; (global-set-key (kbd "s-$") 'toggleDictionary)
   ;; corrige et retient
   (defun endless/ispell-word-then-abbrev (p)
     "Corrige le mot précédent et le rajoute dans les abbreviations"
@@ -1714,66 +1886,27 @@ Collection of Emacs Development Environment Tools
 *** languageTool (correction grammaticale)
 *dépendances*: [[https://github.com/mhayashi1120/Emacs-langtool][langtool.el]]
 #+BEGIN_SRC emacs-lisp
-  (setq langtool-java-bin "/COTS/java/bin/java")
-  (setq langtool-language-tool-jar "~/.emacs.d/LanguageTool-3.1-SNAPSHOT/languagetool-commandline.jar")
-  (setq langtool-default-language "fr")
-  (setq langtool-mother-tongue "fr")
-  (setq langtool-process-coding-system 'iso-8859-1)
-  (autoload 'langtool-check-buffer "langtool" "" t)
-  (setq langtool-keyboard-prefix (kbd "C-c l"))
-  (global-set-key (kbd "C-c l l") 'langtool-check-buffer)
-  (global-set-key (kbd "C-c l c") 'langtool-correct-buffer)
-  (global-set-key (kbd "C-c l d") 'langtool-check-done)
+  ;; (setq langtool-java-bin "/COTS/java/bin/java")
+  ;; (setq langtool-language-tool-jar "~/Outils/emacs/LanguageTool/languagetool-master/languagetool-standalone/target/LanguageTool-3.1-SNAPSHOT/LanguageTool-3.1-SNAPSHOT/languagetool-commandline.jar")
+  ;; (setq langtool-default-language "fr")
+  ;; (setq langtool-mother-tongue "fr")
+  ;; (autoload 'langtool-check-buffer "langtool" "" t)
+  ;; (setq langtool-keyboard-prefix (kbd "C-c l"))
+  ;; (setq langtool-process-coding-system 'iso-8859-1)
+  ;; (global-set-key (kbd "C-c l l") 'langtool-check-buffer)
+  ;; (global-set-key (kbd "C-c l c") 'langtool-correct-buffer)
+  ;; (global-set-key (kbd "C-c l d") 'langtool-check-done)
  #+END_SRC
 *** verbiste (conjugaison)
 *dépendances* [[https://github.com/daimrod/Emacs-config/blob/master/elisp/verbiste.el][verbiste.el]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'verbiste "verbiste" nil t)
-  (global-set-key (kbd "s-v") 'verbiste)
+  ;;(global-set-key (kbd "s-v") 'verbiste)
+  (defalias 'conjugaison 'verbiste)
  #+END_SRC
-*** traduction
-*dépendances* [[https://github.com/atykhonov/google-translate][google-translate]]
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/Outils/emacs/google-translate-master")
-  (require 'google-translate)
-  (require 'google-translate-smooth-ui)
-  (global-set-key "\C-ct" 'google-translate-smooth-translate)
-  (setq google-translate-translation-directions-alist
-      '(("fr" . "en") ("en" . "fr") ("de" . "fr")))
-  (setq google-translate-default-target-language "fr")
-#+END_SRC
-** multiple cursor
-*dépendances*: [[https://github.com/magnars/multiple-cursors.el][multiple-cursors.el]]
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/multiple-cursors.el-master")
-  (autoload 'mc/edit-lines "mc-edit-lines" "" t)
-  (autoload 'mc/mark-next-like-this "mc-mark-more" "" t)
-  (autoload 'mc/mark-previous-like-this "mc-mark-more" "" t)
-  (autoload 'mc/mark-all-like-this "mc-mark-more" "" t)
-  (autoload 'mc/add-cursor-on-click "multiple-cursors" "" t)
-  (global-set-key (kbd "C-c c") 'mc/edit-lines)
-  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-  (global-set-key (kbd "C-S-<mouse-1>") 'mc/add-cursor-on-click) ;; C-Maj-<left-clic>
- #+END_SRC
-** Trees
-*** neotree
-*dépendances*: [[https://github.com/jaypei/emacs-neotree][neo-tree]]
-#+BEGIN_SRC emacs-lisp
-  (autoload 'neotree "neotree" "" t)
-  (setq neo-window-width 50)
-  (setq neo-persist-show nil)
-  (global-set-key (kbd "C-x j") 'neotree)
-  (eval-after-load "noetree"
-    '(progn
-       (define-key neotree-mode-map (kbd "i") #'neotree-enter-horizontal-split)
-       (define-key neotree-mode-map (kbd "I") #'neotree-enter-vertical-split)))
- #+END_SRC
-*** ztree
+** ztree
 *dépendances* [[https://github.com/fourier/ztree][ztree]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/ztree-master")
   (autoload 'ztree-diff "ztree" nil "")
   (autoload 'ztree-dir "ztree" nil "")
  #+END_SRC
@@ -1781,38 +1914,13 @@ Collection of Emacs Development Environment Tools
 *** Firefox
 #+BEGIN_SRC emacs-lisp
   ;; firefox comme navigateur web par defaut
-  (setq browse-url-generic-program (executable-find "firefox")
+  (setq browse-url-generic-program "/home/logilab/Tools/firefox/firefox/firefox"
         browse-url-browser-function 'browse-url-generic)
-  ;; Ouvrir une adresse dans firefox
-  (defun browse-url-firefox-new-tab (url &optional new-window)
-    "Open URL in a new tab in Firefox."
-    (interactive (browse-url-interactive-arg "URL: "))
-    (let ((cmd (shell-command-to-string
-                (concat "~/src/firefox/mozilla-xremote-client -a any 'openURL("
-                        url ",new-tab)'"))))
-      (unless (string= "" cmd)
-        (message "Starting Firefox...")
-        (start-process (concat "firefox " url) nil "/usr/bin/firefox" url)
-        (message "Starting Firefox...done"))))
-  ;; Mes marques page pret a ce lancer dans firefox
-  (defun firefox-tab-open (address)
-    (interactive
-     (list
-      (completing-read "Page: " '("duckduckgo" "memo" "listServices" "tisseo" "pythonPackages"))))
-     (insert address)
-    (cond
-     ((equal address "duckduckgo") (browse-url-firefox-new-tab "https://duckduckgo.com"))
-     ((equal address "memo") (browse-url-firefox-new-tab "http://djangoliv.alwaysdata.net/memos/"))
-     ((equal address "listServices") (browse-url-firefox-new-tab "http://localhost/axis2/services/listServices"))
-     ((equal address "pythonPackages") (browse-url-firefox-new-tab "https://pypi.python.org/pypi/"))
-     ((equal address "tisseo") (browse-url-firefox-new-tab "http://www.tisseo.fr/"))))
-  (global-set-key (kbd "s-f") 'firefox-tab-open) ; Mapper sur la touche windows + f
  #+END_SRC
 ** Completion
   #+BEGIN_SRC emacs-lisp
         ;; completion tuning
         (setq dabbrev-abbrev-skip-leading-regexp "[<>=\"/\\:]'")
-        ;;(setq dabbrev-abbrev-skip-leading-regexp "[<>=\"/]" t)
         (global-set-key (kbd "s-/") 'dabbrev-expand)
         (defconst dabbrev-always-check-other-buffers t) ;; ???
         (defconst dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
@@ -1845,12 +1953,6 @@ Collection of Emacs Development Environment Tools
   (autoload 'puppet-mode "puppet-mode" nil t)
   (add-to-list 'auto-mode-alist '("\\.pp$" . puppet-mode))
 #+END_SRC
-** epub
-*dépendances*: [[https://github.com/girzel/epub-mode][epub-mode.el]]
-#+BEGIN_SRC emacs-lisp
-  (autoload 'epub-mode "epub-mode" nil t)
-  (add-to-list 'auto-mode-alist '(".epub\\'" . epub-mode))
-#+End_SRC
 ** wrap-region
 *dépendances*: [[https://github.com/rejeep/wrap-region.el][wrap-region.el]]
 #+BEGIN_SRC emacs-lisp
@@ -1864,19 +1966,9 @@ Collection of Emacs Development Environment Tools
   (wrap-region-add-wrapper "~" "~" nil 'org-mode)
   (wrap-region-add-wrapper "_" "_" nil 'org-mode)
   (wrap-region-add-wrapper "+" "+" nil 'org-mode)
-  (wrap-region-add-wrapper "float(" ")" "f" 'python-mode)
-  (wrap-region-add-wrapper "str(" ")" "s" 'python-mode)
-  (wrap-region-add-wrapper "int(" ")" "i" 'python-mode)
-  (wrap-region-add-wrapper "round(" ")" "r" 'python-mode)
   ;; unwrap
   (defalias 'unwrap-region 'delete-pair)
   (global-set-key (kbd "M-\"") 'unwrap-region)
-#+End_SRC
-** stripe-buffer
-*dépendances*: [[https://github.com/sabof/stripe-buffer][stripe-buffer.el]]
-#+BEGIN_SRC emacs-lisp
-  (autoload 'turn-on-stripe-buffer-mode "stripe-buffer" "" t)
-  (add-hook 'dired-mode-hook 'turn-on-stripe-buffer-mode)
 #+End_SRC
 ** Tramp
 #+BEGIN_SRC emacs-lisp
@@ -1888,43 +1980,14 @@ Collection of Emacs Development Environment Tools
   (setq tramp-persistency-file-name "/tmp/.tramp")
   ;; se souviens du mot de passe ~/.authinfo.gpg
   (setq password-cache-expiry nil)
-  ;; conection to machine02
-  (defun connect-nachine02 ()
-    (interactive)
-    (dired "/user@machine02:~/Appli/trunk/"))
-  ;; revert
-  (defun revert-buffer-with-user ()
-    (interactive)
-    (setq theLine (line-number-at-pos))
-    (let ((f (buffer-file-name)))
-      (when f
-        (let ((content (when (buffer-modified-p)
-                         (widen)
-                         (buffer-string))))
-          (revert-buffer)
-          (kill-buffer (current-buffer))
-          (find-file (concat "/user@localhost:" f))
-          (when content
-            (let ((buffer-read-only nil))
-              (erase-buffer)
-              (insert content))))))
-    (forward-line (- theLine 1)))
-  (global-set-key (kbd "s-C-a") 'revert-buffer-with-user)
-  ;; ouvir un fichier en tant que user
-  (defun user-find-file (file)
-    "Opens FILE with user privileges."
-    (interactive "FFind file: ")
-    (set-buffer
-     (find-file (concat "/user@localhost:" (expand-file-name file)))))
-  (global-set-key (kbd "s-a") 'user-find-file)
   ;; ouvrir un fichier en sudo
   (defun sudo-find-file (file)
     "Opens FILE with root privileges."
     (interactive "FFind file: /sudo::")
     (set-buffer
      (find-file (concat "/sudo::" (expand-file-name file)))))
-  (global-set-key (kbd "s-r") 'sudo-find-file)
-  (set-default 'tramp-default-proxies-alist (quote (("user" "djangoliv" "/ssh:%h:"))))
+  ;;(global-set-key (kbd "s-r") 'sudo-find-file)
+  (set-default 'tramp-default-proxies-alist (quote (("logilab" "sag" "djangoliv" "/ssh:%h:"))))
   ;; ouvrir un fichier distant en sudo
   (defun sudo-remote-find-file (file)
     "Opens repote FILE with root privileges."
@@ -1934,7 +1997,7 @@ Collection of Emacs Development Environment Tools
     (set-buffer
      (find-file (format "%s" (concat begin "|sudo:root@" end)))))
   ;; refresh as sudo
-  (defun revert-sudo ()
+  (defun sudo-revert ()
     (interactive)
     (setq theLine (line-number-at-pos))
     (let ((f (buffer-file-name)))
@@ -1950,29 +2013,13 @@ Collection of Emacs Development Environment Tools
               (erase-buffer)
               (insert content))))))
     (forward-line (- theLine 1)))
-  (global-set-key (kbd "s-C-r") 'revert-sudo)
-#+END_SRC
-** Tiny-expand
-*dépendances* [[https://github.com/abo-abo/tiny][tiny.el]]
-#+BEGIN_SRC emacs-lisp
-(autoload 'tiny-expand "tiny" nil t)
 #+END_SRC
 ** Vrac
-*** restart emacs
-*dépendances* [[https://github.com/iqbalansari/restart-emacs][restart-emacs]]
-#+BEGIN_SRC emacs-lisp
-  (autoload 'restart-emacs "restart-emacs" nil t)
-  (global-set-key (kbd "C-x M-c") 'restart-emacs)
-#+END_SRC
-*** toogle emacs size
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-z") 'toggle-frame-maximized)
-#+END_SRC
 *** palette and eyedropper
 *dépendances*: [[https://github.com/emacsmirror/emacswiki.org/blob/master/palette.el][palette.el]] [[https://github.com/emacsmirror/emacswiki.org/blob/master/eyedropper.el][eyedropper]]
 #+BEGIN_SRC emacs-lisp
 (autoload 'palette "palette" nil t)
-(require 'eyedropper)
+;;(require 'eyedropper)
 #+END_SRC
 *** Byte-compile
 #+BEGIN_SRC emacs-lisp
@@ -1982,15 +2029,6 @@ Collection of Emacs Development Environment Tools
     (interactive)
     (byte-compile-file (buffer-file-name)))
   (global-set-key (kbd "s-b") 'byte-compile-current-file)
-#+END_SRC
-*** Goto percent
-#+BEGIN_SRC emacs-lisp
-  ;; goto-percent
-  (defun goto-percent (percent)
-    "Goto PERCENT of buffer."
-    (interactive "nGoto percent: ")
-    (goto-char (/ (* percent (point-max)) 100)))
-  (global-set-key (kbd "M-g p") 'goto-percent)
 #+END_SRC
 *** dos2unix
 #+BEGIN_SRC emacs-lisp
@@ -2004,11 +2042,11 @@ Collection of Emacs Development Environment Tools
       (replace-match "" nil nil))
     (set-buffer-file-coding-system 'unix 't))
   ;; Conversion des fins de lignes du format Unix au format MS-DOS (retour chariot)
-  (defun unix2dos ()
-    (interactive)
-    (save-excursion
-      (goto-char (point-min))
-      (while (search-forward "\n" nil t) (replace-match "\r\n"))))
+  ;; (defun unix2dos ()
+  ;;   (interactive)
+  ;;   (save-excursion
+  ;;     (goto-char (point-min))
+  ;;     (while (search-forward "\n" nil t) (replace-match "\r\n"))))
 #+END_SRC
 *** Smart home bouton
 #+BEGIN_SRC emacs-lisp
@@ -2042,16 +2080,6 @@ Collection of Emacs Development Environment Tools
       (set-marker e nil)))
   (global-set-key (kbd "C-M-;") 'comment-box) ;;-line)
  #+END_SRC
-*** Comment todo
-#+BEGIN_SRC emacs-lisp
-  (defun todo-comment ()
-    "Inserts an empty TODO comment or makes an existing comment into a TODO."
-    (interactive)
-    (when (not (region-active-p))
-      (comment-dwim nil)
-      (unless (equal (current-word) "TODO") (insert "TODO: "))))
-  (global-set-key (kbd "s-;") 'todo-comment)
-#+END_SRC
 *** Insert-date
 #+BEGIN_SRC emacs-lisp
   ;; insertion de la date
@@ -2073,19 +2101,6 @@ Collection of Emacs Development Environment Tools
           (set-window-hscroll (selected-window) (- cur mid)))))
   (global-set-key (kbd "C-S-l") 'horizontal-recenter)
 #+END_SRC
-*** Save Macro
-#+BEGIN_SRC emacs-lisp
-  ;; sauver la derniere macro
-  (defun save-macro-to-dot-emacs (name)
-    (interactive "SSave Macro as: ")
-    (name-last-kbd-macro name)
-    (save-excursion
-      (find-file-literally "~/.emacs")
-      (goto-char (point-max))
-      (insert "\n\n;; Saved macro\n")
-      (insert-kbd-macro name)
-      (insert "\n")))
-  #+END_SRC
 *** Remove duplicate lines
 #+BEGIN_SRC emacs-lisp
   ;; effacer les lignes dupliquees
@@ -2099,7 +2114,7 @@ Collection of Emacs Development Environment Tools
               (goto-char start)
               (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
           (replace-match "\\1\n\\2")))))
-  (defun uniquify-all-lines-buffer ()
+  (defun remove-duplicate-lines ()
     "Delete duplicate lines in buffer and keep first occurrence."
     (interactive "*")
     (uniquify-all-lines-region (point-min) (point-max)))
@@ -2107,54 +2122,30 @@ Collection of Emacs Development Environment Tools
 *** increment/decrement numbers
 *dépendances*: [[https://github.com/alezost/shift-number.el][shift-number]]
 #+BEGIN_SRC emacs-lisp
-    ;; increment region
-    (defun increment-progressively-numbers-in-region (start end arg)
-      (interactive "r\np")
-      (increment-numbers-in-region start end arg arg))
-    (defun increment-numbers-in-region (start end arg &optional progressive-increment)
-      (interactive "r\np")
-      (goto-char start)
-      (let ((increment (or arg 1))
-            (progressive-increment (or progressive-increment 0))
-            (previous-line-number (line-number-at-pos)))
-        (while
-            (re-search-forward "[0-9]+" end t)
-          (when (> (line-number-at-pos) previous-line-number)
-            (setq increment (+ increment progressive-increment))
-            (setq previous-line-number (line-number-at-pos)))
-          (let ((incremented-string (int-to-string (+ increment (string-to-number (match-string 0))))))
-            ;; If incremented string and original match differ in length, update end point
-            (setq end (+ end (- (length incremented-string) (length (match-string 0)))))
-            (replace-match incremented-string)))))
+  ;; increment region
+  (defun increment-progressively-numbers-in-region (start end arg)
+    (interactive "r\np")
+    (increment-numbers-in-region start end arg arg))
+  (defun increment-numbers-in-region (start end arg &optional progressive-increment)
+    (interactive "r\np")
+    (goto-char start)
+    (let ((increment (or arg 1))
+          (progressive-increment (or progressive-increment 0))
+          (previous-line-number (line-number-at-pos)))
+      (while
+          (re-search-forward "[0-9]+" end t)
+        (when (> (line-number-at-pos) previous-line-number)
+          (setq increment (+ increment progressive-increment))
+          (setq previous-line-number (line-number-at-pos)))
+        (let ((incremented-string (int-to-string (+ increment (string-to-number (match-string 0))))))
+          ;; If incremented string and original match differ in length, update end point
+          (setq end (+ end (- (length incremented-string) (length (match-string 0)))))
+          (replace-match incremented-string)))))
   ;; incrementer/decrementer un chiffre
   (autoload 'shift-number-up "shift-number" nil t)
   (autoload 'shift-number-down "shift-number" nil t)
   (global-set-key (kbd "M-<kp-add>") 'shift-number-up)
   (global-set-key (kbd "M-<kp-subtract>") 'shift-number-down)
-#+END_SRC
-*** highlight-current-line
-*dépendances*: [[http://www.emacswiki.org/emacs/highlight-current-line.el][highlight-current-line.el]]
-#+BEGIN_SRC emacs-lisp
-  (require 'highlight-current-line)
-  ;; pas de highlight-current-line sur quelques modes
-  (add-hook 'after-change-major-mode-hook
-            '(lambda ()
-               (highlight-current-line-minor-mode (if (or (equal major-mode 'text-mode) (equal major-mode 'term-mode) (equal major-mode 'logview-mode) (equal major-mode 'palette-mode) (equal major-mode 'help-mode)) 0 1))))
-  ;; changer la couleur
-  (defun toggle-highlight-color ()
-    (interactive)
-    (if (string-equal (face-attribute 'highlight-current-line-face :background) "#1f4f4f")
-        (highlight-current-line-set-bg-color "#1d4b5f")
-      (if (string-equal (face-attribute 'highlight-current-line-face :background) "#1d4b5f")
-          (highlight-current-line-set-bg-color "LightSeaGreen")
-        (highlight-current-line-set-bg-color "#1f4f4f"))))
-  (global-set-key (kbd "<f7>") 'toggle-highlight-color)
-#+END_SRC
-*** list-environment
-*dépendances*: [[https://github.com/dgtized/list-environment.el][list-environment.el]]
-#+BEGIN_SRC emacs-lisp
-  ;; environment
-  (autoload 'list-environment "list-environment" nil t)
 #+END_SRC
 *** C-x C-c ne ferme que le frame courant
 #+BEGIN_SRC emacs-lisp
@@ -2228,7 +2219,6 @@ Collection of Emacs Development Environment Tools
 *dépendances*: [[https://github.com/m00natic/vlfi][vlfi]]
 #+BEGIN_SRC emacs-lisp
 ;;  C-c C-v prefix
-(add-to-list 'load-path "~/.emacs.d/vlfi-master")
 (require 'vlf-setup)
 #+END_SRC
 *** (un)tabify-buffer
@@ -2260,20 +2250,28 @@ Collection of Emacs Development Environment Tools
 *** scroll-bar
 *dépendances* [[https://github.com/m2ym/yascroll-el][yascroll]]
 #+BEGIN_SRC emacs-lisp
-  (require 'yascroll)
-  (global-yascroll-bar-mode)
+  ;; (require 'yascroll)
+  ;; (global-yascroll-bar-mode)
 #+END_SRC
 *** duckduckgo
 #+BEGIN_SRC emacs-lisp
-(defun duckduckgo ()
-  "duckduckgo a query or region if any."
-  (interactive)
-  (browse-url
-   (concat
-    "https://duckduckgo.com/?q="
-    (if mark-active
-        (buffer-substring (region-beginning) (region-end))
-      (read-string "Search: ")))))
+  ;; (defun duckduckgo ()
+  ;;   "duckduckgo a query or region if any."
+  ;;   (interactive)
+  ;;   (browse-url
+  ;;    (concat
+  ;;     "https://duckduckgo.com/?q="
+  ;;     (if mark-active
+  ;;         (buffer-substring (region-beginning) (region-end))
+  ;;       (read-string "Search: ")))))
+#+END_SRC
+*** eww recherche la region ou prompt
+#+BEGIN_SRC emacs-lisp
+  ;; ;; M-s M-w recherche la région, si pas de sélection => prompt
+  ;; (defun jab/eww-search (orig-fun &rest args)
+  ;;   (if (region-active-p) (apply orig-fun args)
+  ;;     (eww (read-string "Query: "))))
+  ;; (advice-add 'eww-search-words :around #'jab/eww-search)
 #+END_SRC
 *** diffview
 *dépendances* [[https://github.com/emacsmirror/diffview][diffview]]
@@ -2288,10 +2286,10 @@ Collection of Emacs Development Environment Tools
   (add-to-list 'auto-mode-alist '("\\.log\\'" . logview-mode))
   (custom-set-variables  '(logview-additional-submodes
                            (quote
-                            (("proj Format"
-                              (format . "TIMESTAMP - NAME - LEVEL")
-                              (levels . "myLevels")
-                              (timestamp)
+                            (("kube Format"
+                              (format . "[LEVEL TIMESTAMP NAME")
+                              (levels . "kubeLevels")
+                              (timestamp . "yyyy-MM-dd")
                               (aliases))
                              ("tomcat Format"
                               (format . "TIMESTAMP [THREAD] LEVEL NAME")
@@ -2299,7 +2297,7 @@ Collection of Emacs Development Environment Tools
                               (timestamp)
                               (aliases)))))
                          '(logview-additional-level-mappings
-                           (quote (("myLevels" . ((error "ERROR")(warning "WARNING")(information "INFO")(debug "DEBUG")(trace "TRACE"))))))
+                           (quote (("kubeLevels" . ((error "E")(warning "W")(information "I")(debug "D")(trace "T"))))))
                          '(logview-additional-timestamp-formats
                            (quote (("xxx" (regexp . "[0-9]\\{4\\}-[01][0-9]-[0-3][0-9] [012][0-9]:[0-5][0-9]:[0-9][0-9],[0-9]\\{3\\}") (aliases))))))
 #+END_SRC
@@ -2312,7 +2310,6 @@ Collection of Emacs Development Environment Tools
 *dépendances* [[https://github.com/emacsmirror/unaccent][unaccent]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'unaccent-region "unaccent" "" t)
-  (autoload 'unaccent-word "unaccent" "" t)
 #+END_SRC
 *** letter-toggle-case
 #+BEGIN_SRC emacs-lisp
@@ -2324,21 +2321,6 @@ Collection of Emacs Development Environment Tools
        ((looking-at "[[:upper:]]") (downcase-region (point) (1+ (point)))))
       (right-char)))
   (global-set-key (kbd "M-C") 'toggle-letter-case)
-#+END_SRC
-*** swap-regions
-*dépendance* [[https://github.com/xuchunyang/swap-regions.el][swap-region]] 
-#+BEGIN_SRC emacs-lisp
-  (require 'swap-regions)
-  (swap-regions-mode)
-#+END_SRC
-*** emoji (smiley)
-*dépendances*  [[https://github.com/syl20bnr/emacs-emoji-cheat-sheet-plus][emacs-emoji-cheat-sheet-plus]] 
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/emacs-emoji-cheat-sheet-plus")
-  (autoload 'emoji-cheat-sheet-plus-display-mode "emoji-cheat-sheet-plus" nil t)
-  (autoload 'emoji-cheat-sheet-plus-buffer "emoji-cheat-sheet-plus" nil t)
-  (add-hook 'org-mode-hook 'emoji-cheat-sheet-plus-display-mode)
-  (defalias 'smiley 'emoji-cheat-sheet-plus-buffer)
 #+END_SRC
 *** Correct those annoying DOuble capitals
 #+BEGIN_SRC emacs-lisp
@@ -2364,41 +2346,63 @@ Collection of Emacs Development Environment Tools
   (add-hook 'org-mode-hook #'sk/dubcaps-mode)
   (add-hook 'python-mode-hook #'sk/dubcaps-mode)
 #+END_SRC
-*** eww recherche la region ou prompt
+*** google-translate
 #+BEGIN_SRC emacs-lisp
-  ;; M-s M-w recherche la région, si pas de sélection => prompt
-  (defun jab/eww-search (orig-fun &rest args)
-    (if (region-active-p) (apply orig-fun args)
-      (eww (read-string "Query: "))))
-  (advice-add 'eww-search-words :around #'jab/eww-search)
+  ;; google-translate
+  (require 'google-translate)
+  (autoload 'google-translate-smooth-translate "google-translate-smooth-ui" "" t)
+  (global-set-key "\C-ct" 'google-translate-smooth-translate)
+  (setq google-translate-translation-directions-alist
+          '(("fr" . "en") ("en" . "fr")))
+  (setq google-translate-default-target-language "fr")
+#+END_SRC
+*** narrow dwin
+#+BEGIN_SRC emacs-lisp
+  (defun narrow-or-widen-dwim (p)
+    "Widen if buffer is narrowed, narrow-dwim otherwise.
+  Dwim means: region, org-src-block, org-subtree, or
+  defun, whichever applies first. Narrowing to
+  org-src-block actually calls `org-edit-src-code'.
+  With prefix P, don't widen, just narrow even if buffer
+  is already narrowed."
+    (interactive "P")
+    (declare (interactive-only))
+    (cond ((and (buffer-narrowed-p) (not p)) (widen))
+          ((region-active-p)
+           (narrow-to-region (region-beginning)
+                             (region-end)))
+          ((derived-mode-p 'org-mode)
+           ;; `org-edit-src-code' is not a real narrowing
+           ;; command. Remove this first conditional if
+           ;; you don't want it.
+           (cond ((ignore-errors (org-edit-src-code) t)
+                  (delete-other-windows))
+                 ((ignore-errors (org-narrow-to-block) t))
+                 (t (org-narrow-to-subtree))))
+          ((derived-mode-p 'latex-mode)
+           (LaTeX-narrow-to-environment))
+          (t (narrow-to-defun))))
+  (global-set-key (kbd "s-n") 'narrow-or-widen-dwim)
 #+END_SRC
 * Developpement
 ** Common
 *** Analyse de code
 *dépendances* [[https://github.com/cosmicexplorer/cloc-emacs][cloc.el]] [[http://kitchingroup.cheme.cmu.edu/media/2015-07-28-A-highlight-annotation-mode-for-Emacs-using-font-lock/highlights.el][highlights.el]] [[https://github.com/bastibe/annotate.el][annotate.el]]
 #+BEGIN_SRC emacs-lisp
-  ;; cloc sur les buffers
-  (autoload 'cloc "cloc" nil t)
-  ;; cloc sur un repertoire
-  (defun cloc-dir (dir)
-    (interactive "Ddir: ")
-    (shell-command
-     (format (concat "cloc " dir))))
-  ;; annotation
-  (load-file "~/.emacs.d/lisp/highlights.elc")
-  (setq highlight-keyboard-prefix (kbd "s-c"))
-  (global-set-key (kbd "s-c h") 'highlight)
-  (global-set-key (kbd "s-c n") 'highlight-note)
-  (global-set-key (kbd "s-c l") 'highlight-load)
-  (global-set-key (kbd "s-c s") 'highlight-save)
-  ;; ಠ_ಠ
-  (defun insert-lod ()
-    "Insert look of disapproval"
-    (interactive)
-    (insert "ಠ_ಠ"))
-  (global-set-key (kbd "s-c d") 'insert-lod)
+  ;; ;; cloc sur les buffers
+  ;; (autoload 'cloc "cloc" nil t)
+  ;; ;; cloc sur un repertoire
+  ;; (defun cloc-dir (dir)
+  ;;   (interactive "Ddir: ")
+  ;;   (shell-command
+  ;;    (format (concat "cloc " dir))))
+  ;; (defun insert-lod ()
+  ;;   "Insert look of disapproval"
+  ;;   (interactive)
+  ;;   (insert "ಠ_ಠ"))
+  ;; (global-set-key (kbd "s-c d") 'insert-lod)
   ;; annotate
-  (load-file "~/.emacs.d/annotate.el/annotate.el")
+  ;;(load-file "~/.emacs.d/annotate.el/annotate.el")
 #+END_SRC
 *** Conf-mode
  #+BEGIN_SRC emacs-lisp
@@ -2406,6 +2410,8 @@ Collection of Emacs Development Environment Tools
    (add-to-list 'auto-mode-alist '("\\.orderedproperties\\'" . conf-mode))
    (add-to-list 'auto-mode-alist '("\\.properties\\'" . conf-mode))
    (add-to-list 'auto-mode-alist '("sudoers" . conf-mode))
+   (add-to-list 'auto-mode-alist '("offlineimaprc" . conf-mode))
+   (add-to-list 'auto-mode-alist '("cwclientlibrc" . conf-mode))
  #+END_SRC
 *** ssh-config-mode
 *dépendances* [[https://github.com/jhgorrell/ssh-config-mode-el][ssh-config-mode]]
@@ -2433,11 +2439,11 @@ Collection of Emacs Development Environment Tools
 *** Yasnippet
 *dépendances:* [[https://github.com/capitaomorte/yasnippet][yasnippet.el]] [[https://github.com/tuhdo/yasnippet-snippets][yasnippet-snippets]] [[https://www.emacswiki.org/emacs/dropdown-list.el][dropdown-list]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path  "~/.emacs.d/yasnippet")
   (autoload 'yas-insert-snippet "yasnippet" nil t)
   (eval-after-load "yasnippet"
     '(progn
-       (add-to-list 'yas-snippet-dirs "~/.emacs.d/yasnippet-snippets")
+       (add-to-list 'yas-snippet-dirs "~/.emacs.d/packages/AndreaCrotti/yasnippet-snippets/")
+       (add-to-list 'yas-snippet-dirs "~/.emacs.d/packages/AndreaCrotti/yasnippet-snippets/snippets/")
        (yas-global-mode 1)
        (setq yas/indent-line 'fixed)
        ;; pour avoir les snippet dans le minibuffer
@@ -2489,22 +2495,22 @@ Collection of Emacs Development Environment Tools
 *** Global mark
 *dépendances*: [[https://github.com/rolandwalker/back-button][back-button.el]] [[http://www.emacswiki.org/emacs/auto-mark.el][auto-mark]] [[https://github.com/myuhe/smartrep.el][smart-rep]] [[https://github.com/rolandwalker/nav-flash][nav-flash]]
 #+BEGIN_SRC emacs-lisp
-  ;; global mark :: C-x C-<right> ; C-x C-<left>
-  ;; local mark :: C-x <right> ; C-x <left>
+  ;; ;; global mark :: C-x C-<right> ; C-x C-<left>
+  ;; ;; local mark :: C-x <right> ; C-x <left>
+  ;;(require 'auto-mark)
   (require 'back-button)
-  (require 'auto-mark)
-  (back-button-mode 1)
-  (setq auto-mark-command-class-alist
-        '((anything . anything)
-          (goto-line . jump)
-          (indent-for-tab-command . ignore)
-          (undo . ignore)))
-  (setq auto-mark-command-classifiers
-        (list (lambda (command)
-                (if (and (eq command 'self-insert-command)
-                         (eq last-command-event ? ))
-                    'ignore))))
-  (global-auto-mark-mode 1)
+  ;; (back-button-mode 1)
+  ;; (setq auto-mark-command-class-alist
+  ;;       '((anything . anything)
+  ;;         (goto-line . jump)
+  ;;         (indent-for-tab-command . ignore)
+  ;;         (undo . ignore)))
+  ;; (setq auto-mark-command-classifiers
+  ;;       (list (lambda (command)
+  ;;               (if (and (eq command 'self-insert-command)
+  ;;                        (eq last-command-event ? ))
+  ;;                   'ignore))))
+  ;; (global-auto-mark-mode 1)
 #+END_SRC
 *** rainbow-delimiter
 *dépendances* [[https://github.com/Fanael/rainbow-delimiters][rainbow-delimiter.el]]
@@ -2517,12 +2523,12 @@ Collection of Emacs Development Environment Tools
 *** hide/show Comments
 *dépendances*: [[https://github.com/emacsmirror/hide-comnt][hide-comnt.el]]
 #+BEGIN_SRC emacs-lisp
-  (autoload 'hide/show-comments-toggle "hide-comnt" nil t)
-  (global-set-key (kbd "C-c ;") 'hide/show-comments-toggle)
+  ;; (autoload 'hide/show-comments-toggle "hide-comnt" nil t)
+  ;; (global-set-key (kbd "C-c ;") 'hide/show-comments-toggle)
 #+END_SRC
 *** etags (tables)
 #+BEGIN_SRC emacs-lisp
-  (setq tags-table-list (list "~/workspaces/proj1/" "~/workspaces/proj2"))
+  ;;(setq tags-table-list (list "/home/logilab/workspaces/MUSCLE-NG/"))
 #+END_SRC
 *** whitespace
 #+BEGIN_SRC emacs-lisp
@@ -2544,40 +2550,43 @@ Collection of Emacs Development Environment Tools
   (autoload 'rainbow-mode "rainbow-mode" nil t)
   (add-hook 'rainbow-mode-hook
             (lambda ()
-              (highlight-current-line nil)
               (load-file "~/.emacs.d/lisp/kurecolor.el")))
   (defalias 'color-mode 'rainbow-mode)
 #+END_SRC
 *** which-function-popup
 #+BEGIN_SRC emacs-lisp
-  (autoload 'which-function "which-func")
-  (autoload 'popup-tip "popup")
-  (defun copy-yank-str (msg)
-    (kill-new msg)
-    (with-temp-buffer
-      (insert msg)
-      (shell-command-on-region (point-min) (point-max)
-                               (cond ((eq system-type 'cygwin) "putclip")
-                                     ((eq system-type 'darwin) "pbcopy")
-                                     (t "xsel -ib")))))
-  (defun which-function-popup ()
-    (interactive)
-    (let ((msg (which-function)))
-      (popup-tip msg)
-      (copy-yank-str msg)))
-  (global-set-key (kbd "C-x ?") 'which-function-popup)
+  ;; (autoload 'which-function "which-func")
+  ;; (autoload 'popup-tip "popup")
+  ;; (defun copy-yank-str (msg)
+  ;;   (kill-new msg)
+  ;;   (with-temp-buffer
+  ;;     (insert msg)
+  ;;     (shell-command-on-region (point-min) (point-max)
+  ;;                              (cond ((eq system-type 'cygwin) "putclip")
+  ;;                                    ((eq system-type 'darwin) "pbcopy")
+  ;;                                    (t "xsel -ib")))))
+  ;; (defun which-function-popup ()
+  ;;   (interactive)
+  ;;   (let ((msg (which-function)))
+  ;;     (popup-tip msg)
+  ;;     (copy-yank-str msg)))
+  ;; (global-set-key (kbd "C-x ?") 'which-function-popup)
 #+END_SRC
 *** indent-guide
 *dépendance* [[https://github.com/zk-phi/indent-guide][indent-guide]]
 #+BEGIN_SRC emacs-lisp
-  (require 'highlight-indent-guides)
-  (setq highlight-indent-guides-method 'character)
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  ;; (require 'highlight-indent-guides)
+  ;; (setq highlight-indent-guides-method 'character)
+  ;;(add-hook 'python-mode-hook 'highlight-indent-guides-mode)
 #+END_SRC
 *** syntactic-close
 #+BEGIN_SRC emacs-lisp
   (autoload 'syntactic-close "syntactic-close" "" t)
   (global-set-key (kbd "M-)") 'syntactic-close)
+#+END_SRC
+*** sh-mode
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\postBuild" . sh-mode))
 #+END_SRC
 *** dumb-smart-jump
 #+BEGIN_SRC emacs-lisp
@@ -2591,8 +2600,10 @@ Collection of Emacs Development Environment Tools
   (require 'flycheck)
   (eval-after-load "flycheck"
     '(progn
-       (setq flycheck-pylintrc "/home/ogiorgis/.config/pylintrc")
+       ;;(require 'flycheck-tip)
+       (setq flycheck-pylintrc "/home/logilab/.config/pylintrc")
        (setq flycheck-pylint-use-symbolic-id nil) ;; ID pylint
+       ;;(flycheck-tip-use-timer 'verbose)
        (require 'flycheck-pos-tip)
        (flycheck-pos-tip-mode)
        (global-set-key (kbd "C-c <down>") 'flycheck-next-error)
@@ -2611,6 +2622,10 @@ Collection of Emacs Development Environment Tools
   (require 'guess-language)
   (setq guess-language-languages '(en fr))
   (add-hook 'text-mode-hook (lambda () (guess-language-mode 1)))
+  ;; flycheck modeline
+  ;; (require 'flycheck-color-mode-line)
+  ;; (eval-after-load "flycheck"
+  ;;   '(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
   ;; flyspell in git commit
   (defun flyspell-ignore-comments ()
     "Used for 'flyspell-generic-check-word-predicate' to ignore comments."
@@ -2668,7 +2683,7 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   (require 'company)
   (require 'company-quickhelp)
-  (setq company-minimum-prefix-length 1
+  (setq company-minimum-prefix-length 2
         company-idle-delay 0.3
         company-tooltip-limit 20
         company-selection-wrap-around t
@@ -2728,10 +2743,7 @@ Collection of Emacs Development Environment Tools
 *dépendances*: [[https://github.com/magit/magit][magit]] [[https://github.com/tsgates/git-emacs][git-emacs]] [[https://github.com/syohex/emacs-git-messenger][git-messenger.el]] [[https://github.com/magit/magit-svn][magit-svn]] [[https://github.com/magit/git-modes][gitconfig-mode]] [[https://github.com/jtatarik/magit-gitflow][magit-gitflow]] [[https://github.com/magit/with-editor][with-editor]]
 #+BEGIN_SRC emacs-lisp
   ;; magit
-	(add-to-list 'load-path "~/.emacs.d/magit-master/lisp")
   (require 'magit)
-  (setq magit-repository-directories '(("~/workspaces" . 2)))
-  (global-set-key (kbd "C-x g a") 'magit-list-repositories)
   ;; pour le status dans la modeline
   (setq git-keyboard-prefix "\C-x£") ;; keybinding improbable (ie desactivation)
   (autoload 'git--update-all-state-marks "git-modeline" "Update the modelines of all git buffers" t)
@@ -2739,30 +2751,18 @@ Collection of Emacs Development Environment Tools
   (defun git-status-in-modeline ()
     (if (and vc-mode (string-match "^ Git" (substring-no-properties vc-mode)))
         (git--update-all-state-marks)))
-  ;; git-svn / git-flow
-  (eval-after-load "magit"
-    '(progn
-       (require 'magit-svn)
-       (add-hook 'magit-mode-hook 'magit-svn-mode)
-       (require 'magit-gitflow)
-       (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)))
   ;; messages de commit
   (autoload 'git-messenger:popup-message "git-messenger" nil t)
   (setq git-messenger:show-detail t)
-  (global-set-key (kbd "C-x g m") 'git-messenger:popup-message)
-  ;; remote editor
-  ;; (add-hook 'term-mode-hook 'with-editor-export-editor)
   ;; raccourcis
   (setq magit-keyboard-prefix (kbd "C-x g"))
-  (global-set-key (kbd "C-x g g") 'magit-status) ;; niveau de details => M-1, M-2, M-3, and M-4 ; l pour les logs
+  (global-set-key (kbd "C-x g s") 'magit-status) ;; niveau de details => M-1, M-2, M-3, and M-4 ; l pour les logs
+  (global-set-key (kbd "C-x g m") 'git-messenger:popup-message)
   (global-set-key (kbd "C-x g l") 'magit-log-buffer-file)
   (global-set-key (kbd "C-x g b") 'vc-annotate)
-  (global-set-key (kbd "C-x g s") 'magit-stash)
-  (global-set-key (kbd "C-x g p") 'magit-stash-pop)
   (global-set-key (kbd "C-x g =") 'ediff-revision)
-  (global-set-key (kbd "C-x g r") 'magit-svn-rebase)
-  (global-set-key (kbd "C-x g d") 'magit-svn-dcommit)
   (global-set-key (kbd "C-x g t") 'magit-blob-previous)
+  (global-set-key (kbd "C-x g p") 'magit-file-popup)
   ;; vc-annotate v => affiche juste le nom su commiter
   (eval-after-load "vc-annotate"
     '(defun vc-annotate-get-time-set-line-props ()
@@ -2786,25 +2786,23 @@ Collection of Emacs Development Environment Tools
   (setq magit-push-always-verify nil)
   (setq magit-commit-show-diff nil)
   (setq magit-revert-buffers nil)
-  (setq auto-revert-buffer-list-filter 'magit-auto-revert-repository-buffers-p)
+  ;; (setq auto-revert-buffer-list-filter 'magit-auto-revert-repository-buffers-p)
   (remove-hook 'server-switch-hook 'magit-commit-diff)
-  ;; fichier de conf
-	(add-to-list 'load-path "~/.emacs.d/git-modes")
-  (require 'gitconfig-mode)
-  (require 'gitignore-mode)
-  (require 'gitattributes-mode)
+  ;; fichiers de conf
+  (require 'git-modes)
 #+END_SRC
 *** mercurial
-*dépendances*: [[https://github.com/emacsmirror/ahg][ahg]] [[https://searchcode.com/file/116589788/lisp/scm/hg-status.el][hg-status.el]]
 #+BEGIN_SRC emacs-lisp
-  ;; ahg
+  ;; ahg / monky
   (require 'ahg)
   (global-unset-key (kbd "C-x m"))
-  (global-set-key (kbd "C-x m m") 'ahg-glog)
+  (global-set-key (kbd "C-x m s") 'ahg-glog)
   (global-set-key (kbd "C-x m h") 'ahg-glog-hidden)
   (global-set-key (kbd "C-x m b") 'ahg-annotate-cur-file)
   (global-set-key (kbd "C-x m =") 'ahg-diff-ediff-cur-file)
   (global-set-key (kbd "C-x m l") 'ahg-log-cur-file)
+  (global-set-key (kbd "C-x m r") 'ahg-revert-cur-file)
+  (global-set-key (kbd "C-x m m") 'git-messenger:popup-message)
   ;; mercurial status in modeline
   (require 'hg-status)
   (add-hook 'find-file-hook 'hg-status-in-modeline t)
@@ -2815,10 +2813,8 @@ Collection of Emacs Development Environment Tools
 *** diff-hl
 *dépendances*: [[https://github.com/dgutov/diff-hl][diff-hl.el]]
 #+BEGIN_SRC emacs-lisp
-  (require 'diff-hl)
-  (require 'diff-hl-flydiff)
-  (diff-hl-flydiff-mode)
   (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+  (require 'diff-hl)
   (global-diff-hl-mode)
   (global-set-key (kbd "C-x <up>") 'diff-hl-previous-hunk)
   (global-set-key (kbd "C-x <down>") 'diff-hl-next-hunk)
@@ -2827,6 +2823,14 @@ Collection of Emacs Development Environment Tools
     (diff-hl-update))
   ;; pour git
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  ;; diff-hl-flydiff
+  ;; (require 'diff-hl-flydiff)
+  ;; (diff-hl-flydiff-mode)
+  ;; smartrep
+  (smartrep-define-key
+      global-map "C-x"
+    '(("<down>" . diff-hl-next-hunk)
+      ("<up>" . diff-hl-previous-hunk)))
  #+END_SRC
 ** XML
 *** nxml-mode
@@ -2834,7 +2838,7 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   ;; for xml files, use nxml-mode instead of sgml-mode
   (setq auto-mode-alist
-        (cons '("\\.\\(xml\\|XML\\|xsd\\|XSD\\|xsl\\|rng\\|xhtml\\|CR\\)\\'" . nxml-mode)
+        (cons '("\\.\\(xml\\|XML\\|xsd\\|XSD\\|xsl\\|prj\\|rng\\|xhtml\\|CR\\)\\'" . nxml-mode)
               auto-mode-alist))
   (defun my-nxml-hook ()
     (require 'smart-tabs-mode)
@@ -2847,25 +2851,6 @@ Collection of Emacs Development Environment Tools
   (add-hook 'nxml-mode-hook 'my-nxml-hook)
  #+END_SRC
 *** helpers
-**** Folding
-#+BEGIN_SRC emacs-lisp
-  ;; XML folding
-  (add-hook 'nxml-mode-hook
-            (lambda ()
-              (require 'sgml-mode) ;; build-in
-              (add-to-list 'hs-special-modes-alist
-                           '(nxml-mode
-                             "<!--\\|<[^/>]*[^/]>"
-                             "-->\\|</[^/>]*[^/]>"
-                             "<!--"
-                             sgml-skip-tag-forward
-                             nil))
-              (hs-minor-mode)
-              (define-key nxml-mode-map (kbd "C-<kp-subtract>") 'hs-hide-block)
-              (define-key nxml-mode-map (kbd "C-<kp-add>") 'hs-show-block)
-              (define-key nxml-mode-map (kbd "C-S-<kp-subtract>") 'hs-hide-level)
-              (define-key nxml-mode-map (kbd "C-S-<kp-add>") 'hs-show-all)))
-#+END_SRC
 **** nxml-where
 #+BEGIN_SRC emacs-lisp
   (defun nxml-where ()
@@ -2905,14 +2890,14 @@ Collection of Emacs Development Environment Tools
   (defun xsd-show ()
     (interactive)
     (shell-command
-     (format "cd /tmp; java -jar ~/Outils/XSDVi/lib/xsdvi.jar  %s" (buffer-file-name)))
+     (format "cd /tmp; java -jar ~/Tools/XSDVi/dist/lib/xsdvi.jar  %s" (buffer-file-name)))
     (shell-command
      (format "firefox /tmp/%s" (concat (substring (file-name-nondirectory (buffer-file-name)) 0 -3) "svg"))))
   ;; generation xsd from xml
   (defun xsd-generator ()
     (interactive)
     (shell-command
-     (format "java -jar ~/.emacs.d/trang/trang.jar %s %s" (buffer-file-name) (concat (substring (buffer-file-name) 0 -3) "xsd")))
+     (format "java -jar ~/Tools/trang/trang.jar %s %s" (buffer-file-name) (concat (substring (buffer-file-name) 0 -3) "xsd")))
     (find-file (concat (substring (buffer-file-name) 0 -3) "xsd")))
   #+END_SRC
 ** YAML
@@ -2956,15 +2941,6 @@ Collection of Emacs Development Environment Tools
   (autoload 'po-mode "po-mode" "Major mode for translators to edit PO files" t)
   (setq auto-mode-alist (cons '("\\.po\\'\\|\\.po\\." . po-mode) auto-mode-alist))
 #+END_SRC
-** Jira
-*dépendances* [[https://github.com/baohaojun/org-jira][org-jira]]
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/org-jira")
-  (require 'org-jira)
-  (setq jiralib-url "http://machine02:8000")
-  (setq org-jira-working-dir "~/.emacs-org/jira")
-  (setq org-jira-use-status-as-todo t)
-#+END_SRC
 ** Langages
 *** elisp
 *dépendances* [[https://github.com/auto-complete/popup-el][popup.el]]
@@ -2999,19 +2975,18 @@ Collection of Emacs Development Environment Tools
                vdoc-short)
               :margin t)))))
   (define-key emacs-lisp-mode-map (kbd "s-?") 'elisp-function-or-variable-quickhelp)
+  (define-key emacs-lisp-mode-map (kbd "C-.") 'find-function)
   (define-key org-mode-map (kbd "s-?") 'elisp-function-or-variable-quickhelp)
 #+END_SRC
 *** Bash
 #+BEGIN_SRC emacs-lisp
   ;; indentation des commentaires (#) en bash
   (setq sh-indent-comment t)
-  ;; bash completion
+  ;; bash completion and check
   (add-hook 'sh-mode-hook
             (lambda ()
+              (setq flycheck-pycheckers-checkers '(sh-shellcheck))
               (define-key sh-mode-map (kbd "C-<tab>") 'completion-at-point)))
-  ;; met les droits execuable si le fichier est un script (shebang)
-  (add-hook 'after-save-hook
-              'executable-make-buffer-file-executable-if-script-p)
   ;; association fichier bashrc
   (add-to-list 'auto-mode-alist '("bashrc" . sh-mode))
 #+END_SRC
@@ -3044,7 +3019,6 @@ Collection of Emacs Development Environment Tools
               (highlight-operators-mode)
               ;; indentation auto
               (require 'fuzzy-format)
-              ;;(setq fuzzy-format-default-indent-tabs-mode 1)
               (global-fuzzy-format-mode)
               (require 'flycheck-pycheckers)  ;; config file ~/.pycheckers
               (setq flycheck-pycheckers-ignore-codes '("C0411" "C0413" "W503"))
@@ -3088,7 +3062,7 @@ Collection of Emacs Development Environment Tools
                     (flycheck-mode))))
 
   )))
-  #+END_SRC
+#+END_SRC
 **** jedi
 *dépendances* [[https://github.com/tkf/emacs-jedi][jedi]] [[https://github.com/kiwanami/emacs-deferred][deferred]] [[https://github.com/tkf/emacs-python-environment][python-environment]] [[https://github.com/syohex/emacs-company-jedi][emacs-company-jedi]]
 C-. => goto definition
@@ -3104,9 +3078,14 @@ C-. => goto definition
 #+BEGIN_SRC emacs-lisp
   ;; jedi
   (setq jedi:server-args
-        '("--sys-path" "/home/djangoliv/workspaces/"
-          "--sys-path" "/home/djangoliv/workspaces/project/"))
-  (setq jedi:server-command '("~/.emacs.d/emacs-jedi/jediepcserver.py"))
+        '("--sys-path" "/home/logilab/workspaces/"
+          "--sys-path" "/home/logilab/workspaces/cubes/"
+          "--sys-path" "/home/logilab/workspaces/cubes/simulagora/.tox/py3/share/"
+          "--sys-path" "/home/logilab/workspaces/cubes/simulagora/.tox/py3/lib/python3.5/site-packages"
+          "--sys-path" "/home/logilab/workspaces/TYMPAN/code_tympan/python/"
+          "--sys-path" "/home/logilab/workspaces/TYMPAN/code_tympan_install/usr/local/cython_d/"
+        ))
+  (setq jedi:server-command '("~/.emacs.d/packages/tkf/emacs-jedi/jediepcserver.py"))
   (setq jedi:tooltip-method (quote (nil)))
   (setq jedi:tooltip-show nil)
   (defun my/python-mode-hook ()
@@ -3136,7 +3115,6 @@ C-. => goto definition
 **** docstring
 *dépendances* [[https://github.com/glyph/python-docstring-mode][python-docstring-mode]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/Outils/emacs/python/python-docstring-mode-master")
   (autoload 'python-docstring-mode "python-docstring" nil t)
   (add-hook 'python-mode-hook (lambda () (python-docstring-mode t)))
 #+END_SRC
@@ -3146,21 +3124,12 @@ C-. => goto definition
   ;; pydoc
   (autoload 'pydoc "pydoc" nil t)
   ;; pydoc-info
-  (add-to-list 'load-path "~/.emacs.d/pydoc-info-0.2/")
   (autoload 'info-lookup-symbol "pydoc-info" nil t)
   (defadvice pydoc-info-python-symbol-at-point
       (around jedi:pydoc-info-python-symbol-at-point activate)
     "Use true \"full name\" to search for the symbol at point."
     (or (setq ad-return-value (jedi:get-full-name-sync)) ad-do-it))
-  (global-set-key (kbd "s-d") 'info-lookup-symbol)
-  ;; pylookup
-  (setq pylookup-dir "~/Outils/emacs/python/pylookup-master")
-  (add-to-list 'load-path pylookup-dir)
-  (setq pylookup-program (concat pylookup-dir "/pylookup.py"))
-  (setq pylookup-db-file (concat pylookup-dir "/pylookup.db"))
-  (autoload 'pylookup-lookup "pylookup" "" t)
-  (global-set-key (kbd "C-s-d") 'pylookup-lookup)
-  ;; jeddi:show-doc C-c d
+  (global-set-key (kbd "C-?") 'info-lookup-symbol)
 #+END_SRC
 **** pycscope (xcscope) surtout pour call-hierarchy
 *dépendances*: [[https://github.com/portante/pycscope/tree/master/contrib/xpycscope][xpycscope.el]]
@@ -3169,190 +3138,19 @@ C-. => goto definition
 #+END_SRC
 **** PDB
 #+BEGIN_SRC emacs-lisp
-  (setq gud-pdb-command-name "~/Outils/pdb/pdb.py")
+  ;;(setq gud-pdb-command-name "~/Outils/pdb/pdb.py")
   ;; Surligne les mots temporaires pdb, ipdb,
-  (defun annotate-pdb ()
+  (defun annotate-keywords ()
     (interactive)
     (let ((case-fold-search nil))
       (highlight-lines-matching-regexp "import ipdb")
       (highlight-lines-matching-regexp "import pdb")
       (highlight-lines-matching-regexp "set_trace()")
+      (highlight-regexp "TODO")
       (highlight-regexp "FIXME")
       (highlight-regexp "XXX")
-      (highlight-regexp "TODO")))
-  (add-hook 'python-mode-hook 'annotate-pdb)
-#+END_SRC
-**** python exec
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-c !") 'python-shell-switch-to-shell)
-  (defun python-execute-buffer (arg)
-    (interactive "P")
-    (setq options "")
-    (if (not (null arg))
-        (setq options (read-from-minibuffer "Args: ")))
-    (with-output-to-temp-buffer "*pyOutput*"
-      (async-shell-command (concat "python " (buffer-file-name) " " options ";echo '\n >> job finish with status:' $?") "*pyOutput*")))
-  (add-hook 'python-mode-hook
-                '(lambda ()
-                   (define-key python-mode-map (kbd "C-c C-c") 'python-execute-buffer)))
-#+END_SRC
-**** Insertion d'entete python
-#+BEGIN_SRC emacs-lisp
-  (defun python-head-insert ()
-	(interactive)
-	(insert
-	 "#!/usr/bin/env python
-  # -*- coding: iso-8859-15 -*-
-  # $Id: $
-  ##
-  # =============================================================
-  #
-  # PROJET  :
-  #
-  # Author  : THALES SERVICES
-  #
-  # =============================================================
-  # HISTORIQUE :
-  # VERSION::FA:<num_ft>:<date>:[<commentaire libre>]
-  # VERSION::DM:<num_ft>:<date>:[<commentaire libre>]
-  # =============================================================")
-	(end-of-line))
-  ;; Insertion du shebang python
-  (defun python-shebang-insert ()
-	(interactive)
-	(insert
-	 "#!/usr/bin/env python
-  # -*- coding: iso-8859-15 -*
-  ")
-	(end-of-line))
-  ;; raccourcis
-  (add-hook 'python-mode-hook
-			'(lambda ()
-               (define-key python-mode-map (kbd "C-<f8>") 'python-head-insert)
-               (define-key python-mode-map (kbd "<f8>") 'python-shebang-insert)))
-#+END_SRC
-**** Py-WHERE
-#+BEGIN_SRC emacs-lisp
-  (defun trim-string (string) ;; strip string
-	(replace-regexp-in-string "\\`[ \t\n]*" "" (replace-regexp-in-string "[ \t\n]*\\'" "" string)))
-  ;; PERSO
-  (defun py-where ()
-	;; show all indent lines (for, il while, def...) (way)
-	(interactive)
-	(setq way "")
-	(save-excursion
-      (setq theLine (thing-at-point 'line))
-      (back-to-indentation)
-      (setq col (current-column))
-      ;; on s'arrete a la definition de la classe
-      (while (and (not (or (string-match "^class" theLine)(string-match "^def" theLine))) (> col 0))
-		(forward-line -1)
-		(setq theLine (thing-at-point 'line))
-		(back-to-indentation)
-		;; si ligne non commentaire
-		(if (not (string-match "^[ \t\n]*#" theLine))
-			(progn
-              ;; si ligne non vide et indentation de niveau superieur
-              (if (and (not (= (length (trim-string theLine)) 0)) (> col (current-column)))
-                  (progn
-					(setq way (concat theLine way))
-					(setq col (current-column))
-					;; cas du else (ou elif) on affiche le if correspondant
-					(if (or (string-match ".*elif .*:*" theLine) (string-match ".*else.*:*" theLine))
-						(progn
-                          (forward-line -1)
-                          (setq theLine (thing-at-point 'line))
-                          (back-to-indentation)
-                          ;; tant que la ligne est vide ou en commentaire ou que l'indentation est differente et que if n'est pas dans la ligne
-                          (while (or (string-match "^[ \t\n]*#" theLine) (= (length (trim-string theLine)) 0)
-									 (or (< col (current-column))
-										 (and (not (string-match ".*[ \t]if .*:*" theLine)) (not (string-match ".*for .*:*" theLine)) (not (string-match ".*try.*:*" theLine)) )))
-							(forward-line -1)
-							(back-to-indentation)
-							(setq theLine (thing-at-point 'line))
-							;; si elif ou except on l'affiche
-							(if (and (or (string-match ".*elif *:*" theLine) (string-match ".*except*:*" theLine)) (not (string-match "^[ \t\n]*#" theLine)))
-								(setq way (concat theLine way )))
-							)
-                          (setq way (concat theLine way ))))))))))
-	(message way))
-  (global-set-key (kbd "s-w") 'py-where)
-#+END_SRC
-**** py-lines-to-list
-word1
-word2
-word3
-=> ["word1", "word2", "word3"]
-#+BEGIN_SRC emacs-lisp
-  (defun py-lines-to-list (point mark)
-    (interactive "r")
-    (let ((text (buffer-substring point mark)))
-      (delete-region point mark)
-      (insert "[")
-      (insert (mapconcat (lambda (line) (format "'%s'" line))
-                         (split-string text "\s*\n\s*")
-                         ", "))
-      (insert "]")))
-  (define-key python-mode-map (kbd "C-c C-l") #'py-lines-to-list)
-#+END_SRC
-**** Generation doc header
-#+BEGIN_SRC emacs-lisp
-  ;; generation de doc function
-  (defun get-function-definition(sentence)
-	(if (string-match "def.*(.*):" sentence)
-		(match-string 0 sentence))
-	)
-  (defun get-parameters(sentence)
-	(setq y (get-function-definition sentence))
-	(if y
-		(if (string-match "(.*)" y)
-			(match-string 0 y)))
-	)
-  (autoload 'thing-at-point "thingatpt" nil t) ;; build-in librairie
-(defun python-generate-header()
-	(interactive)
-	(setq p (get-parameters (thing-at-point 'sentence)))
-	(forward-line 1)
-	(insert "    \'\'\'\n")
-	(setq params (split-string p "[?\,?\(?\)?\ ]"))
-	(while params
-      (if (/= (length (chomp (car params))) 0)
-          (progn
-			(insert "    @param ")
-			(insert (chomp (car params)))
-			(insert ": \n")))
-      (setq params (cdr params)))
-	(insert "    \'\'\'\n")
-	)
-  (global-set-key (kbd "<f9>") 'python-generate-header)
-  (defun chomp (str)
-	"Chomp leading and tailing whitespace from STR."
-	(let ((s (if (symbolp str) (symbol-name str) str)))
-      (replace-regexp-in-string
-       "\\(^[[:space:]\n]*\\|[[:space:]\n]*$\\)" "" s)))
-#+END_SRC
-**** Folding
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'python-mode-hook 'my-pythonFold-hook)
-  (defun py-outline-level ()
-	;; from ada-mode.el
-	(let (buffer-invisibility-spec)
-      (save-excursion
-		(skip-chars-forward "\t ")
-		(current-column))))
-  (defun hide-body-recenter ()
-	(interactive)
-	(outline-hide-body)
-	(recenter))
-  (defun my-pythonFold-hook ()
-	(setq outline-regexp "[^ \t\n]\\|[ \t]*\\(def[ \t]+\\|class[ \t]+\\)")
-	(setq outline-level 'py-outline-level)
-	(outline-minor-mode t)
-	;;(show-paren-mode 1)
-	(define-key python-mode-map (kbd "C-<kp-subtract>") 'hide-body-recenter)
-	(define-key python-mode-map (kbd "C-<kp-add>") 'outline-show-all)
-	(define-key python-mode-map (kbd "C-S-<kp-subtract>") 'hide-subtree)
-	(define-key python-mode-map (kbd "C-S-<kp-add>") 'show-subtree))
+    (highlight-regexp "OLIV")))
+  (add-hook 'python-mode-hook 'annotate-keywords)
 #+END_SRC
 **** nose
 *dépendances* [[https://github.com/jahkeup/nose-emacs][nose.el]]
@@ -3364,27 +3162,18 @@ word3
 #+BEGIN_SRC emacs-lisp
   (autoload 'run-qdb "qdb" nil t)
 #+END_SRC
-**** Django (pony-mode)
-*dépendances* [[https://github.com/davidmiller/pony-mode][pony-mode]]
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/pony-mode/src")
-  (autoload 'pony-mode "pony-mode" nil t)
-  (autoload 'pony-goto-template "pony-mode" nil t)
-  (setq pony-keyboard-prefix (kbd "C-x p"))
-  (global-set-key (kbd "C-x p t") 'pony-goto-template)
-  (global-set-key (kbd "C-x p s") 'pony-goto-settings)
-  (global-set-key (kbd "C-x p r") 'pony-runserver)
-#+END_SRC
 **** pyvenv
 *dépendances* [[https://github.com/cyberved/pyenv.el][pyenv]]
 #+BEGIN_SRC emacs-lisp
   (require 'pyvenv)
-  (pyvenv-activate "~/Outils/python/envs/python3.5/")
+  (pyvenv-activate "/home/logilab/Tools/python/envs/python-emacs")
+  (defalias 'switch-virtualenv 'pyvenv-workon)
 #+END_SRC
 **** pip requirements
 *dépendances* [[https://github.com/emacsmirror/pip-requirements][pip-requirements]]
 #+BEGIN_SRC emacs-lisp
   (require 'pip-requirements)
+  (add-to-list 'auto-mode-alist '("\\requires.txt\\'" . pip-requirements-mode))
 #+END_SRC
 **** pyqt browse documentation
 #+BEGIN_SRC emacs-lisp
@@ -3392,16 +3181,33 @@ word3
     (interactive)
     (eww "http://pyqt.sourceforge.net/Docs/PyQt4/classes.html"))
 #+END_SRC
-**** pycoverage
-*dépendances* [[https://github.com/mattharrison/pycoverage.el][pycoverage]]
+**** ini-mode
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/pycoverage/")
-  (require 'pycoverage)
+  (autoload 'ini-mode "ini-mode" nil t)
+  (add-to-list 'auto-mode-alist '("\\.ini\\'" . ini-mode))
 #+END_SRC
 **** pyimport
-*dépendances*: [[https://github.com/Wilfred/pyimport][pyimport]]
 #+BEGIN_SRC emacs-lisp
-  (require 'pyimport)
+  (add-hook 'python-mode-hook (lambda () (require 'pyimport)))
+#+END_SRC
+**** cython
+#+BEGIN_SRC emacs-lisp
+(autoload 'cython-mode "cython" nil t)
+(add-to-list 'auto-mode-alist '("\\.pyx\\'" . cython-mode))
+(add-to-list 'auto-mode-alist '("\\.pxd\\'" . cython-mode))
+(add-to-list 'auto-mode-alist '("\\.pxi\\'" . cython-mode))
+#+END_SRC
+**** black
+#+BEGIN_SRC emacs-lisp
+  ;; blacken
+  (require 'blacken)
+  (setq blacken-executable "/home/logilab/.local/bin/black")
+  (setq blacken-line-length 79)
+#+END_SRC
+*** Rust
+#+BEGIN_SRC emacs-lisp
+  (autoload 'rust-mode "rust-mode" nil t)
+  (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 #+END_SRC
 *** C++
 **** Initialisation
@@ -3434,35 +3240,50 @@ word3
 #+END_SRC
 **** EDE
 #+BEGIN_SRC emacs-lisp
-  (ede-cpp-root-project "proj3"
-                        :name "PROJ3 Project"
-                        :file "~/workspaces/proj3/proj3.txt"
-                        :include-path '("/source/Code/"
-                                        "/source/Code/MAIN"
-                                        "/source/Code/DATA"
-                                        "/source/Code/IO"
-                                        "/source/Code/xml" )
-                        :system-include-path '("/usr/include/ ~/workspaces/install/proj3/lib/ /usr/include/boost/")
-                        :spp-table '(("isUnix" . "") ("BOOST_TEST_DYN_LINK" . "")))
+  ;; (ede-cpp-root-project :name "Tympan Project"
+  ;;                       :file "/home/logilab/workspaces/TYMPAN/code_tympan/CMakeLists.txt"
+  ;;                       :include-path '("/Tympan/core/"
+  ;;                                       "/Tympan/geometric_methods/AcousticRaytracer"
+  ;;                                       "/Tympan/geometric_methods/AnalyticRayTracer"
+  ;;                                       "/Tympan/geometric_methods/ConvexHullFinder"
+  ;;                                       "/Tympan/gui/"
+  ;;                                       "/Tympan/gui/app"
+  ;;                                       "/Tympan/gui/gl"
+  ;;                                       "/Tympan/gui/tools"
+  ;;                                       "/Tympan/gui/widgets"
+  ;;                                       "/Tympan/models/business"
+  ;;                                       "/Tympan/models/business/acoustic"
+  ;;                                       "/Tympan/models/business/geoacoustic"
+  ;;                                       "/Tympan/models/business/geometry"
+  ;;                                       "/Tympan/models/business/infrastructure"
+  ;;                                       "/Tympan/models/business/material"
+  ;;                                       "/Tympan/models/business/topography"
+  ;;                                       "/Tympan/models/common"
+  ;;                                       "/Tympan/models/solver"
+  ;;                                       "/Tympan/solvers/ANIME3DSolver"
+  ;;                                       "/Tympan/solvers/ConvexHullFinder"
+  ;;                                       "/Tympan/solvers/DefaultSolver")
+  ;;                       :system-include-path '("/usr/include/c++/3.6.0/ /usr/include/boost/")
+  ;;                       :spp-table '(("isUnix" . "") ("BOOST_TEST_DYN_LINK" . "")))
 #+END_SRC
 **** GDB
 #+BEGIN_SRC emacs-lisp
-  ;; LD_LIBRAY_PATH (pour gdb) => pose pb avec psvn
-  (require 'gdb-mi) ;; build-in librairie
-  ;;(setq gdb-many-windows t)
-  ;;(setq gdb-show-main t)
-  (defun my-gdb (command-line)
-    (interactive (list (gud-query-cmdline 'gdb)))
-    (split-window-horizontally 100)
-    (gdb command-line)
-    (rename-buffer "GDB"))
-  (global-set-key (kbd "s-g") 'my-gdb)
-  ;; raccourcis
-  (add-hook 'gdb-mode-hook
-            (lambda()
-              ;; make gdb behave more like a normal terminal
-              (global-set-key (kbd "<up>") 'comint-previous-input)
-              (global-set-key (kbd "<down>") 'comint-next-input)))
+  ;; ;; LD_LIBRAY_PATH (pour gdb) => pose pb avec psvn
+  ;; (require 'gdb-mi) ;; build-in librairie
+  ;; ;;(setq gdb-many-windows t)
+  ;; ;;(setq gdb-show-main t)
+  ;; (defun my-gdb (command-line)
+  ;;   (interactive (list (gud-query-cmdline 'gdb)))
+  ;;   (split-window-horizontally 100)
+  ;;   (gdb command-line)
+  ;;   (rename-buffer "GDB"))
+  ;; (global-set-key (kbd "s-g") 'my-gdb)
+  ;; ;; raccourcis
+  ;; (add-hook 'gdb-mode-hook
+  ;;           (lambda()
+  ;;             ;; make gdb behave more like a normal terminal
+  ;;             (global-set-key (kbd "<up>") 'comint-previous-input)
+  ;;             (global-set-key (kbd "<down>") 'comint-next-input)))
 #+END_SRC
 **** CEDET for C++
 *dépendances*: [[https://www.emacswiki.org/emacs/eassist.el][eassist]] [[http://cedet.sourceforge.net/][cedet]] (voir init au dessus) [[https://github.com/randomphrase/company-c-headers][company-c-header]]s
@@ -3481,9 +3302,9 @@ word3
      (global-set-key (kbd "C-<tab>") 'company-complete)
      (global-set-key (kbd "M-s-<tab>") 'semantic-complete-analyze-inline)
      (global-set-key (kbd "M-i") 'semantic-decoration-include-visit)
-     (global-set-key (kbd "C-.") 'semantic-ia-fast-jump)
+     (global-set-key (kbd "C-.") 'dumb-jump-go)
      (global-set-key (kbd "C-c d") 'semantic-ia-show-doc)
-     (global-set-key (kbd "C-,") 'semantic-analyze-proto-impl-toggle)
+     (global-set-key (kbd "C-,") 'dumb-jump-back)
      (global-set-key (kbd "C-M-:") 'semantic-complete-jump)
      (global-set-key (kbd "C-:") 'semantic-complete-jump-local)
      (global-set-key (kbd "C-c s") 'semantic-ia-show-summary)
@@ -3512,38 +3333,39 @@ word3
    (add-to-list 'auto-mode-alist '("\\.cc\\'" . c++-mode))
    (add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
    ;; cedet semantic
-   (semanticdb-enable-gnu-global-databases 'c-mode t)
-   (semanticdb-enable-gnu-global-databases 'c++-mode t)
+   ;; (semanticdb-enable-gnu-global-databases 'c-mode t)
+   ;; (semanticdb-enable-gnu-global-databases 'c++-mode t)
    #+END_SRC
 **** eassist/xcscope/function-args
 *dépendances*:  [[http://cedet.sourceforge.net/][cedet]] [[https://github.com/dkogan/xcscope.el][xcscope.el]]
 #+BEGIN_SRC emacs-lisp
-  (defun my-c-mode-common-hook ()
-       ;; eassist
-       (require 'eassist) ;; M-o M-m
-       ;; function-args
-       (add-to-list 'load-path "~/.emacs.d/function-args")
-       (require 'function-args)
-       (fa-config-default)  ;; M-i M-j
-       (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-       ;; eassist
-       (setq eassist-header-switches '(("h" . ("cpp" "cc" "c" "cxx"))
-                                       ("hpp" . ("cpp" "cc" "cxx"))
-                                       ("cpp" . ("h" "hpp"))
-                                       ("cxx" . ("h" "hpp"))
-                                       ("c" . ("h"))
-                                       ("C" . ("H"))
-                                       ("H" . ("C" "CPP" "CC" "CXX"))
-                                       ("cc" . ("h" "hpp"))))
-       (define-key function-args-mode-map (kbd "M-o") 'eassist-switch-h-cpp)
-       (define-key function-args-mode-map (kbd "M-m") 'eassist-list-methods)
-       ;; You can add this to improve the parse of macro-heavy code:
-       (require 'semantic/bovine/c)
-       (add-to-list 'semantic-lex-c-preprocessor-symbol-file "/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/stddef.h")
-       ;; cscope
-       (require 'xcscope)
-       (cscope-setup)
-       (setq cscope-initial-directory "/space/giorgis/workspaces/CSO/cscope/"))
+    (defun my-c-mode-common-hook ()
+      ;; eassist
+      (require 'eassist) ;; M-o M-m
+      ;; function-args
+      ;;(require 'function-args)
+      (fa-config-default)  ;; M-i M-j
+      (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+      ;; eassist
+      (setq eassist-header-switches '(("h" . ("cpp" "cc" "c" "cxx"))
+                                      ("hpp" . ("cpp" "cc" "cxx"))
+                                      ("hh" . ("cc" "cxx"))
+                                      ("cpp" . ("h" "hpp"))
+                                      ("cxx" . ("h" "hpp"))
+                                      ("c" . ("h"))
+                                      ("C" . ("H"))
+                                      ("H" . ("C" "CPP" "CC" "CXX"))
+                                      ("cc" . ("h" "hpp" "hh"))))
+      (define-key function-args-mode-map (kbd "M-o") 'eassist-switch-h-cpp)
+      (define-key function-args-mode-map (kbd "M-m") 'eassist-list-methods)
+      ;; You can add this to improve the parse of macro-heavy code:
+      (require 'semantic/bovine/c)
+      (add-to-list 'semantic-lex-c-preprocessor-symbol-file "/usr/lib/gcc/x86_64-linux-gnu/6.3.0/include/stddef.h")
+      ;; cscope
+      ;; (require 'xcscope)
+      ;; (cscope-setup)
+      ;; (setq cscope-initial-directory "/home/logilab/workspaces/CSO/cscope/")
+  )
   (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 #+END_SRC
 **** helpers
@@ -3601,75 +3423,21 @@ word3
         (append '(("CMakeLists\\.txt\\'" . cmake-mode)
                   ("\\.cmake\\'" . cmake-mode)) auto-mode-alist))
 #+END_SRC
-**** doxygen
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/Outils/emacs/doxymacs-1.8.0/lisp/")
-  (require 'doxymacs)
-  (add-hook 'c-mode-common-hook 'doxymacs-mode)
-#+END_SRC
 *** Java
-**** Initialisation meghanada
-#+BEGIN_SRC emacs-lisp
-  (autoload 'meghanada-mode "meghanada" nil t)
-  (add-hook 'java-mode-hook
-            (lambda ()
-              (global-set-key (kbd "C-.") 'meghanada-jump-declaration)
-              (global-set-key (kbd "C-,") 'meghanada-back-jump)
-              (meghanada-mode t)
-              (flycheck-mode)))
-  #+END_SRC
-**** javadoc
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'java-mode-hook
-            (lambda ()
-              (require 'javadoc-lookup)
-              (setq-local browse-url-browser-function 'eww-browse-url)
-              (javadoc-add-roots "~/Outils/java/javadocs/api/")
-              (global-set-key (kbd "s-d") 'javadoc-lookup)))
-#+END_SRC
 **** Class decompiler
 *dépendances*: [[https://github.com/m0smith/dotfiles/blob/master/.emacs.d/site-lisp/jdc.el][jdc.el]]
 #+BEGIN_SRC emacs-lisp
   (add-hook 'archive-extract-hooks
             (lambda ()
               (require 'jdc)
-              (cond ((string-match "\312\376\272\276" (buffer-substring-no-properties 1 5))
-                     (jdc-buffer)))))
-#+END_SRC
-**** ant
-*dépendances*: [[https://github.com/tkg/ant-mode][ant-mode]]
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/Outils/emacs/ant-mode-master")
-  (autoload 'ant-mode "ant-mode" "Major mode for editing Ant build files." t)
-  (add-to-list 'auto-mode-alist '("build.xml" . ant-mode))
+              (cond ((string-match "\312\376\272\276" (buffer-substring-no-properties 1 5)) (jdc-buffer)))
+              (java-mode)
+              ))
 #+END_SRC
 *** Fortran
-*dépendances* [[https://github.com/rosenbrockc/fortpy][fortpy]]
+*dépendances* [[https://github.com/rosenbrockc/fortpy-el][fortpy]]
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.f\\'" . f90-mode))
-  (setq fortpy-server-command '("/usr/local/bin/python" "~/Outils/emacs/fortpy-el-master/build/lib/fortpyepcserver.py"))
-  (add-to-list 'load-path "~/Outils/emacs/fortpy-el-master")
-  (autoload 'fortpy-setup "fortpy" nil t)
-  (add-hook 'f90-mode-hook 'fortpy-setup)
-  (add-hook 'f90-mode-hook (lambda () (global-set-key (kbd "C-.") 'fortpy-goto-definition)))
-  (setq fortpy-complete-on-percent t)
-  (setq fortpy-complete-on-bracket t)
-  (setq fortpy-goto-definition-config
-        '((nil definition nil)
-      (t   definition nil)
-      (nil nil        nil)
-      (t   nil        nil)
-      (nil definition t  )
-      (t   definition t  )
-      (nil nil        t  )
-      (t   nil        t  )))
-  #+END_SRC
-*** Csharp
-*dépendances*: [[https://github.com/josteink/csharp-mode][csharp-mode.el]]
-#+BEGIN_SRC emacs-lisp
-  (autoload 'csharp-mode "csharp-mode" "Major mode for editing C# code." t)
-  (setq auto-mode-alist
-        (append '(("\\.cs$" . csharp-mode)) auto-mode-alist))
 #+END_SRC
 *** Scilab
 *dépendances*: [[http://www.emacswiki.org/emacs/scilab.el][scilab.el]]
@@ -3678,74 +3446,71 @@ word3
   (add-to-list 'auto-mode-alist '("\\.sci\\'" . scilab-mode))
   (add-to-list 'auto-mode-alist '("\\.sce\\'" . scilab-mode))
 #+END_SRC
-*** Visual basic
-*dépendances*: [[https://github.com/emacsmirror/visual-basic-mode][visual-basic-mode.el]]
-#+BEGIN_SRC emacs-lisp
-  (autoload 'visual-basic-mode "visual-basic-mode" "Visual Basic mode." t)
-  (setq auto-mode-alist (append '(("\\.\\(vb\\)$" . visual-basic-mode)) auto-mode-alist))
-#+END_SRC
-*** Web
+*** Web                                                               :web:
 **** Web-mode
 *dépendances* [[https://github.com/fxbois/web-mode][web-mode.el]] [[https://github.com/osv/company-web][company-web]] [[https://github.com/osv/web-completion-data][web-completion-data]]
 #+BEGIN_SRC emacs-lisp
-    (autoload 'web-mode "web-mode" "" t)
-    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.jinja\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-    (setq web-mode-auto-close-style 1)
-    (setq web-mode-tag-auto-close-style t)
-    (setq web-mode-enable-auto-pairing t)
-    (setq web-mode-enable-auto-indentation t)
-    (setq web-mode-enable-indent-cycle t)
-    ;; hook
-    (add-hook 'web-mode-hook (lambda ()
-                               ;; indentation
-                               (setq indent-tabs-mode nil)
-                               (setq web-mode-markup-indent-offset 4)
-                               (setq web-mode-css-indent-offset 4)
-                               (setq web-mode-code-indent-offset 4)
-                               ;; padding
-                               (setq web-mode-style-padding 1)
-                               (setq web-mode-script-padding 1)
-                               (setq web-mode-block-padding 0)
-                               ;; raccourcis
-                               (define-key web-mode-map (kbd "M-;") 'web-mode-comment-or-uncomment)
-                               (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
-                               (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
-                               ))
-    ;; company
-    (add-to-list 'load-path "~/.emacs.d/company-web")
-    (add-to-list 'load-path "~/.emacs.d/web-completion-data")
-    (require 'company-web-html)
-    (add-hook 'web-mode-hook
-                  (lambda ()
-                    (add-to-list (make-local-variable 'company-backends)
-                                 'company-nxml)
-                    (add-to-list (make-local-variable 'company-backends)
-                                 'company-web-html)
-                    (add-to-list (make-local-variable 'company-backends)
-                                 'company-css)
-                    ))
-    ;; force django engine for html
-    (setq web-mode-engines-alist
-          '(("django"    . "\\.html\\'")
-            ("jinja"    . "\\.jinja\\'")
-            ("jinja"    . "\\.jinja2\\'"))
-          )
-    ;; force django engine (manual)
-    (defun web-mode-django ()
-      (interactive)
-      (web-mode-set-engine "django"))
-    (global-set-key (kbd "s-%") 'web-mode-django)
-    ;; force angular engine (manual)
-    (defun web-mode-angularJs ()
-      (interactive)
-      (web-mode-set-engine "angular"))
+  (autoload 'web-mode "web-mode" "" t)
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.jinja\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mako\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\'" . web-mode))
+  (setq web-mode-auto-close-style 1)
+  (setq web-mode-tag-auto-close-style t)
+  (setq web-mode-enable-auto-pairing t)
+  (setq web-mode-enable-auto-indentation t)
+  (setq web-mode-enable-indent-cycle t)
+  (setq web-mode-enable-auto-quoting nil)
+  ;; hook
+  (add-hook 'web-mode-hook (lambda ()
+                             ;; indentation
+                             (setq indent-tabs-mode nil)
+                             (setq web-mode-markup-indent-offset 2)
+                             (setq web-mode-css-indent-offset 2)
+                             (setq web-mode-code-indent-offset 2)
+                             ;; padding
+                             (setq web-mode-style-padding 1)
+                             (setq web-mode-script-padding 1)
+                             (setq web-mode-block-padding 0)
+                             ;; raccourcis
+                             (define-key web-mode-map (kbd "M-;") 'web-mode-comment-or-uncomment)
+                             (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
+                             (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
+                             ))
+  ;; company
+  (require 'company-web-html)
+  (add-hook 'web-mode-hook
+                (lambda ()
+                  (add-to-list (make-local-variable 'company-backends)
+                               'company-nxml)
+                  (add-to-list (make-local-variable 'company-backends)
+                               'company-web-html)
+                  (add-to-list (make-local-variable 'company-backends)
+                               'company-css)
+                  ))
+  ;; force django engine for html
+  (setq web-mode-engines-alist
+        '(("django" . "\\.html\\'")
+          ("jinja" . "\\.jinja\\'")
+          ("jinja" . "\\.jinja2\\'"))
+        )
+  ;; force django engine (manual)
+  (defun web-mode-django ()
+    (interactive)
+    (web-mode-set-engine "django"))
+  (global-set-key (kbd "s-%") 'web-mode-django)
+  ;; force angular engine (manual)
+  (defun web-mode-angularJs ()
+    (interactive)
+    (web-mode-set-engine "angular"))
   #+END_SRC
 **** jquery
 #+BEGIN_SRC emacs-lisp
@@ -3772,17 +3537,17 @@ word3
       (setq emmet-use-css-transform t)
         (setq emmet-use-css-transform nil)))
     (emmet-expand-line nil))
-  (defun emmet-doc ()
-    (interactive)
-    (split-window-horizontally 144)
-    (eww-open-file "~/.emacs.d/emmet-doc/Cheat Sheet.html")
-    (swap-windows)
-    (other-window 1)
-    (split-window-vertically)
-    (find-file "~/.emacs.d/emmet-doc/emmet.org")
-    ;;(other-window 1)
-    (enlarge-window 20)
-    (other-window 3))
+  ;; (defun emmet-doc ()
+  ;;   (interactive)
+  ;;   (split-window-horizontally 144)
+  ;;   (eww-open-file "~/.emacs.d/emmet-doc/Cheat Sheet.html")
+  ;;   (swap-windows)
+  ;;   (other-window 1)
+  ;;   (split-window-vertically)
+  ;;   (find-file "~/.emacs.d/emmet-doc/emmet.org")
+  ;;   ;;(other-window 1)
+  ;;   (enlarge-window 20)
+  ;;   (other-window 3))
   #+END_SRC
 **** Javascript/json
 *dépendances*: [[https://github.com/mooz/js2-mode][js2-mode.el]] [[https://github.com/joshwnj/json-mode][json-mode.el]] [[https://github.com/gongo/json-reformat][json-reformat]] [[https://github.com/Sterlingg/json-snatcher][json-snatcher]]  [[https://github.com/omouse/angularjs-mode][angularjs-mode.el]]
@@ -3792,6 +3557,8 @@ word3
     (autoload 'json-mode "json-mode" "" t)
     (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
     (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
+    (add-to-list 'auto-mode-alist '("\\.ipynb$" . json-mode))
+    (setq js-indent-level 2)
     (setq js2-highlight-level 3)
     (add-hook 'js2-mode-hook
               (lambda ()
@@ -3817,7 +3584,6 @@ word3
       (interactive)
       (json-pretty-print (point-min) (point-max))
       (indent-region (point-min) (point-max)))
-  (require 'typescript-mode)
   ;; eslint
   (add-hook 'js2-mode-hook
             (lambda ()
@@ -3831,9 +3597,32 @@ word3
                                     '(json-jsonlist)))
               ;; use eslint with web-mode and javascript-mode
               (flycheck-add-mode 'javascript-eslint 'web-mode)
-              (flycheck-add-mode 'javascript-eslint 'js2-mode)))
+              (flycheck-add-mode 'javascript-eslint 'js2-mode))
+)
   ;; jhintrc
   ;;(setq flycheck-jshintrc "~/.emacs.d/.jshintrc")
+#+END_SRC
+**** typescript
+#+BEGIN_SRC emacs-lisp
+  (require 'typescript-mode)
+  (setq typescript-indent-level 2)
+  ;; tide
+  (defun setup-tide-mode ()
+    (interactive)
+    (require 'tide)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (global-set-key (kbd "C-.") 'tide-jump-to-definition)
+    (tide-hl-identifier-mode +1))
+  (add-hook 'typescript-mode-hook #'setup-tide-mode)
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                (setup-tide-mode))))
+  (flycheck-add-mode 'typescript-tslint 'web-mode)
+  (require 'prettier-js)
 #+END_SRC
 **** css and less-css
 *dépendances* [[https://github.com/purcell/less-css-mode][less-css-mode]]
@@ -3843,7 +3632,21 @@ word3
   (add-hook 'less-css-mode-hook 'rainbow-mode)
   (add-hook 'css-mode-hook 'rainbow-mode)
 #+END_SRC
-**** Vrac: accents HTML/Apache
+**** elm
+#+BEGIN_SRC emacs-lisp
+  (require 'elm-mode)
+  (setq elm-format-on-save t)
+  (add-hook 'elm-mode-hook
+            (lambda ()
+              (setq company-backends '(company-elm)))
+            (require 'flycheck-elm))
+  (eval-after-load 'flycheck
+    '(add-hook 'flycheck-mode-hook #'flycheck-elm-setup))
+  (add-to-list 'auto-mode-alist '("\\.eml\\'" . org-mode))
+  ;; elm TAGS
+  (setq tags-table-list (list "/home/logilab/workspaces/cubes/simulagora/frontend"))
+#+END_SRC
+**** Vrac: accents HTML/Apache open html
 *dépendances* [[http://www.emacswiki.org/emacs/html-accent.el][html-accent.el]] [[https://github.com/emacsmirror/emacswiki.org/blob/master/apache-mode.el][apache-mode.el]]
 #+BEGIN_SRC emacs-lisp
   ;; accents html
@@ -3856,10 +3659,19 @@ word3
   (add-to-list 'auto-mode-alist '("srm\\.conf\\'"    . apache-mode))
   (add-to-list 'auto-mode-alist '("access\\.conf\\'" . apache-mode))
   (add-to-list 'auto-mode-alist '("sites-\\(available\\|enabled\\)/" . apache-mode))
+  ;; open file in firefox
+  (defun open-html()
+    "Get the HTML file path & open it"
+    (interactive)
+    (let (html-file-path)
+      (setq html-file-path (buffer-file-name))
+      (shell-command (format "xdg-open '%s'" html-file-path))))
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (define-key web-mode-map (kbd "C-c C-c") 'open-html)))
 #+END_SRC
 **** restclient [[https://github.com/pashky/restclient.el][restclient.el]] [[https://github.com/for-GET/know-your-http-well][know-your-http-well]] [[https://github.com/iquiw/company-restclient][company-restclient]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/know-your-http-well/emacs")
   (autoload 'restclient-mode "restclient" "" t)
   (add-to-list 'auto-mode-alist '("\\.restclient$" . restclient-mode))
   (setq url-proxy-services '(("no_proxy" . "^\\(localhost\\|127.*\\|10.*\\)")))
@@ -3868,15 +3680,34 @@ word3
 *dépendances* [[https://github.com/ajc/nginx-mode][nginx-mode]]
 #+BEGIN_SRC emacs-lisp
   (autoload 'nginx-mode "nginx-mode" nil t)
+  (add-to-list 'auto-mode-alist '("default_site" . nginx-mode))
 #+END_SRC
 *** Statistiques ESS
 *dépendances* [[https://github.com/emacs-ess/ESS][ESS]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/ESS/lisp/")
   (defun ess ()
     (interactive)
     (load "ess-site")
     (revert-buffer))
+#+END_SRC
+*** Salt-mode
+#+BEGIN_SRC emacs-lisp
+  (require 'salt-mode)
+#+END_SRC
+*** groovy
+#+BEGIN_SRC emacs-lisp
+  (autoload 'groovy-mode "groovy-mode" "Start Groovy" t)
+  (add-to-list 'auto-mode-alist '("Jenkinsfile" . groovy-mode))
+#+END_SRC
+*** matlab
+#+BEGIN_SRC emacs-lisp
+  (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
+  (add-to-list 'auto-mode-alist '("\\.m$" . matlab-mode))
+#+END_SRC
+*** kotlin
+#+BEGIN_SRC emacs-lisp
+  (autoload 'kotlin-mode "kotlin-mode" nil t)
+  (add-to-list 'auto-mode-alist '("\\.kt\\'" . kotlin-mode))
 #+END_SRC
 ** Docker
 *dépendances*: [[https://github.com/spotify/dockerfile-mode][dockerfile-mode.el]] [[https://github.com/Silex/docker.el][docker.el]] [[https://github.com/Silex/tabulated-list-extensions][tle]] [[https://github.com/politza/tablist][tabList]]
@@ -3911,28 +3742,35 @@ word3
 ** eswap
 *dépendances* [[https://github.com/djangoliv/eswap][eswap-mode]]
 #+BEGIN_SRC emacs-lisp
-  (require 'eswap-mode)
-  (eswap-global-mode t)
-  (add-to-list 'eswap-except-modes 'org-mode) ;;
-  (setq eswap-toggle-path-alist ;; (srcPath . targetPath )
-        (quote
-         (("~/workspaces/proj1/trunk/src/main/python/" . "~/install/proj1/traitements/")
-          ("~/workspaces/proj1/trunk/src/main/config/" . "~/install/proj1/config/")
-          ("~/workspaces/proj2/trunk/src/Main" . "~/install/proj2/Main")
-          ;; ("" . "")
-          )))
+  ;; (require 'eswap-mode)
+  ;; (eswap-global-mode t)
+  ;; (setq eswap-toggle-path-alist ;; (srcPath . targetPath )
+  ;;       (quote
+  ;;        (("/space/logilab/workspaces/AGILE/trunk/agile-traitements/src/main/python/" . "/AGILE/SAG_vm-agile02/OPERATIONNEL/REFERENTIEL_AGILE/TRAITEMENTS/")
+  ;;         ("/space/logilab/workspaces/AGILE/trunk/agile-traitements/src/main/config/" . "/AGILE/SAG_vm-agile02/OPERATIONNEL/REFERENTIEL_AGILE/CONFIG/")
+  ;;         ("/space/logilab/workspaces/AGILE/trunk/agile-traitements/src/main/script" . "/AGILE/SAG_vm-agile02/OPERATIONNEL/REFERENTIEL_AGILE/SCRIPTS")
+  ;;         ("/space/logilab/workspaces/TEC-S2/trunk/tecs2-traitements/src/main/python/TEC_TRAITEMENTS/" . "/AGILE/SAG_vm-agile02/OPERATIONNEL/REFERENTIEL_TECS2/TRAITEMENTS/TEC_TRAITEMENTS/")
+  ;;         ("/space/logilab/workspaces/4ARTIC/trunk/src/Main" . "/space/logilab/dev/4ARTIC/install/Main")
+  ;;         ("/space/logilab/workspaces/4ARTIC/trunk/src/Input" . "/space/logilab/dev/4ARTIC/install/Input")
+  ;;         ("/space/logilab/workspaces/4ARTIC/trunk_preprocessing/src/Main/" . "/space/logilab/dev/4ARTIC/install_preproc/Main/")
+  ;;         ("/space/logilab/workspaces/4ARTIC/trunk_preprocessing/src/Input/" . "/space/logilab/dev/4ARTIC/install_preproc/Input/")
+  ;;         ("/space/logilab/workspaces/4ARTIC/trunk_preprocessing/ressources/" . "/space/logilab/dev/4ARTIC/install_preproc/ressources/")
+  ;;         ("/space/logilab/workspaces/4ARTIC/trunk/ressources" . "/space/logilab/dev/4ARTIC/install/ressources")
+  ;;         ("/home/logilab/.emacs.d/" . "/space/logilab/Outils/github/conf")
+  ;;         ("/home/logilab/.emacs.d/lisp" . "/space/logilab/Outils/github/org-week-tracker")
+  ;;         )))
 #+END_SRC
 ** Rechercher dans le projet courant
 *dépendances* [[https://github.com/djangoliv/ifind-mode-plus][ifind-mode-plus]]
 #+BEGIN_SRC emacs-lisp
-  (setq workspace-dir "/space/giorgis/workspaces/AGILE/trunk /AGILE/SAG_3.4/OPERATIONNEL/REFERENTIEL/TRAITEMENTS/SAG/ /space/giorgis/workspaces/4ARTIC/trunk /space/giorgis/workspaces/FLEGM/trunk")
-  (setq ifind-project-list '(("4ARTIC" . "/space/giorgis/workspaces/4ARTIC/trunk")
-                             ("AGILE" . "/space/giorgis/workspaces/AGILE/trunk /AGILE/SAG_3.4/OPERATIONNEL/REFERENTIEL/TRAITEMENTS/SAG/")
-                             ("FLEGM" . "/space/giorgis/workspaces/FLEGM/trunk")))
-  (autoload 'ifind-mode "ifind-mode-plus" "" t)
-  (autoload 'ifind-switch-project "ifind-mode-plus" "" t)
-  (global-set-key (kbd "C-x F") 'ifind-mode)
-  (global-set-key (kbd "C-x S") 'ifind-switch-project)
+  ;; (setq workspace-dir "/home/logilab/workspaces/")
+  ;; (setq ifind-project-list '(("MUSCLE-NG" . "/home/logilab/workspaces/MUSCLE-NG")
+  ;;                            ("AGILE" . "/space/logilab/workspaces/AGILE/trunk /AGILE/SAG/VALIDATION/REFERENTIEL/TRAITEMENTS/SAG/")
+  ;;                            ("FLEGM" . "/space/logilab/workspaces/FLEGM/trunk")))
+  ;; (autoload 'ifind-mode "ifind-mode-plus" "" t)
+  ;; (autoload 'ifind-switch-project "ifind-mode-plus" "" t)
+  ;; (global-set-key (kbd "C-x F") 'ifind-mode)
+  ;; (global-set-key (kbd "C-x S") 'ifind-switch-project)
 #+END_SRC
 ** Vrac
 #+BEGIN_SRC emacs-lisp
@@ -3955,15 +3793,20 @@ word3
       (while (re-search-forward "[0-9]*\\.?[0-9]+" nil t)
         (setq sum (+ sum (string-to-number (match-string 0)))))
       (message "Sum: %f" sum)))
-#+END_SRC
+  ;; list colors and switch
+  (defun list-colors ()
+    (interactive)
+    (list-colors-display)
+    (select-window (get-buffer-window "*Colors*")))
+  #+END_SRC
 ** Sort helper
 #+BEGIN_SRC emacs-lisp
   ;; tri avec respect des accents et majuscules
   (defun my-sort-lines-buffer ()
     (interactive)
     (shell-command-on-region (point-min) (point-max) "LC_COLLATE=en_US.UTF-8 sort" (buffer-name) t ))
-  (defun my-sort-lines-region (start end) 
-    (interactive "r") 
+  (defun my-sort-lines-region (start end)
+    (interactive "r")
     (shell-command-on-region start end "LC_COLLATE=en_US.UTF-8 sort" (buffer-name) t))
   (defun my-sort-lines-region-or-buffer ()
     (interactive)
@@ -4089,14 +3932,12 @@ word3
 * Final
 ** Custum file
 #+BEGIN_SRC emacs-lisp
-  ;; emacs custumize conf
+  ;; emacs customize conf
   (setq custom-file "~/.emacs.d/lisp/custom.el")
   (load custom-file 'noerror)
 #+END_SRC
 ** Server start
 #+BEGIN_SRC emacs-lisp
-  ;; start page
-  (setq initial-buffer-choice "~/workspaces")
   ;; server
   (server-start)
   ;; declare cette frame comme la princiale (pour emacsclient)
@@ -4105,4 +3946,55 @@ word3
   (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
   ;; plus rien a degugger
   (setq debug-on-error nil)
+  ;; start page
+  (setq initial-buffer-choice "~/.emacs-org/memo.org")
+#+END_SRC
+* Test
+#+BEGIN_SRC emacs-lisp
+      ;; =================== etags =====================
+      (defvar tags-cmd "etags -R ./* 2>/dev/null")
+      (defun regen-tags ()
+        "Regenerate the tags file for the current working directory"
+        (interactive)
+        (let ((tag-file (concat default-directory "TAGS")))
+          (shell-command tags-cmd)
+          (visit-tags-table tag-file)))
+      ;; =================== end etags =====================
+      (defun enable-clipboard()
+        (interactive)
+        ;;(setq x-select-enable-clipboard t)
+        (setq select-enable-clipboard t)
+        (setq interprogram-paste-function 'x-cut-buffer-or-selection-value))
+    ;; google agenda
+    (require 'ansi-color)
+    (defun display-ansi-colors ()
+      (interactive)
+      (ansi-color-apply-on-region (point-min) (point-max)))
+    (defun gagenda-open ()
+      "Open my google calendar agenda file. The agenda is displayed in the buffer *gcal*."
+      (interactive)
+      ;; launch gcalcli
+      (shell-command "python2 /usr/bin/gcalcli --nostarted agenda > /tmp/gagenda")
+      ;; set name of calendar buffer and location of file containing my agenda
+      (let ((tmp-buff-name "*gcal*") (cal-file (expand-file-name "/tmp/gagenda")))
+      ;; switch to calendar buffer
+      (switch-to-buffer tmp-buff-name)
+      ;; turn off read only to overwrite if buffer exists
+      (read-only-mode -1)
+      ;; clear buffer
+      (erase-buffer)
+      ;; insert agenda file
+      (insert-file-contents cal-file)
+      ;; turn on colours
+      (display-ansi-colors)
+      ;; turn on special mode
+      (special-mode)
+      ;; turn off line wrapping
+      (visual-line-mode -1)))
+    ;; grammalecte
+    ;;(load-file "/home/logilab/.emacs.d/flycheck-grammalecte/flycheck-grammalecte.el")
+    (setq flycheck-grammalecte-enabled-modes
+        '(org-mode text-mode mail-mode latex-mode markdown-mode mu4e-compose-mode))
+    (require 'flycheck-grammalecte)
+
 #+END_SRC
