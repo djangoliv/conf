@@ -122,6 +122,8 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+# gpg-agent deamon
+exec_always --no-startup-id "eval $(gpg-agent --daemon)"
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -154,12 +156,16 @@ focus_follows_mouse no
 
 # network
 exec --no-startup-id nm-applet
+# safeeyes
+#exec --no-startup-id safeeyes
 
 # status bar
 bar {
     font pango:Economica, FontAwesome 10
-    status_command i3status --config ~/.config/i3/i3status.conf
-    separator_symbol " ⋆ "
+    #status_command exec ~/.config/i3/i3status/i3status/mybar.sh
+    #status_command i3status --config ~/.config/i3/i3status.conf
+    status_command py3status -c ~/.config/i3/i3status.conf
+    separator_symbol "⁞"
     colors {
         statusline #9CA2A4
         focused_workspace  #333333 #5F676A #ffffff
@@ -168,51 +174,62 @@ bar {
         urgent_workspace   #2f343a #700000 #ffffff
     }
 }
-client.focused #3f4f23 #3f4f4f #afafaf #ffffff
+client.focused #32411C #113937 #afafaf #ffffff
 client.focused_inactive #000000 #000000 #606060 #000000
 client.unfocused #000000 #000000 #606060 #000000
 
 # workspace 1
-exec --no-startup-id i3-msg 'workspace 1; append_layout /home/ogiorgis/.config/i3/workspace-1.json'
-exec --no-startup-id i3-msg 'workspace 1; exec /home/ogiorgis/Tools/emacs/emacs/src/emacs --name emacs'
-exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/emacs -q -l ~/.emacs-terms --name emacsTerm'
+exec --no-startup-id i3-msg 'workspace 1; append_layout /home/djangoliv/.config/i3/workspace-1.json'
+exec --no-startup-id i3-msg 'workspace 1; exec /home/djangoliv/Tools/emacs/emacs/src/emacs --name emacs'
+exec --no-startup-id i3-msg 'workspace 1; exec /home/djangoliv/Tools/emacs/emacs/src/emacs -q -l ~/.emacs-terms --name emacsTerm'
 exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/xterm'
 # # workspace2: mail
 exec --no-startup-id i3-msg 'workspace 3; exec /usr/bin/thunderbird'
 # workspace3: firefox
-exec --no-startup-id i3-msg 'workspace 2; exec /home/ogiorgis/Tools/firefox/firefox/firefox'
+exec --no-startup-id i3-msg 'workspace 2; exec /home/djangoliv/Tools/firefox/firefox/firefox'
 # # workspace4: jabber
 # exec --no-startup-id i3-msg 'workspace 4; exec /usr/bin/gajim'
+
+# background
+exec --no-startup-id feh --bg-scale /home/djangoliv/doc/perso/wallpaper.jpg
+# redshift
+exec --no-startup-id redshift-gtk
+
 
 # shortcuts
 
 # calendar
 bindsym $mod+c exec zenity --calendar
 # emacs
-bindsym --release $mod+x exec --no-startup-id /home/ogiorgis/Tools/emacs/emacs/src/emacs --name emacs
-bindsym --release $mod+t exec --no-startup-id "/usr/bin/emacs -q -l ~/.emacs-terms"
+bindsym --release $mod+x exec --no-startup-id /home/djangoliv/Tools/emacs/emacs/src/emacs --name emacs
+bindsym --release $mod+t exec --no-startup-id "/home/djangoliv/Tools/emacs/emacs/src/emacs -q -l ~/.emacs-terms"
+# xterm
+bindsym --release $mod+Enter exec --no-startup-id "xterm" --name xterm
 # workspaces
 bindsym $mod+Tab workspace next
 bindsym $mod+oe workspace prev
 # hibernate
-bindsym $mod+Shift+Escape exec "i3lock; systemctl hibernate"
+bindsym $mod+Shift+Escape exec "i3lock -c 103c48; systemctl hibernate"
 bindsym $mod+Escape exec "i3lock -c 000033"
 # mount USB
 bindsym $mod+m exec --no-startup-id "udisksctl mount -b /dev/sdb1 /media/$USER/"
 # kill workspace
 bindsym $mod+Control+Shift+k focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, kill
 # firefox
-bindsym --release $mod+Shift+f exec --no-startup-id /home/ogiorgis/Tools/firefox/firefox/firefox
+bindsym --release $mod+Shift+f exec --no-startup-id /home/djangoliv/Tools/firefox/firefox/firefox
+# thunderbird
+bindsym --release $mod+Shift+t exec --no-startup-id /usr/bin/thunderbird
+# gajim
+bindsym --release $mod+g exec --no-startup-id gajim
 # auto i3lock
-# exec xautolock -time 1 -locker "i3lock -d -c 000070" -notify 30 -notifier "notify-send -u critical -t 10000 -- 'LOCKING screen in 30 seconds'"
 exec xautolock -detectsleep -time 15 -locker "i3lock -c 000033"
 
 #exec xrandr --output eDP-1 --auto --output HDMI1 --auto --left-of eDP1
-# workspace 1 output eDP-1
-# workspace 2 output eDP-1
-# workspace 3 output eDP-1
-# workspace 4 output eDP-1
-# workspace 5 output HDMI-1
+#workspace 1 output HDMI-1
+#workspace 2 output HDMI-1
+#workspace 3 output HDMI-1
+#workspace 4 output HDMI-1
+#workspace 5 output eDP-1
 # workspace 6 output HDMI-1
 
 
