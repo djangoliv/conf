@@ -75,6 +75,11 @@ bindsym $mod+v split v
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
 
+# Screenshots
+bindsym Print exec --no-startup-id maim "/home/ogiorgis/doc/screenshots/$(date '+%Y-%m-%d_%H:%M:%S').jpg"
+bindsym $mod+Print exec --no-startup-id maim --window $(xdotool getactivewindow) "/home/ogiorgis/doc/screenshots/$(date '+%Y-%m-%d_%H:%M:%S').jpg"
+bindsym Shift+Print exec --no-startup-id maim --select "/home/ogiorgis/doc/screenshots/$(date '+%Y-%m-%d_%H:%M:%S').jpg"
+
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+s layout stacking
 bindsym $mod+z layout tabbed
@@ -87,10 +92,24 @@ bindsym $mod+Shift+space floating toggle
 bindsym $mod+space focus mode_toggle
 
 # focus the parent container
-bindsym $mod+q focus parent
+#bindsym $mod+q focus parent
 
+# exit i3
+mode "exit: [l]ogout, [r]eboot, [s]hutdown" {
+  bindsym l exec i3-msg exit
+  bindsym r exec systemctl reboot
+  bindsym s exec systemctl shutdown
+  bindsym Escape mode "default"
+  bindsym Return mode "default"
+}
+bindsym $mod+Shift+q mode "exit: [l]ogout, [r]eboot, [s]hutdown"
 # focus the child container
 #bindsym $mod+d focus child
+
+# set $ws1 "dev"
+# set $ws2 "web"
+# set $ws3 "mail"
+# set $ws4 "chat"
 
 # switch to workspace
 bindsym $mod+ampersand workspace 1
@@ -162,12 +181,9 @@ exec --no-startup-id nm-applet
 # status bar
 bar {
     font pango:Economica, FontAwesome 10
-    #status_command exec ~/.config/i3/i3status/i3status/mybar.sh
-    #status_command i3status --config ~/.config/i3/i3status.conf
     status_command py3status -c ~/.config/i3/i3status.conf
     separator_symbol "⁞"
     colors {
-        statusline #9CA2A4
         focused_workspace  #333333 #5F676A #ffffff
         active_workspace   #567D00 #000033 #aaaaaa
         inactive_workspace #333333 #000000 #5F676A
@@ -177,21 +193,22 @@ bar {
 client.focused #32411C #113937 #afafaf #ffffff
 client.focused_inactive #000000 #000000 #606060 #000000
 client.unfocused #000000 #000000 #606060 #000000
+for_window [class="^.*"] border pixel 2
 
 # workspace 1
-exec --no-startup-id i3-msg 'workspace 1; append_layout /home/djangoliv/.config/i3/workspace-1.json'
-exec --no-startup-id i3-msg 'workspace 1; exec /home/djangoliv/Tools/emacs/emacs/src/emacs --name emacs'
-exec --no-startup-id i3-msg 'workspace 1; exec /home/djangoliv/Tools/emacs/emacs/src/emacs -q -l ~/.emacs-terms --name emacsTerm'
+exec --no-startup-id i3-msg 'workspace 1; append_layout /home/ogiorgis/.config/i3/workspace-1.json'
+exec --no-startup-id i3-msg 'workspace 1; exec /home/ogiorgis/Tools/emacs/emacs/src/emacs --name emacs'
+exec --no-startup-id i3-msg 'workspace 1; exec /home/ogiorgis/Tools/emacs/emacs/src/emacs -q -l ~/.emacs-terms --name emacsTerm'
 exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/xterm'
 # # workspace2: mail
 exec --no-startup-id i3-msg 'workspace 3; exec /usr/bin/thunderbird'
 # workspace3: firefox
-exec --no-startup-id i3-msg 'workspace 2; exec /home/djangoliv/Tools/firefox/firefox/firefox'
+exec --no-startup-id i3-msg 'workspace 2; exec /home/ogiorgis/Tools/firefox/firefox/firefox'
 # # workspace4: jabber
 # exec --no-startup-id i3-msg 'workspace 4; exec /usr/bin/gajim'
 
 # background
-exec --no-startup-id feh --bg-scale /home/djangoliv/doc/perso/wallpaper.jpg
+exec --no-startup-id feh --bg-scale /home/ogiorgis/doc/perso/wallpaper.jpg
 # redshift
 exec --no-startup-id redshift-gtk
 
@@ -201,8 +218,8 @@ exec --no-startup-id redshift-gtk
 # calendar
 bindsym $mod+c exec zenity --calendar
 # emacs
-bindsym --release $mod+x exec --no-startup-id /home/djangoliv/Tools/emacs/emacs/src/emacs --name emacs
-bindsym --release $mod+t exec --no-startup-id "/home/djangoliv/Tools/emacs/emacs/src/emacs -q -l ~/.emacs-terms"
+bindsym --release $mod+x exec --no-startup-id /home/ogiorgis/Tools/emacs/emacs/src/emacs --name emacs
+bindsym --release $mod+t exec --no-startup-id "/home/ogiorgis/Tools/emacs/emacs/src/emacs -q -l ~/.emacs-terms"
 # xterm
 bindsym --release $mod+Enter exec --no-startup-id "xterm" --name xterm
 # workspaces
@@ -216,7 +233,7 @@ bindsym $mod+m exec --no-startup-id "udisksctl mount -b /dev/sdb1 /media/$USER/"
 # kill workspace
 bindsym $mod+Control+Shift+k focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, kill
 # firefox
-bindsym --release $mod+Shift+f exec --no-startup-id /home/djangoliv/Tools/firefox/firefox/firefox
+bindsym --release $mod+Shift+f exec --no-startup-id /home/ogiorgis/Tools/firefox/firefox/firefox
 # thunderbird
 bindsym --release $mod+Shift+t exec --no-startup-id /usr/bin/thunderbird
 # gajim
