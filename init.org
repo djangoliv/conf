@@ -2634,8 +2634,6 @@ Collection of Emacs Development Environment Tools
               ;; Python indentation
               (setq tab-width 4)
               (setq python-indent-offset 4)
-              ;; highlight operators
-              (highlight-operators-mode)
               ;; indentation auto
               (require 'fuzzy-format)
               (global-fuzzy-format-mode)
