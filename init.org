@@ -62,6 +62,8 @@ Configuration Minimal (sans librairies externes)
   (setq scroll-conservatively 10)
   ;; Laisser le curseur en place lors d'un défilement par pages.
   (setq scroll-preserve-screen-position t)
+  ;; horizontal scroll
+  (setq mouse-wheel-tilt-scroll t)
   ;; sous-mots
   ;;(global-subword-mode 1)
   ;; Recherche automatique des fermetures et ouvertures des parentheses
@@ -424,7 +426,7 @@ Collection of Emacs Development Environment Tools
   (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
   (setq semantic-load-turn-everything-on t)
   (semantic-mode)
-  (use-package stickyfunc-enhance :straight t) ;; multilines concatene dans la header line
+  ;;(use-package stickyfunc-enhance :straight t) ;; multilines concatene dans la header line
 #+END_SRC
 * Major-modes
 ** Text-mode
@@ -731,9 +733,9 @@ Collection of Emacs Development Environment Tools
      (R . t)
      (python . t)))
   ;; dita
-  (setq org-ditaa-jar-path "/home/ogiorgis/Tools/ditaa/ditaa0_9.jar")
+  (setq org-ditaa-jar-path "~/Tools/ditaa/ditaa0_9.jar")
   ;; plantuml
-  (setq org-plantuml-jar-path "/home/ogiorgis/.emacs.d/plantuml/plantuml.jar")
+  (setq org-plantuml-jar-path "~/.emacs.d/plantuml/plantuml.jar")
   ;; don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)
   ;; display/update images in the buffer after I evaluate
@@ -910,7 +912,7 @@ Collection of Emacs Development Environment Tools
     :defer 1
     :config
     (add-to-list 'auto-mode-alist '("\\.uml\\'" . plantuml-mode))
-    (setq plantuml-jar-path "/home/ogiorgis/.emacs.d/plantuml/plantuml.jar"))
+    (setq plantuml-jar-path "~/.emacs.d/plantuml/plantuml.jar"))
  #+END_SRC
 ** gnuplot
 #+Begin_SRC emacs-lisp
@@ -1076,6 +1078,7 @@ Collection of Emacs Development Environment Tools
     (setq undo-tree-auto-save-history 1)
     (setq undo-tree-visualizer-timestamps t)
     (setq undo-tree-enable-undo-in-region nil)
+    (add-to-list 'undo-tree-incompatible-major-modes #'magit-status-mode)
     (setq-default undo-tree-history-directory-alist (quote (("." . "~/.emacs-undo-files/"))))
     (defun undo-toggle-diff ()
       (interactive)
@@ -1265,6 +1268,7 @@ Collection of Emacs Development Environment Tools
      :straight t
      :config
      (drag-stuff-global-mode t)
+     (drag-stuff-define-keys)
      ;; org-mode gere mieux tout seul
      (add-to-list 'drag-stuff-except-modes 'org-mode))
  #+END_SRC
@@ -1699,6 +1703,21 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   (use-package verbiste :straight t :defer 1)
  #+END_SRC
+*** languagetool
+#+BEGIN_SRC emacs-lisp
+  (use-package languagetool
+    :straight (:host github :repo "PillFall/Emacs-LanguageTool.el")
+    :config
+    (global-set-key (kbd "C-c l c") 'languagetool-check)
+    (global-set-key (kbd "C-c l d") 'languagetool-clear-buffer)
+    (global-set-key (kbd "C-c l p") 'languagetool-correct-at-point)
+    (global-set-key (kbd "C-c l b") 'languagetool-correct-buffer)
+    (global-set-key (kbd "C-c l l") 'languagetool-set-language)
+    (setq languagetool-language-tool-jar
+          "/home/ogiorgis/Tools/languageTool/LanguageTool-5.3/languagetool-commandline.jar")
+    (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8"))
+    (setq languagetool-default-language "en-GB"))
+#+END_SRC
 ** Web
 *** Firefox
 #+BEGIN_SRC emacs-lisp
@@ -1997,10 +2016,7 @@ Collection of Emacs Development Environment Tools
 #+End_SRC
 *** vlf (View Large Files)
 #+BEGIN_SRC emacs-lisp
-  (use-package vlf
-    :straight t
-    :config
-    (require 'vlf-setup))
+  (use-package vlf :straight t)
 #+END_SRC
 *** (un)tabify-buffer
 #+BEGIN_SRC emacs-lisp
@@ -2050,29 +2066,27 @@ Collection of Emacs Development Environment Tools
 #+END_SRC
 *** logview
 #+BEGIN_SRC emacs-lisp
-  (use-package logview
-  :straight t
-  :defer 1
-  :config
-    (add-to-list 'auto-mode-alist '("\\log.txt\\'" . logview-mode))
-    (add-to-list 'auto-mode-alist '("\\.log\\'" . logview-mode))
-    (custom-set-variables  '(logview-additional-submodes
-                             (quote
-                              (("kube Format"
-                                (format . "[LEVEL TIMESTAMP NAME")
-                                (levels . "kubeLevels")
-                                (timestamp . "yyyy-MM-dd")
-                                (aliases))
-                               ("tomcat Format"
-                                (format . "TIMESTAMP [THREAD] LEVEL NAME")
-                                (levels . "SLF4J")
-                                (timestamp)
-                                (aliases)))))
-                           '(logview-additional-level-mappings
-                             (quote (("kubeLevels" . ((error "E")(warning "W")(information "I")(debug "D")(trace "T"))))))
-                           '(logview-additional-timestamp-formats
-                             (quote (("xxx" (regexp . "[0-9]\\{4\\}-[01][0-9]-[0-3][0-9] [012][0-9]:[0-5][0-9]:[0-9][0-9],[0-9]\\{3\\}") (aliases))))))
+    (use-package logview
+    :straight t
+    :defer 1
+    :config
+      (add-to-list 'auto-mode-alist '("\\log.txt\\'" . logview-mode))
+      (add-to-list 'auto-mode-alist '("\\.log\\'" . logview-mode))
+      (custom-set-variables  '(logview-additional-submodes
+                               (quote
+                                (("kube Format"
+                                  (format . "[LEVEL TIMESTAMP NAME")
+                                  (levels . "kubeLevels")
+                                  (aliases)) )))
+                             '(logview-additional-level-mappings
+                               (quote (("kubeLevels" . ((error "E")(warning "W")(information "I")(debug "D")(trace "T"))))))
+                             '( logview-additional-timestamp-formats
+                                '(("MMM-dd HH:mm:ss.SSS"
+                                   (java-pattern . "MMM-dd HH:mm:ss.SSS"))))
+
+
   )
+    )
 #+END_SRC
 *** syslog
 #+BEGIN_SRC emacs-lisp
@@ -2487,8 +2501,8 @@ Collection of Emacs Development Environment Tools
     ;; pour git
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
     ;; diff-hl-flydiff
-    ;; (require 'diff-hl-flydiff)
-    ;; (diff-hl-flydiff-mode)
+    ;;(require 'diff-hl-flydiff)
+    ;;(diff-hl-flydiff-mode)
     ;; smartrep
     (smartrep-define-key
         global-map "C-x"
@@ -2504,7 +2518,7 @@ Collection of Emacs Development Environment Tools
         (cons '("\\.\\(xml\\|XML\\|xsd\\|XSD\\|xsl\\|prj\\|rng\\|xhtml\\|CR\\)\\'" . nxml-mode)
               auto-mode-alist))
   (defun my-nxml-hook ()
-    (require 'smart-tabs-mode)
+    (use-package smart-tabs-mode :straight t)
     (setq-default tab-width 4)    ;; taille TAB
     (smart-tabs-insinuate 'nxml)
     (setq nxml-child-indent 4
@@ -2626,6 +2640,10 @@ Collection of Emacs Development Environment Tools
   (add-to-list 'auto-mode-alist '("\\pylintrc\\'" . python-mode))
   ;; fuzzy-format for this
   (setq python-indent-guess-indent-offset nil)
+  (use-package fuzzy-format
+    :straight t
+    :config
+    (global-fuzzy-format-mode))
   ;; hook
   (add-hook 'python-mode-hook
             (lambda ()
@@ -2634,9 +2652,6 @@ Collection of Emacs Development Environment Tools
               ;; Python indentation
               (setq tab-width 4)
               (setq python-indent-offset 4)
-              ;; indentation auto
-              (require 'fuzzy-format)
-              (global-fuzzy-format-mode)
               (require 'flycheck-pycheckers)  ;; config file ~/.pycheckers
               (setq flycheck-pycheckers-ignore-codes '("C0411" "C0413" "W503"))
               (with-eval-after-load 'flycheck
@@ -2717,10 +2732,6 @@ Pour typer un parametre dans la doc
     :config
     (add-hook 'python-mode-hook (lambda () (python-docstring-mode t))))
 #+END_SRC
-**** pycscope (xcscope) surtout pour call-hierarchy
-#+BEGIN_SRC emacs-lisp
-  (require 'xpycscope)
-#+END_SRC
 **** PDB
 #+BEGIN_SRC emacs-lisp
   ;;(setq gud-pdb-command-name "~/Outils/pdb/pdb.py")
@@ -2789,7 +2800,6 @@ Pour typer un parametre dans la doc
 #+END_SRC
 **** fstring
 #+BEGIN_SRC emacs-lisp
-(require 'python)
 (setq python-font-lock-keywords-maximum-decoration
       (append python-font-lock-keywords-maximum-decoration
           '(;; this is the full string.
@@ -2824,21 +2834,6 @@ Pour typer un parametre dans la doc
     (modern-c++-font-lock-global-mode t))
   (use-package clang-format :straight t)
   #+END_SRC
-**** GGTAGS
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (require 'ggtags)
-              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
-                (ggtags-mode 1))
-              (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
-              (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
-              (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
-              (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
-              (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
-              (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
-              (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)))
-#+END_SRC
 **** EDE
 #+BEGIN_SRC emacs-lisp
   (ede-cpp-root-project :name "Code Tympan"
@@ -2867,25 +2862,6 @@ Pour typer un parametre dans la doc
                         :system-include-path '("/usr/include/c++/3.6.0/ /usr/include/boost/")
                         :spp-table '(("isUnix" . "") ("BOOST_TEST_DYN_LINK" . "")))
 #+END_SRC
-**** GDB
-#+BEGIN_SRC emacs-lisp
-  ;; ;; LD_LIBRAY_PATH (pour gdb) => pose pb avec psvn
-  ;; (require 'gdb-mi) ;; build-in librairie
-  ;; ;;(setq gdb-many-windows t)
-  ;; ;;(setq gdb-show-main t)
-  ;; (defun my-gdb (command-line)
-  ;;   (interactive (list (gud-query-cmdline 'gdb)))
-  ;;   (split-window-horizontally 100)
-  ;;   (gdb command-line)
-  ;;   (rename-buffer "GDB"))
-  ;; (global-set-key (kbd "s-g") 'my-gdb)
-  ;; ;; raccourcis
-  ;; (add-hook 'gdb-mode-hook
-  ;;           (lambda()
-  ;;             ;; make gdb behave more like a normal terminal
-  ;;             (global-set-key (kbd "<up>") 'comint-previous-input)
-  ;;             (global-set-key (kbd "<down>") 'comint-next-input)))
-#+END_SRC
 **** CEDET for C++
  #+BEGIN_SRC emacs-lisp
    (defun my-cedet-hook ()
@@ -2902,7 +2878,7 @@ Pour typer un parametre dans la doc
      (global-set-key (kbd "C-<tab>") 'company-complete)
      (global-set-key (kbd "M-s-<tab>") 'semantic-complete-analyze-inline)
      (global-set-key (kbd "M-i") 'semantic-decoration-include-visit)
-     (global-set-key (kbd "C-.") 'dumb-jump-go)
+     (global-set-key (kbd "C-.") 'xref-find-definition)
      (global-set-key (kbd "C-c d") 'semantic-ia-show-doc)
      (global-set-key (kbd "C-,") 'dumb-jump-back)
      (global-set-key (kbd "C-M-:") 'semantic-complete-jump)
@@ -2910,8 +2886,6 @@ Pour typer un parametre dans la doc
      (global-set-key (kbd "C-c s") 'semantic-ia-show-summary)
      (global-set-key (kbd "C-c c") 'semantic-ia-describe-class)
      (global-set-key (kbd "C-c B") 'semantic-ia-fast-jump-back)
-     ;; gtags
-     (global-set-key (kbd "C-s-.") 'ggtags-find-tag-dwim)
      ;; deplacement de function en function
      (global-set-key (kbd "M-s-<left>") 'senator-previous-tag)
      (global-set-key (kbd "M-s-<right>") 'senator-next-tag)
@@ -2922,19 +2896,11 @@ Pour typer un parametre dans la doc
      (global-set-key (kbd "C-<kp-subtract>") 'senator-fold-tag)
      (global-set-key (kbd "C-<kp-add>") 'senator-unfold-tag)
      ;; company
-     (require 'company-c-headers)
+     (use-package company-c-headers :straight t)
      (add-to-list 'company-backends 'company-c-headers)
      (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.7/ /usr/include/boost/")
      )
    (add-hook 'c++-mode-hook 'my-cedet-hook)
-   ;; extension <=> mode
-   ;; (add-to-list 'auto-mode-alist '("\\.h\\'" . cpp-mode))
-   ;; (add-to-list 'auto-mode-alist '("\\.hpp\\'" . cpp-mode))
-   ;; (add-to-list 'auto-mode-alist '("\\.cc\\'" . cpp-mode))
-   ;; (add-to-list 'auto-mode-alist '("\\.cxx\\'" . cpp-mode))
-   ;; cedet semantic
-   ;; (semanticdb-enable-gnu-global-databases 'c-mode t)
-   ;; (semanticdb-enable-gnu-global-databases 'c++-mode t)
    #+END_SRC
 **** eassist/xcscope/function-args
 #+BEGIN_SRC emacs-lisp
@@ -2942,7 +2908,7 @@ Pour typer un parametre dans la doc
       ;; eassist
       (require 'eassist) ;; M-o M-m
       ;; function-args
-      (require 'function-args)
+      (use-package function-args :straight t)
       ;;(fa-config-default)  ;; M-i M-j
       (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
       ;; eassist
@@ -2955,15 +2921,10 @@ Pour typer un parametre dans la doc
                                       ("C" . ("H"))
                                       ("H" . ("C" "CPP" "CC" "CXX"))
                                       ("cc" . ("h" "hpp" "hh"))))
-      (define-key function-args-mode-map (kbd "M-o") 'eassist-switch-h-cpp)
-      (define-key function-args-mode-map (kbd "M-m") 'eassist-list-methods)
-      ;; You can add this to improve the parse of macro-heavy code:
+      (global-set-key (kbd "M-o") 'eassist-switch-h-cpp)
+            ;; You can add this to improve the parse of macro-heavy code:
       (require 'semantic/bovine/c)
       (add-to-list 'semantic-lex-c-preprocessor-symbol-file "/usr/lib/gcc/x86_64-linux-gnu/6.3.0/include/stddef.h")
-      ;; cscope
-      ;; (require 'xcscope)
-      ;; (cscope-setup)
-      ;; (setq cscope-initial-directory "/home/ogiorgis/workspaces/CSO/cscope/")
   )
   (add-hook 'c++-mode-hook 'my-c-mode-common-hook)
 #+END_SRC
@@ -3023,93 +2984,37 @@ Pour typer un parametre dans la doc
           (append '(("CMakeLists\\.txt\\'" . cmake-mode)
                     ("\\.cmake\\'" . cmake-mode)) auto-mode-alist)))
 #+END_SRC
-*** Java
-**** Class decompiler
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'archive-extract-hooks
-            (lambda ()
-              (require 'jdc)
-              (cond ((string-match "\312\376\272\276" (buffer-substring-no-properties 1 5)) (jdc-buffer)))
-              (java-mode)
-              ))
-#+END_SRC
 *** Fortran
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.f\\'" . f90-mode))
 #+END_SRC
-*** Web
-**** Web-mode
+*** Statistiques ESS
 #+BEGIN_SRC emacs-lisp
-  (use-package web-mode 
+  (use-package ess
     :straight t
+    :commands ess-site)
+#+END_SRC
+*** Salt-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package salt-mode :straight t :defer 1)
+#+END_SRC
+*** groovy
+#+BEGIN_SRC emacs-lisp
+  (use-package groovy-mode
+    :straight t
+    :defer 1
     :config
-    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.jinja\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.mako\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.tpl\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
-    (setq web-mode-auto-close-style 1)
-    (setq web-mode-tag-auto-close-style t)
-    (setq web-mode-enable-auto-pairing t)
-    (setq web-mode-enable-auto-indentation t)
-    (setq web-mode-enable-indent-cycle t)
-    (setq web-mode-enable-auto-quoting nil)
-    ;; hook
-    (add-hook 'web-mode-hook (lambda ()
-                               ;; indentation
-                               (setq indent-tabs-mode nil)
-                               (setq web-mode-markup-indent-offset 2)
-                               (setq web-mode-css-indent-offset 2)
-                               (setq web-mode-code-indent-offset 2)
-                               ;; padding
-                               (setq web-mode-style-padding 1)
-                               (setq web-mode-script-padding 1)
-                               (setq web-mode-block-padding 0)
-                               ;; raccourcis
-                               (define-key web-mode-map (kbd "M-;") 'web-mode-comment-or-uncomment)
-                               (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
-                               (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
-                               ))
-    ;; company
-    (use-package ac-html-bootstrap :straight t :defer 1)
-    (use-package company-web
-      :straight t
-      :defer 1
-      :config
-      (add-hook 'web-mode-hook
-                (lambda ()
-                  (add-to-list (make-local-variable 'company-backends)
-                               'company-nxml)
-                  (add-to-list (make-local-variable 'company-backends)
-                               'company-web-html)
-                  (add-to-list (make-local-variable 'company-backends)
-                               'company-css)
-                  )))
-    ;; force django engine for html
-    (setq web-mode-engines-alist
-          '(("django" . "\\.html\\'")
-            ("jinja" . "\\.jinja\\'")
-            ("jinja" . "\\.jinja2\\'"))
-        )
-    ;; force django engine (manual)
-    (defun web-mode-django ()
-      (interactive)
-      (web-mode-set-engine "django"))
-    (global-set-key (kbd "s-%") 'web-mode-django)
-    ;; force angular engine (manual)
-    (defun web-mode-angularJs ()
-      (interactive)
-      (web-mode-set-engine "angular")))
-  #+END_SRC
+    (add-to-list 'auto-mode-alist '("Jenkinsfile" . groovy-mode)))
+#+END_SRC
+*** kotlin
+#+BEGIN_SRC emacs-lisp
+  (use-package kotlin-mode
+    :straight t
+    :defer
+    :config
+    (add-to-list 'auto-mode-alist '("\\.kt\\'" . kotlin-mode)))
+#+END_SRC
+*** Web
 **** jquery
 #+BEGIN_SRC emacs-lisp
   (use-package jquery-doc
@@ -3158,44 +3063,115 @@ Pour typer un parametre dans la doc
               )
     )
 #+END_SRC
-**** typescript
+**** typescript/react
 #+BEGIN_SRC emacs-lisp
   (use-package tide
-    :straight t
-    :config
-    (defun setup-tide-mode ()
-      (interactive)
-      (require 'tide)
-      (tide-setup)
-      (flycheck-mode +1)
-      (setq flycheck-check-syntax-automatically '(save mode-enabled))
-      (eldoc-mode +1)
-      (global-set-key (kbd "C-.") 'tide-jump-to-definition)
-      (tide-hl-identifier-mode +1))
-    (add-hook 'typescript-mode-hook #'setup-tide-mode)
-    (add-hook 'web-mode-hook
-              (lambda ()
-                (when (or (string-equal "tsx" (file-name-extension buffer-file-name)) (string-equal "ts" (file-name-extension buffer-file-name)))
-                  (setq prettier-js-args '( ))
-                  (prettier-js-mode)
-                  (setq web-mode-enable-auto-indentation nil)
-                  (setup-tide-mode))))
-    (add-hook 'web-mode-hook
-              (lambda ()
-                (when (string-equal "jsx" (file-name-extension buffer-file-name))
-                  (setq prettier-js-args '(
-                                           "--trailing-comma" "all"
-                                           "--semi" "false"
-                                           "--single-quote" "true"
-                                           "--tab-width" "4"
-                                           "--bracket-spacing" "false"
-                                           "--arrow-parens" "avoid"
-                                           ))
-                  (prettier-js-mode)
-                  (setq web-mode-enable-auto-indentation nil)
-                  (setup-tide-mode))))
-    (flycheck-add-mode 'typescript-tslint 'web-mode))
+  :straight t
+  :config
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (global-set-key (kbd "C-.") 'tide-jump-to-definition)
+    (tide-hl-identifier-mode +1))
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (or (string-equal "tsx" (file-name-extension buffer-file-name)) (string-equal "ts" (file-name-extension buffer-file-name)))
+                (setq prettier-js-args '( ))
+                (prettier-js-mode)
+                (setq web-mode-enable-auto-indentation nil)
+                (setup-tide-mode))))
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (string-equal "jsx" (file-name-extension buffer-file-name))
+                (setq prettier-js-args '(
+                                         "--trailing-comma" "all"
+                                         "--semi" "false"
+                                         "--single-quote" "true"
+                                         "--tab-width" "4"
+                                         "--bracket-spacing" "false"
+                                         "--arrow-parens" "avoid"
+                                         ))
+                (prettier-js-mode)
+                (setq web-mode-enable-auto-indentation nil)
+                (setup-tide-mode))))
+  (flycheck-add-mode 'typescript-tslint 'web-mode))
 #+END_SRC
+**** Web-mode
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\.ts\'" . web-mode))
+  (use-package web-mode
+      :straight t
+      :mode (("\\.tsx$" . web-mode)
+             ("\\.html$" . web-mode)
+             ("\\.phtml$" . web-mode)
+             ("\\.djhtml$" . web-mode)
+             ("\\.jinja$" . web-mode)
+             ("\\.jinja2$" . web-mode)
+             ("\\.php$" . web-mode) 
+             ("\\.jsp$" . web-mode)
+             ("\\.as[cp]x\\'" . web-mode)
+             ("\\.jsx$" . web-mode)
+             ("\\.mako\\'" . web-mode)
+             ("\\.ts$" . web-mode)
+             ("\\.tpl$" . web-mode)
+             ("\\.scss$" . web-mode))
+      :config
+      (setq web-mode-auto-close-style 1)
+      (setq web-mode-tag-auto-close-style t)
+      (setq web-mode-enable-auto-pairing t)
+      (setq web-mode-enable-auto-indentation t)
+      (setq web-mode-enable-indent-cycle t)
+      (setq web-mode-enable-auto-quoting nil)
+      ;; hook
+      (add-hook 'web-mode-hook
+                (lambda ()
+                  ;; indentation
+                  (setq indent-tabs-mode nil)
+                  (setq web-mode-markup-indent-offset 2)
+                  (setq web-mode-css-indent-offset 2)
+                  (setq web-mode-code-indent-offset 2)
+                  ;; padding
+                  (setq web-mode-style-padding 1)
+                  (setq web-mode-script-padding 1)
+                  (setq web-mode-block-padding 0)
+                  ;; raccourcis
+                  (define-key web-mode-map (kbd "M-;") 'web-mode-comment-or-uncomment)
+                  (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
+                  (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
+                  ))
+      ;; company
+      (use-package ac-html-bootstrap :straight t)
+      (use-package company-web
+        :straight t
+        :config
+        (add-hook 'web-mode-hook
+                  (lambda ()
+                    (add-to-list (make-local-variable 'company-backends)
+                                 'company-nxml)
+                    (add-to-list (make-local-variable 'company-backends)
+                                 'company-web-html)
+                    (add-to-list (make-local-variable 'company-backends)
+                                 'company-css)
+                    )))
+      ;; force django engine for html
+      (setq web-mode-engines-alist
+            '(("django" . "\\.html\\'")
+              ("jinja" . "\\.jinja\\'")
+              ("jinja" . "\\.jinja2\\'"))
+          )
+      ;; force django engine (manual)
+      (defun web-mode-django ()
+        (interactive)
+        (web-mode-set-engine "django"))
+      (global-set-key (kbd "s-%") 'web-mode-django)
+      ;; force angular engine (manual)
+      (defun web-mode-angularJs ()
+        (interactive)
+        (web-mode-set-engine "angular")))
+  #+END_SRC
 **** css and less-css
 #+BEGIN_SRC emacs-lisp
   (use-package less-css-mode
@@ -3241,32 +3217,6 @@ Pour typer un parametre dans la doc
     :defer 1
     :config
     (add-to-list 'auto-mode-alist '("default_site" . nginx-mode)))
-#+END_SRC
-*** Statistiques ESS
-#+BEGIN_SRC emacs-lisp
-  (use-package ess
-    :straight t
-    :commands ess-site)
-#+END_SRC
-*** Salt-mode
-#+BEGIN_SRC emacs-lisp
-  (use-package salt-mode :straight t :defer 1)
-#+END_SRC
-*** groovy
-#+BEGIN_SRC emacs-lisp
-  (use-package groovy-mode
-    :straight t
-    :defer 1
-    :config
-    (add-to-list 'auto-mode-alist '("Jenkinsfile" . groovy-mode)))
-#+END_SRC
-*** kotlin
-#+BEGIN_SRC emacs-lisp
-  (use-package kotlin-mode
-    :straight t
-    :defer
-    :config
-    (add-to-list 'auto-mode-alist '("\\.kt\\'" . kotlin-mode)))
 #+END_SRC
 ** Docker
 #+BEGIN_SRC emacs-lisp
@@ -3501,69 +3451,71 @@ Pour typer un parametre dans la doc
 #+END_SRC
 * Test
 #+BEGIN_SRC emacs-lisp
-  ;; =================== etags =====================
-  (defvar tags-cmd "etags -R ./* 2>/dev/null")
-  (defun regen-tags ()
-    "Regenerate the tags file for the current working directory"
-    (interactive)
-    (let ((tag-file (concat default-directory "TAGS")))
-      (shell-command tags-cmd)
-      (visit-tags-table tag-file)))
-  ;; =================== end etags =====================
-  (defun enable-clipboard()
-    (interactive)
-    ;;(setq x-select-enable-clipboard t)
-    (setq select-enable-clipboard t)
-    (setq interprogram-paste-function 'x-cut-buffer-or-selection-value))
-  ;; google agenda
-  (defun google-agenda-open ()
-    "Open my google calendar agenda file. The agenda is displayed in the buffer *gcal*."
-    (interactive)
-    ;; launch gcalcli
-    (shell-command "python2 /usr/bin/gcalcli --nostarted agenda > /tmp/gagenda")
-    ;; set name of calendar buffer and location of file containing my agenda
-    (let ((tmp-buff-name "*gcal*") (cal-file (expand-file-name "/tmp/gagenda")))
-      ;; switch to calendar buffer
-      (switch-to-buffer tmp-buff-name)
-      ;; turn off read only to overwrite if buffer exists
-      (read-only-mode -1)
-      ;; clear buffer
-      (erase-buffer)
-      ;; insert agenda file
-      (insert-file-contents cal-file)
-      ;; turn on special mode
-      (special-mode)
-      ;; turn off line wrapping
-      (visual-line-mode -1)))
+          ;; =================== etags =====================
+          (defvar tags-cmd "etags -R ./* 2>/dev/null")
+          (defun regen-tags ()
+            "Regenerate the tags file for the current working directory"
+            (interactive)
+            (let ((tag-file (concat default-directory "TAGS")))
+              (shell-command tags-cmd)
+              (visit-tags-table tag-file)))
+          ;; =================== end etags =====================
+          (defun enable-clipboard()
+            (interactive)
+            ;;(setq x-select-enable-clipboard t)
+            (setq select-enable-clipboard t)
+            (setq interprogram-paste-function 'x-cut-buffer-or-selection-value))
+          ;; google agenda
+          (defun google-agenda-open ()
+            "Open my google calendar agenda file. The agenda is displayed in the buffer *gcal*."
+            (interactive)
+            ;; launch gcalcli
+            (shell-command "python2 /usr/bin/gcalcli --nostarted agenda > /tmp/gagenda")
+            ;; set name of calendar buffer and location of file containing my agenda
+            (let ((tmp-buff-name "*gcal*") (cal-file (expand-file-name "/tmp/gagenda")))
+              ;; switch to calendar buffer
+              (switch-to-buffer tmp-buff-name)
+              ;; turn off read only to overwrite if buffer exists
+              (read-only-mode -1)
+              ;; clear buffer
+              (erase-buffer)
+              ;; insert agenda file
+              (insert-file-contents cal-file)
+              ;; turn on special mode
+              (special-mode)
+              ;; turn off line wrapping
+              (visual-line-mode -1)))
 
-  (use-package company-box
-    :straight t
-    :disabled t
-    :defer 1
-    :config
-    (add-hook 'company-mode-hook 'company-box-mode)
-    (dimmer-configure-company-box)
-    (setq company-tooltip-minimum-width 70)
-    (setq company-tooltip-maximum-width 70))
+          (use-package company-box
+            :straight t
+            :disabled t
+            :defer 1
+            :config
+            (add-hook 'company-mode-hook 'company-box-mode)
+            (dimmer-configure-company-box)
+            (setq company-tooltip-minimum-width 70)
+            (setq company-tooltip-maximum-width 70))
 
-  (use-package company-quickhelp
-    :straight t
-    :defer 1
-    :config
-    (company-quickhelp-mode))
+          (use-package company-quickhelp
+            :straight t
+            :defer 1
+            :config
+            (company-quickhelp-mode))
 
-  (use-package emacs-application-framework
-      :straight (:host github :repo "manateelazycat/emacs-application-framework")
-      :config
-      :disabled t
-      (require 'eaf)
-      (setq eaf-browser-default-search-engine 'duckduckgo)
-      (eaf-setq eaf-browser-enable-adblocker "true")
-      (eaf-bind-key scroll_up_page "<next>" eaf-pdf-viewer-keybinding)
-      (eaf-bind-key scroll_down_page "<prior>" eaf-pdf-viewer-keybinding)
-      )
+          (use-package eaf
+            :straight t
+            :load-path "~/.emacs.d/straight/repos/eaf/"
+            :init
+            (use-package ctable :straight t :defer t)
+            (use-package deferred :straight t :defer t)
+            (use-package s :straight t :defer t)
+            :custom
+            (eaf-browser-continue-where-left-off t)
+            :config
+            (eaf-setq eaf-browser-enable-adblocker "true")
+            (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+            (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding))
 
-    (setq sql-sqlite-options '("-interactive"))
-
-#+END_SRC
+           (setq sql-sqlite-options '("-interactive"))
+ #+END_SRC
 v
