@@ -1,4 +1,4 @@
-* Emacs Congfiguration                                     :noexport:ARCHIVE:
+* Emacs Configuration                                      :noexport:ARCHIVt:
 #+AUTHOR: Djangoliv'
 #+TITLE: Djangoliv' Emacs Configuration 
 #+EMAIL: djangoliv@mailoo.org
@@ -62,8 +62,6 @@ Configuration Minimal (sans librairies externes)
   (setq scroll-conservatively 10)
   ;; Laisser le curseur en place lors d'un défilement par pages.
   (setq scroll-preserve-screen-position t)
-  ;; horizontal scroll
-  (setq mouse-wheel-tilt-scroll t)
   ;; sous-mots
   ;;(global-subword-mode 1)
   ;; Recherche automatique des fermetures et ouvertures des parentheses
@@ -83,7 +81,7 @@ Configuration Minimal (sans librairies externes)
   ;;; Temporarily reduce garbage collection during startup. Inspect `gcs-done'.
   (defun ambrevar/reset-gc-cons-threshold ()
     (setq gc-cons-threshold (car (get 'gc-cons-threshold 'standard-value))))
-  (setq gc-cons-threshold (* 64 1024 1024))
+  (setq gc-cons-threshold 8000000)
   (add-hook 'after-init-hook #'ambrevar/reset-gc-cons-threshold)
   ;;; Temporarily disable the file name handler.
   (setq default-file-name-handler-alist file-name-handler-alist)
@@ -91,6 +89,8 @@ Configuration Minimal (sans librairies externes)
   (defun ambrevar/reset-file-name-handler-alist ()
     (setq file-name-handler-alist default-file-name-handler-alist))
   (add-hook 'after-init-hook #'ambrevar/reset-file-name-handler-alist)
+  ;;; Triggering GC whenever Emacs loses focus 
+  (add-hook 'focus-out-hook 'garbage-collect)
   ;; Un gros fichier est superieur à 35mb
   (setq large-file-warning-threshold (* 35 1024 1024))
   ;; historique
@@ -121,7 +121,7 @@ Configuration Minimal (sans librairies externes)
   ;; compilation scroll
   (setq compilation-scroll-output t)
   ;; font
-  (set-frame-font "DejaVuSansMono 8" nil t)
+  (set-frame-font "DejaVuSansMono 9" nil t)
   ;; auto revert
   (global-auto-revert-mode)
   ;; auto-fill
@@ -140,6 +140,7 @@ Configuration Minimal (sans librairies externes)
 #+END_SRC
 ** straight.el
 #+BEGIN_SRC emacs-lisp
+  (setq straight-check-for-modifications '(check-on-save))
   (defvar bootstrap-version)
   (let ((bootstrap-file
          (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -153,6 +154,7 @@ Configuration Minimal (sans librairies externes)
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
   (straight-use-package 'use-package)
+  (setq package-enable-at-startup nil)
 #+END_SRC
 ** common libs
 #+BEGIN_SRC emacs-lisp
@@ -452,72 +454,71 @@ Collection of Emacs Development Environment Tools
 ** Dired
 *** Initialisation
 #+BEGIN_SRC emacs-lisp
-  (require 'dired)
-  ;; apparence
-  (setq dired-listing-switches "-lah --time-style long")
-  (setq directory-free-space-args "-Pkh")
-  ;; wdired permet le changement des permissions
-  (setq wdired-allow-to-change-permissions t)
-  ;; find-dired options
-  (setq find-ls-option '("-print0 | xargs -0 ls -ld" . "-ld"))
-  ;; repertoire de copie par defaut
-  (setq dired-dwim-target t)
-  ;; couleur par type de fichier
-  (setq dired-filetype-plain-regexp "^  .*\\.\\(TXT\\|txt\\|Txt\\|ini\\|INI\\|lrc\\|org\\|log\\|conf\\|CFG\\|cfg\\|properties\\|config\\|diff\\|patch\\|ebuild\\|inf\\|cnf\\|example\\|sample\\|default\\|m4\\|PARAM\\)$")
-  (setq dired-filetype-xml-regexp "^  .*\\.\\(html?\\|HTML?\\|xml\\|XML\\|xsl\\|xsd\\|rng\\|dtd\\|mht\\|jsp\\|asp\\|js\\|xaml\\|gml\\|GML\\|XSD\\|kml\\|KML\\)$")
-  ;; récursivité
-  (setq dired-recursive-copies 'always)
-  (setq dired-recursive-deletes 'always)
-  ;; auto refresh dired when file changes
-  (add-hook 'dired-mode-hook 'auto-revert-mode)
- #+END_SRC
-*** tris dans Dired
-#+BEGIN_SRC emacs-lisp
-  (defvar dired-sort-map (make-sparse-keymap))
-  (define-key dired-mode-map "s" dired-sort-map)
-  (defvar sort-params)
-  (defun dired-sort-by-size (arg)
-    "sort by Size"
-    (interactive "P")
-    (if (null arg)
-        (setq sort-params " -S")
-      (setq sort-params " -Sr"))
-    (dired-sort-other (concat dired-listing-switches sort-params)))
-  (defun dired-sort-by-extension (arg)
-    "sort by eXtension"
-    (interactive "P")
-    (if (null arg)
-        (setq sort-params " -X")
-      (setq sort-params " -Xr"))
-    (dired-sort-other (concat dired-listing-switches sort-params)))
-  (defun dired-sort-by-time (arg)
-    "sort by Time"
-    (interactive "P")
-    (if (null arg)
-        (setq sort-params " -t")
-      (setq sort-params " -tr"))
-    (dired-sort-other (concat dired-listing-switches sort-params)))
-  (defun dired-sort-by-Name (arg)
-    "sort by Name"
-    (interactive "P")
-    (if (null arg)
-        (setq sort-params " -N")
-      (setq sort-params " -Nr"))
-    (dired-sort-other (concat dired-listing-switches sort-params)))
+  (use-package dired
+    :straight (:type built-in)
+    :defer 0.5
+    :hook
+    (dired-mode . auto-revert-mode)     ;; auto refresh dired when file changes
+    :custom
+    ;; apparence
+    (dired-listing-switches "-lah --time-style long")
+    (directory-free-space-args "-Pkh")
+    ;; wdired permet le changement des permissions
+    (wdired-allow-to-change-permissions t)
+    ;; find-dired options
+    (find-ls-option '("-print0 | xargs -0 ls -ld" . "-ld"))
+    ;; repertoire de copie par defaut
+    (dired-dwim-target t)
+    ;; couleur par type de fichier
+    (dired-filetype-plain-regexp "^  .*\\.\\(TXT\\|txt\\|Txt\\|ini\\|INI\\|lrc\\|org\\|log\\|conf\\|CFG\\|cfg\\|properties\\|config\\|diff\\|patch\\|ebuild\\|inf\\|cnf\\|example\\|sample\\|default\\|m4\\|PARAM\\)$")
+    (dired-filetype-xml-regexp "^  .*\\.\\(html?\\|HTML?\\|xml\\|XML\\|xsl\\|xsd\\|rng\\|dtd\\|mht\\|jsp\\|asp\\|js\\|xaml\\|gml\\|GML\\|XSD\\|kml\\|KML\\)$")
+    ;; récursivité
+    (dired-recursive-copies 'always)
+    (dired-recursive-deletes 'always)
+    :config
+    ;; tris dans Dired
+    (defvar dired-sort-map (make-sparse-keymap))
+    (define-key dired-mode-map "s" dired-sort-map)
+    (defvar sort-params)
+    (defun dired-sort-by-size (arg)
+      "sort by Size"
+      (interactive "P")
+      (if (null arg)
+          (setq sort-params " -S")
+        (setq sort-params " -Sr"))
+      (dired-sort-other (concat dired-listing-switches sort-params)))
+    (defun dired-sort-by-extension (arg)
+      "sort by eXtension"
+      (interactive "P")
+      (if (null arg)
+          (setq sort-params " -X")
+        (setq sort-params " -Xr"))
+      (dired-sort-other (concat dired-listing-switches sort-params)))
+    (defun dired-sort-by-time (arg)
+      "sort by Time"
+      (interactive "P")
+      (if (null arg)
+          (setq sort-params " -t")
+        (setq sort-params " -tr"))
+      (dired-sort-other (concat dired-listing-switches sort-params)))
+    (defun dired-sort-by-Name (arg)
+      "sort by Name"
+      (interactive "P")
+      (if (null arg)
+          (setq sort-params " -N")
+        (setq sort-params " -Nr"))
+      (dired-sort-other (concat dired-listing-switches sort-params)))
   (define-key dired-sort-map "s" 'dired-sort-by-size)
   (define-key dired-sort-map "x" 'dired-sort-by-extension)
   (define-key dired-sort-map "t" 'dired-sort-by-time)
   (define-key dired-sort-map "n" 'dired-sort-by-Name)
   (define-key dired-sort-map "?" (lambda () "sort help" (interactive) (message "s Size; x eXtension; t Time; n Name;")))
-#+END_SRC
-*** (de)compression
-#+BEGIN_SRC emacs-lisp
-  ;; compress
+  ;; (de)compression
   (define-key dired-mode-map "c" 'dired-do-compress-to)
   (defvar dired-compress-files-alist
   '(("\\.tar\\.gz\\'" . "tar -c %i | gzip -c9 > %o")
     ("\\.tgz\\'" . "tar -czf %i > %o")
-    ("\\.zip\\'" . "zip %o -r --filesync %i")))
+    ("\\.zip\\'" . "zip %o -r --filesync %i"))))
 #+END_SRC
 *** Couleurs des fichiers
 #+BEGIN_SRC emacs-lisp
@@ -651,7 +652,14 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   ;; initialisation
   (use-package org
+    :defer 1
     :straight (:type built-in)
+    :bind
+    ("C-M-<return>" . org-insert-heading-after-current)
+    ("<S-C-up>" . nil)
+    ("<S-C-down>" . nil)
+    ("<S-C-right>" . nil)
+    ("<S-C-left>" . nil)
     :config
     (setq org-startup-indented t)
     (setq org-hide-emphasis-markers t)
@@ -689,18 +697,6 @@ Collection of Emacs Development Environment Tools
     (setq org-todo-keywords
           (quote
            ((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "VALID(v)" "|" "DONE(d!)" "CANCELED(c@)" "NEEDSREVIEW(n@/!)"))))
-    ;; raccourci
-    (eval-after-load "org"
-      '(progn
-         (define-key org-mode-map (kbd "C-M-<return>") 'org-insert-heading-after-current)
-         (define-key org-mode-map (kbd "S-<tab>") 'outline-hide-subtree)
-         (define-key org-mode-map (kbd "C-c s") 'org-goto)
-         (define-key org-mode-map (kbd "M-s-<up>") 'drag-stuff-up)
-         (define-key org-mode-map (kbd "M-s-<down>") 'drag-stuff-down)
-         (define-key org-mode-map (kbd "<S-C-up>") nil)
-         (define-key org-mode-map (kbd "<S-C-down>") nil)
-         (define-key org-mode-map (kbd "<S-C-right>") nil)
-         (define-key org-mode-map (kbd "<S-C-left>") nil)))
     ;; org-find-tag
     (push '(tags-tree . local) org-show-context-detail)
     (define-key org-mode-map (kbd "C-x r J") 'org-tags-sparse-tree)
@@ -713,7 +709,9 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   (use-package org-superstar
     :straight t
-    :hook (org-mode . org-superstar-mode)
+    :hook (org-mode . (lambda () (org-superstar-mode 1)))
+    :config
+    ;;(setq org-superstar-headline-bullets-list '("◉" ("🞛" ?◈) "○" "▷"))
     )
 #+END_SRC
 *** babel
@@ -909,7 +907,7 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   (use-package plantuml-mode
     :straight t
-    :defer 1
+    :defer t
     :config
     (add-to-list 'auto-mode-alist '("\\.uml\\'" . plantuml-mode))
     (setq plantuml-jar-path "~/.emacs.d/plantuml/plantuml.jar"))
@@ -936,7 +934,7 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :straight t
-    :defer 1
+    :defer t
     :commands gfm-mode markdown-mode
     :mode
     ("README\\.md\\'" . gfm-mode)
@@ -999,13 +997,6 @@ Collection of Emacs Development Environment Tools
     :config
     (add-to-list 'auto-mode-alist '("\\.env\\..*\\'" . dotenv-mode)))
 #+END_SRC
-** pdf-tool
-#+BEGIN_SRC emacs-lisp
-  (use-package pdf-tools
-    :straight t
-    :init
-    (pdf-tools-install))
-#+END_SRC
 * Minor-Modes and Helper Functions
 ** Centaur-tabs
 #+BEGIN_SRC emacs-lisp
@@ -1014,6 +1005,13 @@ Collection of Emacs Development Environment Tools
       :straight t
       :defer 1
       :after all-the-icons
+      :bind
+      ("C-<prior>" . centaur-tabs-backward)
+      ("C-<next>" . centaur-tabs-forward)
+      ("C-S-<prior>" . centaur-tabs-move-current-tab-to-left)
+      ("C-S-<next>" . centaur-tabs-move-current-tab-to-right)
+      ("M-+" . centaur-tabs-backward-group)
+      ("M--" . centaur-tabs-forward-group)
       :init
       (centaur-tabs-mode)
       (setq centaur-tabs-cycle-scope 'tabs)
@@ -1021,12 +1019,6 @@ Collection of Emacs Development Environment Tools
       (setq centaur-tabs-gray-out-icons 'buffer)
       (setq centaur-tabs-set-icons t)
       :config
-      (global-set-key (kbd "C-<prior>")  'centaur-tabs-backward)
-      (global-set-key (kbd "C-<next>") 'centaur-tabs-forward)
-      (global-set-key (kbd "C-S-<prior>")  'centaur-tabs-move-current-tab-to-left)
-      (global-set-key (kbd "C-S-<next>") 'centaur-tabs-move-current-tab-to-right)
-      (global-set-key (kbd "M-+")  'centaur-tabs-backward-group)
-      (global-set-key (kbd "M--") 'centaur-tabs-forward-group)
       (setq centaur-tabs-background-color (face-background 'default))
       (setq centaur-tabs-style "box")
       (setq centaur-tabs-set-bar 'over)
@@ -1073,11 +1065,13 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
     :straight t
+    :defer 0.5
+    :custom
+    (undo-tree-auto-save-history 1)
+    (undo-tree-visualizer-timestamps t)
+    (undo-tree-enable-undo-in-region nil)
     :config
     (global-undo-tree-mode 1)
-    (setq undo-tree-auto-save-history 1)
-    (setq undo-tree-visualizer-timestamps t)
-    (setq undo-tree-enable-undo-in-region nil)
     (add-to-list 'undo-tree-incompatible-major-modes #'magit-status-mode)
     (setq-default undo-tree-history-directory-alist (quote (("." . "~/.emacs-undo-files/"))))
     (defun undo-toggle-diff ()
@@ -1087,6 +1081,11 @@ Collection of Emacs Development Environment Tools
         (setq undo-tree-visualizer-diff t))
       )
     (global-set-key (kbd "C-c u") 'undo-toggle-diff)
+    (defun my-undo-tree-save-history (undo-tree-save-history &rest args)
+      (let ((message-log-max nil)
+            (inhibit-message t))
+        (apply undo-tree-save-history args)))
+    (advice-add 'undo-tree-save-history :around 'my-undo-tree-save-history)
     )
 #+END_SRC
 ** FFAP amelioration
@@ -1277,29 +1276,31 @@ Collection of Emacs Development Environment Tools
   (use-package expand-region
     :straight t
     :defer 1
-    :config
-    (global-set-key (kbd "C-@") 'er/expand-region)
-    (global-set-key (kbd "C-M-@") 'er/contract-region)
-    )
+    :bind
+    ("C-@" . er/expand-region))
 #+END_SRC
 ** Ediff
 *** Initialisation
 #+BEGIN_SRC emacs-lisp
-  ;; restore la configuration à la fin
-  (defvar ediff-last-windows nil  "Last ediff window configuration.")
-  (defun ediff-restore-windows ()
-    "Restore window configuration to `ediff-last-windows'."
-    (set-window-configuration ediff-last-windows)
-    (remove-hook 'ediff-after-quit-hook-internal 'ediff-restore-windows))
-  (defadvice ediff-buffers (around ediff-restore-windows activate)
-    (setq ediff-last-windows (current-window-configuration))
-    (add-hook 'ediff-after-quit-hook-internal 'ediff-restore-windows) ad-do-it)
-  ;; ediff horizontal
-  (setq ediff-split-window-function 'split-window-horizontally)
-  ;; evite la frame supplementaire
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-  ;; raccourci
-  (global-set-key (kbd "s-=") 'ediff-buffers)
+  (use-package ediff
+    :straight nil
+    :bind
+    ("s-=" . ediff-buffers)
+    :custom
+    ;; ediff horizontal
+    (ediff-split-window-function 'split-window-horizontally)
+    ;; evite la frame supplementaire
+    (ediff-window-setup-function 'ediff-setup-windows-plain)
+    :config
+    ;; restore la configuration à la fin
+    (defvar ediff-last-windows nil  "Last ediff window configuration.")
+    (defun ediff-restore-windows ()
+      "Restore window configuration to `ediff-last-windows'."
+      (set-window-configuration ediff-last-windows)
+      (remove-hook 'ediff-after-quit-hook-internal 'ediff-restore-windows))
+    (defadvice ediff-buffers (around ediff-restore-windows activate)
+      (setq ediff-last-windows (current-window-configuration))
+      (add-hook 'ediff-after-quit-hook-internal 'ediff-restore-windows) ad-do-it))
 #+END_SRC
 *** ediff par caractere (pas par mot)
 #+BEGIN_SRC emacs-lisp
@@ -1342,70 +1343,75 @@ Collection of Emacs Development Environment Tools
  #+END_SRC
 *** Recentf
 #+BEGIN_SRC emacs-lisp
-  ;; Se souvenir des derniers fichiers ouverts
-  (setq recentf-menu-path nil)
-  (setq recentf-menu-title "Recentf")
-  (setq recentf-menu-filter 'recentf-arrange-by-mode)
-  (setq recentf-filename-handler 'abbreviate-file-name)
-  (setq recentf-max-saved-items 150)
-  (setq recentf-auto-cleanup 'never)
-  (run-at-time nil (* 25 60) 'recentf-save-list) ;; save list every 25 minutes
-  (recentf-mode 1)
-  (add-to-list 'recentf-exclude "\\.emacs-persistent\\'")
-  (add-to-list 'recentf-exclude "\\.elc\\'")
-  (add-to-list 'recentf-exclude "\\@\\'")
-  (add-to-list 'recentf-exclude "\\TAGS\\'")
-  (add-to-list 'recentf-exclude ".pyc")
-  (add-to-list 'recentf-exclude "~$")
-  (add-to-list 'recentf-exclude "\\recentf\\'")
-  (global-set-key (kbd "M-r") 'recentf-open-files)
-  ;; gérer les répertoires
-  (defun recentd-track-opened-file ()
-    "Insert the name of the directory just opened into the recent list."
-    (and (derived-mode-p 'dired-mode) default-directory
-         (recentf-add-file default-directory))
-    ;; Must return nil because it is run from `write-file-functions'.
-    nil)
-  (defun recentd-track-closed-file ()
-    "Update the recent list when a dired buffer is killed.
-  That is, remove a non kept dired from the recent list."
-    (and (derived-mode-p 'dired-mode) default-directory
-         (recentf-remove-if-non-kept default-directory)))
-
-  (add-hook 'dired-after-readin-hook 'recentd-track-opened-file)
-  (add-hook 'kill-buffer-hook 'recentd-track-closed-file)
-  ;; reouvrir le dernier fichier tué à la bonne ligne
-  (use-package saveplace
-    :straight (:type built-in)
+  (use-package recentf
+    :straight nil
+    :hook (after-init . recentf-mode)
+    :bind
+      ("M-r" . recentf-open-files)
+    :custom
+    (recentf-menu-path nil)
+    (recentf-menu-title "Recentf")
+    (recentf-menu-filter 'recentf-arrange-by-mode)
+    (recentf-filename-handler 'abbreviate-file-name)
+    (recentf-max-saved-items 150)
+    (recentf-auto-cleanup 'never)
     :config
-    (defun always-save-place-to-alist ()
-      (let ((save-place t))
-        (save-place-to-alist)))
-    (add-hook 'kill-buffer-hook #'always-save-place-to-alist)
-    (defun restore-save-place ()
-      (save-place-find-file-hook)
-      (setq save-place nil)))
-  (defvar killed-buffer-list nil
-    "List of recently killed files.")
-  (defun add-file-to-killed-file-list ()
-    "If buffer is associated with a file name, add that file to the
-       `killed-file-list' when killing the buffer."
-    (when buffer-file-name
-      (push buffer-file-name killed-buffer-list)))
-  (add-hook 'kill-buffer-hook #'add-file-to-killed-file-list)
-  (defun reopen-killed-file ()
-    "Reopen the most recently killed file, if one exists."
-    (interactive)
-    (when killed-buffer-list
-      (find-file (pop killed-buffer-list))
-      (restore-save-place)
-      ))
-  (global-set-key (kbd "C-x K") 'reopen-killed-file)
-  ;; iterer entre les 2 buffers les plus récemment ouverts
-  (defun switch-to-recent-buffer ()
-    (interactive)
-    (switch-to-buffer nil))
-  (global-set-key (kbd "M-b") 'switch-to-recent-buffer)
+    (run-at-time nil (* 25 60) 'recentf-save-list) ;; save list every 25 minutes
+    (add-to-list 'recentf-exclude "\\.emacs-persistent\\'")
+    (add-to-list 'recentf-exclude "\\.elc\\'")
+    (add-to-list 'recentf-exclude "\\@\\'")
+    (add-to-list 'recentf-exclude "\\TAGS\\'")
+    (add-to-list 'recentf-exclude ".pyc")
+    (add-to-list 'recentf-exclude "~$")
+    (add-to-list 'recentf-exclude "\\recentf\\'")
+    (add-to-list 'recentf-exclude ".emacs.d/straight"))
+    ;; gérer les répertoires
+    (defun recentd-track-opened-file ()
+      "Insert the name of the directory just opened into the recent list."
+      (and (derived-mode-p 'dired-mode) default-directory
+           (recentf-add-file default-directory))
+      ;; Must return nil because it is run from `write-file-functions'.
+      nil)
+    (defun recentd-track-closed-file ()
+      "Update the recent list when a dired buffer is killed.
+    That is, remove a non kept dired from the recent list."
+      (and (derived-mode-p 'dired-mode) default-directory
+           (recentf-remove-if-non-kept default-directory)))
+
+    (add-hook 'dired-after-readin-hook 'recentd-track-opened-file)
+    (add-hook 'kill-buffer-hook 'recentd-track-closed-file)
+    ;; reouvrir le dernier fichier tué à la bonne ligne
+    (use-package saveplace
+      :straight (:type built-in)
+      :config
+      (defun always-save-place-to-alist ()
+        (let ((save-place t))
+          (save-place-to-alist)))
+      (add-hook 'kill-buffer-hook #'always-save-place-to-alist)
+      (defun restore-save-place ()
+        (save-place-find-file-hook)
+        (setq save-place nil)))
+    (defvar killed-buffer-list nil
+      "List of recently killed files.")
+    (defun add-file-to-killed-file-list ()
+      "If buffer is associated with a file name, add that file to the
+         `killed-file-list' when killing the buffer."
+      (when buffer-file-name
+        (push buffer-file-name killed-buffer-list)))
+    (add-hook 'kill-buffer-hook #'add-file-to-killed-file-list)
+    (defun reopen-killed-file ()
+      "Reopen the most recently killed file, if one exists."
+      (interactive)
+      (when killed-buffer-list
+        (find-file (pop killed-buffer-list))
+        (restore-save-place)
+        ))
+    (global-set-key (kbd "C-x K") 'reopen-killed-file)
+    ;; iterer entre les 2 buffers les plus récemment ouverts
+    (defun switch-to-recent-buffer ()
+      (interactive)
+      (switch-to-buffer nil))
+    (global-set-key (kbd "M-b") 'switch-to-recent-buffer)
 #+END_SRC
 *** ibuffer
  #+BEGIN_SRC emacs-lisp
@@ -2135,12 +2141,16 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   (use-package go-translate
     :straight t
-    :config
-    (setq go-translate-token-current (cons 430675 2721866130))
-    (setq go-translate-local-language "en")
-    (setq go-translate-target-language "fr")
-    (global-set-key "\C-ct" 'go-translate)
-    (global-set-key "\C-cT" 'go-translate-popup)
+    :defer t
+    :bind
+    ("C-c t" . gts-do-translate)
+    :custom
+    (gts-translate-list '(("en" "fr")))
+    (gts-default-translator
+     (gts-translator
+      :picker (gts-prompt-picker)
+      :engines (list  (gts-google-engine :parser (gts-google-summary-parser)))
+      :render (gts-buffer-render)))
     )
 #+END_SRC
 *** narrow dwin
@@ -2280,13 +2290,8 @@ Collection of Emacs Development Environment Tools
 #+END_SRC
 *** couleurs
 #+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode
-    :straight t
-    :config
-    (add-hook 'rainbow-mode-hook
-              (lambda ()
-                (load-file "~/.emacs.d/lisp/kurecolor.el")))
-    (defalias 'color-mode 'rainbow-mode))
+  (use-package rainbow-mode :straight t)
+  (defalias 'color-mode 'rainbow-mode)
 #+END_SRC
 *** sh-mode
 #+BEGIN_SRC emacs-lisp
@@ -2375,38 +2380,42 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :straight t
+    :init (add-hook 'after-init-hook #'global-company-mode)
+    :custom
+    (company-minimum-prefix-length 2)
+    (company-idle-delay 0.3)
+    (company-tooltip-limit 20)
+    (company-selection-wrap-around t)
+    (company-dabbrev-downcase nil)
+    (company-tooltip-align-annotations 't)
+    (company-transformers '(company-sort-by-occurrence))
+    (company-tooltip-maximum-width 300)
+    ;; aligns annotation to the right hand side
+    (company-tooltip-align-annotations t)
     :config
-    (setq company-minimum-prefix-length 2
-          company-idle-delay 0.3
-          company-tooltip-limit 20
-          company-selection-wrap-around t
-          company-dabbrev-downcase nil
-          company-tooltip-align-annotations 't
-          company-transformers '(company-sort-by-occurrence)
-          company-begin-commands '(self-insert-command))
-    (add-hook 'after-init-hook 'global-company-mode)
     (setq company-backends '(company-capf
                              company-keywords
                              company-semantic
                              company-files
                              company-etags
                              company-elisp
-                             ;;company-clang
                              company-cmake
                              company-ispell
                              company-yasnippet))
     (setq company-frontends '(company-pseudo-tooltip-frontend
-                              company-echo-metadata-frontend))
-    (setq company-tooltip-maximum-width 300)
-    ;; aligns annotation to the right hand side
-    (setq company-tooltip-align-annotations t)
+                              company-echo-metadata-frontend)))
     ;; company-dict
     (use-package company-dict
       :straight t
+      :after company
       :config
       (setq company-dict-dir (concat user-emacs-directory "dict/"))
       (define-key org-mode-map (kbd "C-c <tab>") 'company-dict)
-      (define-key text-mode-map (kbd "C-c <tab>") 'company-dict)))
+      (define-key text-mode-map (kbd "C-c <tab>") 'company-dict))
+    (use-package prescient
+      :straight t
+      :after company
+      :hook (after-init . prescient-persist-mode))
   #+END_SRC
 ** Gestion de versions
 *** Common
@@ -2427,10 +2436,15 @@ Collection of Emacs Development Environment Tools
     :bind
     ("C-x g s" . magit-status)
     ("C-x g l" . magit-log-buffer-file)
+    :custom
+    (magit-keyboard-prefix (kbd "C-x g"))
+    (git-keyboard-prefix "\C-x£") ;; keybinding improbable (ie desactivation)
+    (magit-diff-options '("-b")) ;; ignore whitespace
+    (magit-push-always-verify nil)
+    (magit-commit-show-diff nil)
+    ;; (magit-revert-buffers nil)
     :config
-    (setq magit-keyboard-prefix (kbd "C-x g"))
-    ;; pour le status dans la modeline
-    (setq git-keyboard-prefix "\C-x£") ;; keybinding improbable (ie desactivation)
+    ;; modeline status
     (autoload 'git--update-all-state-marks "git-modeline" "Update the modelines of all git buffers" t)
     (add-hook 'find-file-hook 'git-status-in-modeline t)
     (defun git-status-in-modeline ()
@@ -2453,12 +2467,7 @@ Collection of Emacs Development Environment Tools
                  (remove-text-properties p1 (1- (point)) '(invisible nil))
                  )))
            date)))
-    ;; optimisation
     (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
-    (setq magit-diff-options '("-b")) ;; ignore whitespace
-    (setq magit-push-always-verify nil)
-    (setq magit-commit-show-diff nil)
-    (setq magit-revert-buffers nil)
     ;; (setq auto-revert-buffer-list-filter 'magit-auto-revert-repository-buffers-p)
     (remove-hook 'server-switch-hook 'magit-commit-diff))
   ;; fichiers de conf
@@ -2490,8 +2499,10 @@ Collection of Emacs Development Environment Tools
 #+BEGIN_SRC emacs-lisp
   (use-package diff-hl
     :straight t
+    :defer 0.5
+    :custom
+    (diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
     :config
-    (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
     (global-diff-hl-mode)
     (global-set-key (kbd "C-x <up>") 'diff-hl-previous-hunk)
     (global-set-key (kbd "C-x <down>") 'diff-hl-next-hunk)
@@ -2499,6 +2510,7 @@ Collection of Emacs Development Environment Tools
     (defadvice svn-status-update-modeline (after svn-update-diff-hl activate)
       (diff-hl-update))
     ;; pour git
+    (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
     ;; diff-hl-flydiff
     ;;(require 'diff-hl-flydiff)
@@ -2703,6 +2715,7 @@ Pour typer un parametre dans la doc
     (setq python-environment-directory "~/Tools/python/envs/"))
   (use-package company-jedi
     :straight t
+    :after company
     :config
     (add-to-list 'company-backends 'company-jedi)
     (add-hook 'python-mode-hook 'jedi:setup)
@@ -2800,20 +2813,21 @@ Pour typer un parametre dans la doc
 #+END_SRC
 **** fstring
 #+BEGIN_SRC emacs-lisp
-(setq python-font-lock-keywords-maximum-decoration
-      (append python-font-lock-keywords-maximum-decoration
-          '(;; this is the full string.
-        ;; group 1 is the quote type and a closing quote is matched
-        ;; group 2 is the string part
-        ("f\\(['\"]\\{1,3\\}\\)\\(.+?\\)\\1"
-         ;; these are the {keywords}
-         ("{[^}]*?}"
-          ;; Pre-match form
-          (progn (goto-char (match-beginning 0)) (match-end 0))
-          ;; Post-match form
-          (goto-char (match-end 0))
-          ;; face for this match
-          (0 font-lock-variable-name-face t))))))
+  (if (version< "27.0" emacs-version)
+      (setq python-font-lock-keywords-maximum-decoration
+        (append python-font-lock-keywords-maximum-decoration
+            '(;; this is the full string.
+          ;; group 1 is the quote type and a closing quote is matched
+          ;; group 2 is the string part
+          ("f\\(['\"]\\{1,3\\}\\)\\(.+?\\)\\1"
+           ;; these are the {keywords}
+           ("{[^}]*?}"
+            ;; Pre-match form
+            (progn (goto-char (match-beginning 0)) (match-end 0))
+            ;; Post-match form
+            (goto-char (match-end 0))
+            ;; face for this match
+            (0 font-lock-variable-name-face t)))))))
 #+END_SRC
 *** Rust
 #+BEGIN_SRC emacs-lisp
@@ -2875,7 +2889,6 @@ Pour typer un parametre dans la doc
      ;; semantic
      (global-set-key (kbd "s-<tab>") 'semantic-ia-complete-symbol-menu)
      (global-set-key (kbd "C-c ?") 'semantic-ia-complete-symbol)
-     (global-set-key (kbd "C-<tab>") 'company-complete)
      (global-set-key (kbd "M-s-<tab>") 'semantic-complete-analyze-inline)
      (global-set-key (kbd "M-i") 'semantic-decoration-include-visit)
      (global-set-key (kbd "C-.") 'xref-find-definition)
@@ -3102,75 +3115,76 @@ Pour typer un parametre dans la doc
 **** Web-mode
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("\.ts\'" . web-mode))
-  (use-package web-mode
-      :straight t
-      :mode (("\\.tsx$" . web-mode)
-             ("\\.html$" . web-mode)
-             ("\\.phtml$" . web-mode)
-             ("\\.djhtml$" . web-mode)
-             ("\\.jinja$" . web-mode)
-             ("\\.jinja2$" . web-mode)
-             ("\\.php$" . web-mode) 
-             ("\\.jsp$" . web-mode)
-             ("\\.as[cp]x\\'" . web-mode)
-             ("\\.jsx$" . web-mode)
-             ("\\.mako\\'" . web-mode)
-             ("\\.ts$" . web-mode)
-             ("\\.tpl$" . web-mode)
-             ("\\.scss$" . web-mode))
-      :config
-      (setq web-mode-auto-close-style 1)
-      (setq web-mode-tag-auto-close-style t)
-      (setq web-mode-enable-auto-pairing t)
-      (setq web-mode-enable-auto-indentation t)
-      (setq web-mode-enable-indent-cycle t)
-      (setq web-mode-enable-auto-quoting nil)
-      ;; hook
-      (add-hook 'web-mode-hook
-                (lambda ()
-                  ;; indentation
-                  (setq indent-tabs-mode nil)
-                  (setq web-mode-markup-indent-offset 2)
-                  (setq web-mode-css-indent-offset 2)
-                  (setq web-mode-code-indent-offset 2)
-                  ;; padding
-                  (setq web-mode-style-padding 1)
-                  (setq web-mode-script-padding 1)
-                  (setq web-mode-block-padding 0)
-                  ;; raccourcis
-                  (define-key web-mode-map (kbd "M-;") 'web-mode-comment-or-uncomment)
-                  (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
-                  (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
-                  ))
-      ;; company
-      (use-package ac-html-bootstrap :straight t)
-      (use-package company-web
+  ;; company
+  (use-package ac-html-bootstrap :straight t)
+  (use-package company-web
+    :straight t
+    :after company
+    :config
+    (global-set-key (kbd "C-<tab>") 'company-complete)
+    (add-hook 'web-mode-hook
+              (lambda ()
+                (add-to-list 'company-backends 'company-nxml)
+                (add-to-list 'company-backends 'company-web-html)
+                (add-to-list 'company-backends 'company-css)
+                )))
+    (use-package web-mode
         :straight t
+        :mode (("\\.tsx$" . web-mode)
+               ("\\.html$" . web-mode)
+               ("\\.phtml$" . web-mode)
+               ("\\.djhtml$" . web-mode)
+               ("\\.jinja$" . web-mode)
+               ("\\.jinja2$" . web-mode)
+               ("\\.php$" . web-mode) 
+               ("\\.jsp$" . web-mode)
+               ("\\.as[cp]x\\'" . web-mode)
+               ("\\.jsx$" . web-mode)
+               ("\\.mako\\'" . web-mode)
+               ("\\.ts$" . web-mode)
+               ("\\.tpl$" . web-mode)
+               ("\\.css$" . web-mode)
+               ("\\.scss$" . web-mode))
+        :custom
+        (web-mode-auto-close-style 1)
+        (web-mode-tag-auto-close-style t)
+        (web-mode-enable-auto-pairing t)
+        (web-mode-enable-auto-indentation t)
+        (web-mode-enable-indent-cycle t)
+        (web-mode-enable-auto-quoting nil)
         :config
+        ;; hook
         (add-hook 'web-mode-hook
                   (lambda ()
-                    (add-to-list (make-local-variable 'company-backends)
-                                 'company-nxml)
-                    (add-to-list (make-local-variable 'company-backends)
-                                 'company-web-html)
-                    (add-to-list (make-local-variable 'company-backends)
-                                 'company-css)
-                    )))
-      ;; force django engine for html
-      (setq web-mode-engines-alist
-            '(("django" . "\\.html\\'")
-              ("jinja" . "\\.jinja\\'")
-              ("jinja" . "\\.jinja2\\'"))
-          )
-      ;; force django engine (manual)
-      (defun web-mode-django ()
-        (interactive)
-        (web-mode-set-engine "django"))
-      (global-set-key (kbd "s-%") 'web-mode-django)
-      ;; force angular engine (manual)
-      (defun web-mode-angularJs ()
-        (interactive)
-        (web-mode-set-engine "angular")))
+                    ;; indentation
+                    (setq indent-tabs-mode nil)
+                    (setq web-mode-markup-indent-offset 2)
+                    (setq web-mode-css-indent-offset 2)
+                    (setq web-mode-code-indent-offset 2)
+                    ;; padding
+                    (setq web-mode-style-padding 1)
+                    (setq web-mode-script-padding 1)
+                    (setq web-mode-block-padding 0)
+                    ;; raccourcis
+                    (define-key web-mode-map (kbd "M-;") 'web-mode-comment-or-uncomment)
+                    (define-key web-mode-map (kbd "M-k") 'web-mode-element-kill)
+                    (define-key web-mode-map (kbd "C-c C-v") 'browse-url-of-buffer) ;; preview
+                    ))
+        ;; force django engine for html
+        (setq web-mode-engines-alist
+              '(("django" . "\\.html\\'")
+                ("jinja" . "\\.jinja\\'")
+                ("jinja" . "\\.jinja2\\'"))
+            )
+        ;; force django engine (manual)
+        (defun web-mode-django ()
+          (interactive)
+          (web-mode-set-engine "django"))
+        (global-set-key (kbd "s-%") 'web-mode-django)
+        ;; force angular engine (manual)
+        (defun web-mode-angularJs ()
+          (interactive)
+          (web-mode-set-engine "angular")))
   #+END_SRC
 **** css and less-css
 #+BEGIN_SRC emacs-lisp
@@ -3222,6 +3236,7 @@ Pour typer un parametre dans la doc
 #+BEGIN_SRC emacs-lisp
   (use-package dockerfile-mode
     :straight t
+    :defer t
     :config
     (add-to-list 'auto-mode-alist '("\\Dockerfile*" . dockerfile-mode)))
   (use-package docker-compose-mode :straight t :defer 1)
@@ -3451,71 +3466,66 @@ Pour typer un parametre dans la doc
 #+END_SRC
 * Test
 #+BEGIN_SRC emacs-lisp
-          ;; =================== etags =====================
-          (defvar tags-cmd "etags -R ./* 2>/dev/null")
-          (defun regen-tags ()
-            "Regenerate the tags file for the current working directory"
-            (interactive)
-            (let ((tag-file (concat default-directory "TAGS")))
-              (shell-command tags-cmd)
-              (visit-tags-table tag-file)))
-          ;; =================== end etags =====================
-          (defun enable-clipboard()
-            (interactive)
-            ;;(setq x-select-enable-clipboard t)
-            (setq select-enable-clipboard t)
-            (setq interprogram-paste-function 'x-cut-buffer-or-selection-value))
-          ;; google agenda
-          (defun google-agenda-open ()
-            "Open my google calendar agenda file. The agenda is displayed in the buffer *gcal*."
-            (interactive)
-            ;; launch gcalcli
-            (shell-command "python2 /usr/bin/gcalcli --nostarted agenda > /tmp/gagenda")
-            ;; set name of calendar buffer and location of file containing my agenda
-            (let ((tmp-buff-name "*gcal*") (cal-file (expand-file-name "/tmp/gagenda")))
-              ;; switch to calendar buffer
-              (switch-to-buffer tmp-buff-name)
-              ;; turn off read only to overwrite if buffer exists
-              (read-only-mode -1)
-              ;; clear buffer
-              (erase-buffer)
-              ;; insert agenda file
-              (insert-file-contents cal-file)
-              ;; turn on special mode
-              (special-mode)
-              ;; turn off line wrapping
-              (visual-line-mode -1)))
+  ;; =================== etags =====================
+  (defvar tags-cmd "etags -R ./* 2>/dev/null")
+  (defun regen-tags ()
+    "Regenerate the tags file for the current working directory"
+    (interactive)
+    (let ((tag-file (concat default-directory "TAGS")))
+      (shell-command tags-cmd)
+      (visit-tags-table tag-file)))
+  ;; =================== end etags =====================
+  (defun enable-clipboard()
+    (interactive)
+    ;;(setq x-select-enable-clipboard t)
+    (setq select-enable-clipboard t)
+    (setq interprogram-paste-function 'x-cut-buffer-or-selection-value))
+  ;; google agenda
+  (defun google-agenda-open ()
+    "Open my google calendar agenda file. The agenda is displayed in the buffer *gcal*."
+    (interactive)
+    ;; launch gcalcli
+    (shell-command "python2 /usr/bin/gcalcli --nostarted agenda > /tmp/gagenda")
+    ;; set name of calendar buffer and location of file containing my agenda
+    (let ((tmp-buff-name "*gcal*") (cal-file (expand-file-name "/tmp/gagenda")))
+      ;; switch to calendar buffer
+      (switch-to-buffer tmp-buff-name)
+      ;; turn off read only to overwrite if buffer exists
+      (read-only-mode -1)
+      ;; clear buffer
+      (erase-buffer)
+      ;; insert agenda file
+      (insert-file-contents cal-file)
+      ;; turn on special mode
+      (special-mode)
+      ;; turn off line wrapping
+      (visual-line-mode -1)))
 
-          (use-package company-box
-            :straight t
-            :disabled t
-            :defer 1
-            :config
-            (add-hook 'company-mode-hook 'company-box-mode)
-            (dimmer-configure-company-box)
-            (setq company-tooltip-minimum-width 70)
-            (setq company-tooltip-maximum-width 70))
+  ;; (use-package company-box
+  ;;   :straight t
+  ;;   :defer 1
+  ;;   :config
+  ;;   (add-hook 'company-mode-hook 'company-box-mode)
+  ;;   (dimmer-configure-company-box)
+  ;;   (setq company-tooltip-minimum-width 70)
+  ;;   (setq company-tooltip-maximum-width 
+  (use-package company-quickhelp
+    :straight t
+    :defer 1
+    :config
+    (company-quickhelp-mode))
 
-          (use-package company-quickhelp
-            :straight t
-            :defer 1
-            :config
-            (company-quickhelp-mode))
+  (use-package eaf
+    :straight t
+    :load-path "~/.emacs.d/straight/repos/eaf/"
+    :init
+    (use-package ctable :straight t :defer t)
+    (use-package deferred :straight t :defer t)
+    (use-package s :straight t :defer t)
+    :custom
+    (eaf-browser-continue-where-left-off t))
 
-          (use-package eaf
-            :straight t
-            :load-path "~/.emacs.d/straight/repos/eaf/"
-            :init
-            (use-package ctable :straight t :defer t)
-            (use-package deferred :straight t :defer t)
-            (use-package s :straight t :defer t)
-            :custom
-            (eaf-browser-continue-where-left-off t)
-            :config
-            (eaf-setq eaf-browser-enable-adblocker "true")
-            (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-            (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding))
-
-           (setq sql-sqlite-options '("-interactive"))
+  (setq sql-sqlite-options '("-interactive"))
  #+END_SRC
-v
+
+ 
