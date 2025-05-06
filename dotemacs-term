@@ -1,8 +1,12 @@
 (require 'cl)
 (setq byte-compile-warnings '(not obsolete))
-
+;;(setq byte-compile-warnings 'silent)
+(setq native-comp-async-report-warnings-errors 'silent)
 ;; path
 (add-to-list 'load-path "~/.emacs.d/lisp")
+(add-to-list 'load-path "~/.emacs.d/straight/repos/dash.el/")
+(add-to-list 'load-path "~/.emacs.d/multi-term/")
+(add-to-list 'load-path "~/.emacs.d/straight/vterm")
 
 ;; desactive message de depart
 (setq inhibit-startup-message t)
@@ -35,18 +39,17 @@
 (setq default-directory "/home/djangoliv")
 
 ;; encoding
+(prefer-coding-system 'utf-8)
 (set-terminal-coding-system 'utf-8-unix)
-
 (load-theme 'deeper-blue t)
 
 ;; Change les couleurs
+(setq frame-background-mode 'dark)
 (cond (window-system
        (set-cursor-color "lightblue")
        (set-mouse-color "lightblue")
 ))
-(set-face-background 'tool-bar "black")
 (custom-set-faces
-
  '(term-color-black ((t (:foreground "#3F3F3F" :background "#2B2B2B"))))
  '(term-color-red ((t (:foreground "#af0000" :background "#8C5353"))))
  '(term-color-green ((t (:foreground "#00d700" :background "#9FC59F"))))
@@ -56,13 +59,18 @@
  '(term-color-cyan ((t (:foreground "#93E0E3" :background "#8CD0D3"))))
  '(term-color-white ((t (:foreground "#DCDCCC" :background "#656555"))))
 
- '(term-default-fg-color ((t (:inherit term-color-white))))
- '(term-default-bg-color ((t (:inherit term-color-black))))
+ '(fringe ((t (:background "#181a26"))))
+ ;; '(term-default-fg-color ((t (:inherit term-color-white))))
+ ;; '(term-default-bg-color ((t (:inherit term-color-black))))
+ '(term-default-fg-color ((t (:inherit term-color-black))))
+ '(term-default-bg-color ((t (:inherit term-color-white))))
 
  )
+(set-face-foreground 'mode-line "#000033")
+(set-face-background 'mode-line "#2B2B2B")
 
 ;; font
-(set-frame-font "DejaVuSansMono 10" nil t)
+(set-frame-font "Monospace-12")
 
 ;; Colorisation syntaxique maximale dans tous les modes
 (global-font-lock-mode t)
@@ -107,9 +115,9 @@
 ;; copie sans couper
 (defun copy-line (&optional arg)
   (interactive "P")
-  (toggle-read-only 1)
+  (read-only-mode 1)
   (kill-line arg)
-  (toggle-read-only 0))
+  (read-only-mode 0))
 (setq-default kill-read-only-ok t)
 
 ;; pas de sauvegarde auto
@@ -117,7 +125,7 @@
 (setq make-backup-files nil)
 
 ;; conf dans regristre
-(set-register ?e '(file . "~/.emacs-terms"))
+(set-register ?i '(file . "~/.emacs-terms"))
 
 ;; copier-coller application externe
 (setq x-select-enable-clipboard nil)
@@ -142,15 +150,14 @@
 (auto-fill-mode -1)
 
 ;; FFAP ouvre sans confirm
-;; remplace TRAVAIL par DEBUG ou KEEP si necessaire
 ;; lit le numero de ligne (si present) apres le signe :
 (defun open-file-at-cursor-replace ()
   (interactive)
   (setq line-number (and (string-match ":[0-9]+" (thing-at-point 'line))
-               (substring (thing-at-point 'line) (1+ (match-beginning 0)) (match-end 0))))
+                         (substring (thing-at-point 'line) (1+ (match-beginning 0)) (match-end 0))))
   (if (equal line-number nil)
       (setq line-number (and (string-match "line [0-9]+" (thing-at-point 'line))
-               (substring (thing-at-point 'line) (+ 5 (match-beginning 0)) (match-end 0)))))
+                             (substring (thing-at-point 'line) (+ 5 (match-beginning 0)) (match-end 0)))))
   (if (equal line-number nil)
       (setq line-number "0"))
   (let ( (path (if (region-active-p)
@@ -169,54 +176,49 @@
                   (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string ":" "" path )))
 		(if (file-exists-p (replace-regexp-in-string ":.*" "" path ))
 		    (auto-send-2-server (replace-regexp-in-string ":.*" "" path ))
-		  (if (file-exists-p (replace-regexp-in-string "^a/" "./" path ))
-		      (auto-send-2-server (replace-regexp-in-string "^a/" "./" path ))
-		    (if (file-exists-p (replace-regexp-in-string "^b/" "./" path ))
-			(auto-send-2-server (replace-regexp-in-string "^b/" "./" path ))
-		      (if (file-exists-p (replace-regexp-in-string "$i" "0" path ))
-			  (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "$i" "0" path )))
-			(if (file-exists-p (concat "/home/djangoliv/workspaces/Proj1/trunk/" path))
-			    (auto-send-2-server (concat "+" line-number " /home/djangoliv/workspaces/Proj1/trunk/" path))
-			  (if (file-exists-p (concat "/home/djangoliv/workspaces/Proj2/" path))
-			      (auto-send-2-server (concat "+" line-number " /home/djangoliv/workspaces/Proj2/" path))
-			    (when (y-or-n-p (format "file doesn't exist: 「%s」. Create?" path) )
-			      (auto-send-2-server path )))))))))))))))
+		    (if (file-exists-p (replace-regexp-in-string ".*:" "" path ))
+			(auto-send-2-server (replace-regexp-in-string ".*:" "" path ))
+			(if (file-exists-p (replace-regexp-in-string "^a/" "./" path ))
+			    (auto-send-2-server (replace-regexp-in-string "^a/" "./" path ))
+			    (if (file-exists-p (replace-regexp-in-string "^a/" "/home/djangoliv/workspaces/codeTympan/code_tympan/" path ))
+				(auto-send-2-server (replace-regexp-in-string "^a/" "/home/djangoliv/workspaces/codeTympan/code_tympan/" path ))
+				(if (file-exists-p (replace-regexp-in-string "^b/" "./" path ))
+				    (auto-send-2-server (replace-regexp-in-string "^b/" "./" path ))
+				    (if (file-exists-p (replace-regexp-in-string "^b/" "/home/djangoliv/workspaces/codeTympan/code_tympan/" path ))
+					(auto-send-2-server (replace-regexp-in-string "^b/" "/home/djangoliv/workspaces/codeTympan/code_tympan/" path ))
+					(if (file-exists-p (replace-regexp-in-string "$i" "0" path ))
+					    (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "$i" "0" path )))
+					    (if (file-exists-p (concat "/home/djangoliv/workspaces/Mosaic/mosaic-board" path))
+						(auto-send-2-server (concat "+" line-number " /home/djangoliv/workspaces/Mosaic/mosaic-board" path))
+						(if (file-exists-p (concat "/home/djangoliv/workspaces/logilab/training/logilab-courses/" path))
+						    (auto-send-2-server (concat "+" line-number " /home/djangoliv/workspaces/logilab/training/logilab-courses/" path))
+						    (if (file-exists-p (concat "/home/djangoliv/workspaces/jupyter/training/jupyterApps/" path))
+							(auto-send-2-server (concat "+" line-number " /home/djangoliv/workspaces/jupyter/training/jupyterApps/" path))
+							(when (y-or-n-p (format "file doesn't exist: 「%s」. Create?" path) )
+							  (auto-send-2-server path )))))))))))))))))))
 )
 (global-set-key [(control f1)] 'open-file-at-cursor-replace)
 
-;; open-diff-files-at-cursor
-(require 'f)
-(defun open-diff-files-at-cursor ()
+
+(defun magit-diff-at-cursor ()
   (interactive)
-  (setq theLine (thing-at-point 'line))
-  (setq lineSplit (split-string theLine))
-  (setq firstWord (car lineSplit))
-  (message firstWord)
-  (if (string-equal firstWord "Seulement")
-      (progn
-	(setq fileName (replace-regexp-in-string ":" "" (s-join "/" (cdr (cdr lineSplit)))))
-	(if (f-exists? fileName)
-	    (auto-send-2-server fileName))
-	)
-    (progn
-      (while lineSplit
-        (setq fileName (car lineSplit))
-        (if (f-exists? fileName)
-            (auto-send-2-server fileName))
-        (setq lineSplit (cdr lineSplit))))))
-(global-set-key (kbd "C-<f2>") 'open-diff-files-at-cursor)
+  (setq commit (thing-at-point 'symbol))
+  (shell-command (concat "/usr/bin/emacsclient -e " "\"(magit-show-commit \\\"" commit "\\\")\""))
+  (shell-command "/usr/bin/emacsclient -e \"(select-frame-set-input-focus (selected-frame))\"")
+)
+(global-set-key [(control f2)] 'magit-diff-at-cursor)
 
 ; envoyer le buffer dans emacs client
 (defun auto-send-2-server(fileName)
   (shell-command
-   (concat "emacsclient -n " fileName))
+   (concat "/usr/bin/emacsclient -n " fileName))
 )
 (defun send-2-server()
   (interactive)
   (message buffer-file-name)
   (setq lineNb (count-lines 1 (point)))
   (shell-command
-    (concat "emacsclient -n +" (int-to-string (+ lineNb 1)) " " buffer-file-name))
+   (concat "/usr/bin/emacsclient -n +" (int-to-string (+ lineNb 1)) " " buffer-file-name))
 )
 (global-set-key (kbd "C-<f5>") 'send-2-server)
 
@@ -233,8 +235,10 @@
 (setq term-buffer-maximum-size 0)
 
 ;;;;;;;;; tabbar
-;;(require 'tabbar)
-(load-file "~/.emacs.d/lisp/tabbar.more.el")
+(add-to-list 'load-path "~/.emacs.d/mode-icons/")
+(setq tabbar-use-images nil)
+(require 'tabbar-ruler)
+
 (assq-delete-all 'tabbar-mode minor-mode-map-alist) ;; pour que le C-c fonctionne
 
 ;; permet de ne pas afficher les buffers non pertinents (comme *scratch* par exemple):
@@ -275,11 +279,26 @@
 (global-set-key "\M--" 'tabbar-forward-group)
 
 ;; tabbar custom color
-(setq tabbar-background-color "black") ;; the color of the tabbar background
-(set-face-attribute
- 'tabbar-unselected nil
- :foreground "black")
-(setq tabbar-tab-label-function (lambda (tab) (format " %s " (car tab)))) ; ajoute des espaces autours des labels
+(setq tabbar-background-color "gray11") ;; the color of the tabbar background
+(custom-set-faces
+ '(tabbar-default ((t (:height 0.95))))
+ '(tabbar-separator ((t (:background "black"))))
+ '(tabbar-selected ((t (:inherit tabbar-default :foreground "gray60" :background "gray10" :bold t ))))
+ '(tabbar-selected-modified ((t (:inherit tabbar-default :foreground "gray60" :background "gray10" :bold t ))))
+ '(tabbar-unselected ((t (:inherit tabbar-default :foreground "gray30" :background "black" :bold t))))
+ '(tabbar-unselected-modified ((t (:inherit tabbar-default :foreground "gray30" :background "black" :bold t))))
+ '(tabbar-button ((t (:inherit tabbar-default :foreground "black" :background "black" )))))
+
+(custom-set-variables
+ '(tabbar-scroll-left-button (quote (("") "")))
+ '(tabbar-scroll-right-button (quote (("") ""))))
+;; space around the label to make it looks less crowd.
+(defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
+  (setq ad-return-value
+        (if (and (buffer-modified-p (tabbar-tab-value tab))
+                 (buffer-file-name (tabbar-tab-value tab)))
+            (concat " " (concat ad-return-value " "))
+          (concat " " (concat ad-return-value " ")))))
 
 ;; paste du clipboard
 (global-set-key (kbd "C-M-y") 'x-clipboard-yank)
@@ -300,8 +319,11 @@
     (term-line-mode)))
 (global-set-key (kbd "C-x t") 'term-toggle-mode)
 
+(global-set-key (kbd "C-x l") 'comint-clear-buffer)
+
 (setq term-buffer-maximum-size 100000)
 (setq term-program "/bin/bash")
+(setq multi-term-dedicated-close-back-to-open-buffer-p t)
 
 (require 'multi-term)
 ;; Permet d'avoir un term dans une tab de tabbar
@@ -309,7 +331,7 @@
   "Lance le terminal dans la fenetre courante nom 'Term #', donc il est possible de lancer plusieurs terminaux"
   (interactive)
   (command-execute 'multi-term)
-  (text-scale-decrease 1)
+  ;;(text-scale-decrease 1)
   ;;(setq-default truncate-lines nil)
   (if (not (boundp 'term-number))
       (defvar term-number 1 "term index in the current emacs session") )
@@ -319,13 +341,15 @@
 (global-set-key (kbd "C-S-t") 'my-run-term) ;; mappe sur C-T
 
 ;; fermer un terminal
-(global-set-key [(control f4)] 'kill-this-buffer);; mappe sur C-F4
+;;(global-set-key [(control f4)] 'kill-this-buffer);; mappe sur C-F4
+(bind-key "k" (lambda () (interactive) (kill-buffer (current-buffer))) ctl-x-map)
+
 
 ;; ssh
 (defun my-ssh-term (args)
   "Connect to a remote host by SSH."
   (interactive (list
-    (completing-read "sssh " '("machine02" "djangoliv@machine02" "user@machine02" "proj1@machine02" )))
+    (completing-read "sssh " '("testing@silu.logilab.priv" "root@localhost")))
 	       (insert args))
   (let ((switches (split-string-and-unquote args)))
     (set-buffer (apply 'make-term "ssh" "ssh" nil "-X" switches))
@@ -349,17 +373,17 @@
     (setq prompt (substring (thing-at-point 'line) 0 4 ))
     (message prompt)
     (while (equal prompt (substring (thing-at-point 'line) 0 4 ))
-      (previous-line)
+      (forward-line -1)
       (beginning-of-line)
       (copy-line))
     (if (not (equal arg nil))
 	(progn
-	  (previous-line)
+	  (forward-line -1)
 	  (beginning-of-line)
 	  (copy-line)
 	  (while (equal prompt (substring (thing-at-point 'line) 0 4 ))
 	    (message "ppp")
-	    (previous-line)
+	    (forward-line -1)
 	    (beginning-of-line)
 	    (copy-line)))))
   (yank)
@@ -418,8 +442,8 @@
 (modify-syntax-entry ?~ "w" term-mode-syntax-table)
 (modify-syntax-entry ?$ "(^" term-mode-syntax-table)
 (modify-syntax-entry ?_ "w" term-mode-syntax-table)
-(modify-syntax-entry ?[ "w" term-mode-syntax-table)
-(modify-syntax-entry ?] "w" term-mode-syntax-table)
+(modify-syntax-entry ?\[ "w" term-mode-syntax-table)
+(modify-syntax-entry ?\] "w" term-mode-syntax-table)
 
 ;; sudo + ssh
 ;; C-x C-f /sudo:djangoliv@agile02:/COTS/torque/
@@ -484,9 +508,9 @@
   (interactive "sterminal name: ")
   (rename-buffer name t))
 
-(defun term-previous-line()
-  (previous-line)
-  )
+
+;; to use previous-line function in term-char-mode
+(custom-set-variables '(term-char-mode-point-at-process-mark nil))
 
 ;; unbind keys
 (setq term-unbind-key-list '("<ESC>" "C-h" "C-s" "C-r"))
@@ -509,12 +533,12 @@
         ("M-K" . term-send-kill-line)
 	("C-." . getLastOutput)
 	("C-/" . term-dabbrev-expand)
-	("M-<right>" . term-send-forward-word)
-	("M-<left>" . term-send-backward-word)
-	("C-<right>" . term-send-forward-big-word)
-	("C-<left>" . term-send-backward-big-word)
-	("C-<backspace>" . term-send-backward-kill-word)
-	("M-<backspace>" . term-kill-word)
+	("C-<right>" . term-send-forward-word)
+	("C-<left>" . term-send-backward-word)
+	("M-<right>" . term-send-forward-big-word)
+	("M-<left>" . term-send-backward-big-word)
+	("M-<backspace>" . term-send-backward-kill-word)
+	("C-<backspace>" . term-kill-word)
 	("C-%" . toggle-hard-newline)
 	("S-<up>" . previous-line)
 	("S-<down>" . next-line)
@@ -538,6 +562,7 @@
 (add-hook 'term-mode-hook
               '(lambda ()
 	      (term-set-escape-char ?\C-x)
+          (goto-address-mode)
 	      (global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
 	      ))
 
@@ -581,15 +606,22 @@
 ;; (add-hook 'term-mode-hook 'my-term-hook)
 
 
-;;(defun term-window-width () 80)
+(defun term-window-width () 80)
 ;;(setq truncate-lines t)
 
 (require 'tramp-term)
 
-(setq term-prompt-regexp "[[:ascii:]]*djangoliv@machine:")
+;;(setq term-prompt-regexp "[[:ascii:]]*djangoliv@django:")
+(setq term-prompt-regexp "[[:ascii:]]*djangoliv@django:+")
 
 ;; (defun ansi-term-debug-message (proc char)
 ;;   (message "ANSI escape in process %s char %c, param %d, remaining params %d"
 ;;            proc char term-terminal-parameter term-terminal-more-parameters))
 
 ;; (advice-add 'term-handle-ansi-escape :before 'ansi-term-debug-message)
+
+(setq bidi-paragraph-direction 'left-to-right)
+
+(setq-default ispell-program-name "aspell")
+(setq ispell-local-dictionary "english")
+(ispell-change-dictionary "english")
