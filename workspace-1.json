@@ -1,51 +1,81 @@
 {
-  // emacs
-  "layout": "stacked",
-  "border": "normal",
-  "current_border_width": 2,
-  "floating": "auto_off",
-  "percent": 0.5,
-  "swallows": [
-    {
-      "class": "^Emacs$",
-      "instance": "^emacs$",
-      "transient_for": "^$"
-    }
-  ],
-  "type": "con"
-}
-{
-  // splitv split container with 2 children
-  "layout": "splitv",
-  "percent": 0.5,
-  "type": "con",
-  "nodes": [
-    {
-      "border": "normal",
-      "current_border_width": 2,
-      "percent": 0.7,
-      "type": "con",
-      "swallows": [
+    "border": "normal",
+    "floating": "auto_off",
+    "layout": "splith",
+    "percent": 1,
+    "type": "con",
+    "nodes": [
         {
-          "class": "^Emacs$",
-          "instance": "^emacsTerm$",
-          "transient_for": "^$"
-        }
-      ]
-    },
-    {
-      "border": "normal",
-      "current_border_width": 2,
-      "percent":0.3,
-      "type": "con",
-      "swallows": [
+            "border": "pixel",
+            "current_border_width": 2,
+            "floating": "auto_off",
+            "geometry": {
+               "height": 673,
+               "width": 752,
+               "x": 0,
+               "y": 0
+            },
+            "name": " workspace-1.json []",
+            "percent": 0.5,
+            "swallows": [
+               {
+                 "class": "^Emacs$",
+                 "instance": "^emacs$",
+                 "transient_for": "^$"
+               }
+            ],
+            "type": "con"
+        },
         {
-          "class": "^XTerm$",
-          "instance": "^xterm$",
-          "transient_for": "^$"
+            "border": "normal",
+            "floating": "auto_off",
+            "layout": "splitv",
+            "percent": 0.5,
+            "type": "con",
+            "nodes": [
+                {
+                    "border": "pixel",
+                    "current_border_width": 2,
+                    "floating": "auto_off",
+                    "geometry": {
+                       "height": 673,
+                       "width": 752,
+                       "x": 0,
+                       "y": 0
+                    },
+                    "name": "emacsTerm",
+                    "percent": 0.7,
+                    "swallows": [
+                       {
+                         "class": "^Emacs$",
+                         "instance": "^emacsTerm$",
+                         "title": "^emacsTerm$"
+                       }
+                    ],
+                    "type": "con"
+                },
+                {
+                    "border": "pixel",
+                    "current_border_width": 2,
+                    "floating": "auto_off",
+                    "geometry": {
+                       "height": 1062,
+                       "width": 960,
+                       "x": 960,
+                       "y": 18
+                    },
+                    "name": "kitty",
+                    "percent": 0.3,
+                    "swallows": [
+                       {
+                        "class": "^kitty$",
+                        "title": "^kitty$"
+                       }
+                    ],
+                    "type": "con"
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
 
