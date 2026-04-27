@@ -20,6 +20,9 @@
 ;; pas de Bip
 (setq ring-bell-function 'ignore)
 
+;; pas de modeline
+(setq-default mode-line-format nil)
+
 ;; historique minibuffer entre les sessions
 (setq savehist-additional-variables
 	  '(search-ring regexp-search-ring compile-history)
@@ -149,64 +152,9 @@
 
 (auto-fill-mode -1)
 
-;; FFAP ouvre sans confirm
-;; lit le numero de ligne (si present) apres le signe :
-(defun open-file-at-cursor-replace ()
-  (interactive)
-  (setq line-number (and (string-match ":[0-9]+" (thing-at-point 'line))
-                         (substring (thing-at-point 'line) (1+ (match-beginning 0)) (match-end 0))))
-  (if (equal line-number nil)
-      (setq line-number (and (string-match "line [0-9]+" (thing-at-point 'line))
-                             (substring (thing-at-point 'line) (+ 5 (match-beginning 0)) (match-end 0)))))
-  (if (equal line-number nil)
-      (setq line-number "0"))
-  (let ( (path (if (region-active-p)
-                   (buffer-substring-no-properties (region-beginning) (region-end))
-                 (thing-at-point 'filename) ) ))
-    (if (string-match-p "\\`https?://" path)
-        (browse-url path)
-      (progn ; not starting “http://”
-	(if (file-exists-p (replace-regexp-in-string "elc" "el" path ))
-	    (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "elc" "el" path )))
-	  (if (file-exists-p (substitute-in-file-name path))
-	      (auto-send-2-server (concat "+" line-number " " (substitute-in-file-name path)))
-	    (if (file-exists-p (concat path ".el"))
-		(auto-send-2-server (concat "+" line-number " " path ".el"))
-              (if (file-exists-p (replace-regexp-in-string ":" "" path ))
-                  (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string ":" "" path )))
-		(if (file-exists-p (replace-regexp-in-string ":.*" "" path ))
-		    (auto-send-2-server (replace-regexp-in-string ":.*" "" path ))
-		    (if (file-exists-p (replace-regexp-in-string ".*:" "" path ))
-			(auto-send-2-server (replace-regexp-in-string ".*:" "" path ))
-			(if (file-exists-p (replace-regexp-in-string "^a/" "./" path ))
-			    (auto-send-2-server (replace-regexp-in-string "^a/" "./" path ))
-			    (if (file-exists-p (replace-regexp-in-string "^a/" "/home/djangoliv/workspaces/codeTympan/code_tympan/" path ))
-				(auto-send-2-server (replace-regexp-in-string "^a/" "/home/djangoliv/workspaces/codeTympan/code_tympan/" path ))
-				(if (file-exists-p (replace-regexp-in-string "^b/" "./" path ))
-				    (auto-send-2-server (replace-regexp-in-string "^b/" "./" path ))
-				    (if (file-exists-p (replace-regexp-in-string "^b/" "/home/djangoliv/workspaces/codeTympan/code_tympan/" path ))
-					(auto-send-2-server (replace-regexp-in-string "^b/" "/home/djangoliv/workspaces/codeTympan/code_tympan/" path ))
-					(if (file-exists-p (replace-regexp-in-string "$i" "0" path ))
-					    (auto-send-2-server (concat "+" line-number " " (replace-regexp-in-string "$i" "0" path )))
-					    (if (file-exists-p (concat "/home/djangoliv/workspaces/Mosaic/mosaic-board" path))
-						(auto-send-2-server (concat "+" line-number " /home/djangoliv/workspaces/Mosaic/mosaic-board" path))
-						(if (file-exists-p (concat "/home/djangoliv/workspaces/logilab/training/logilab-courses/" path))
-						    (auto-send-2-server (concat "+" line-number " /home/djangoliv/workspaces/logilab/training/logilab-courses/" path))
-						    (if (file-exists-p (concat "/home/djangoliv/workspaces/jupyter/training/jupyterApps/" path))
-							(auto-send-2-server (concat "+" line-number " /home/djangoliv/workspaces/jupyter/training/jupyterApps/" path))
-							(when (y-or-n-p (format "file doesn't exist: 「%s」. Create?" path) )
-							  (auto-send-2-server path )))))))))))))))))))
-)
-(global-set-key [(control f1)] 'open-file-at-cursor-replace)
-
-
-(defun magit-diff-at-cursor ()
-  (interactive)
-  (setq commit (thing-at-point 'symbol))
-  (shell-command (concat "/usr/bin/emacsclient -e " "\"(magit-show-commit \\\"" commit "\\\")\""))
-  (shell-command "/usr/bin/emacsclient -e \"(select-frame-set-input-focus (selected-frame))\"")
-)
-(global-set-key [(control f2)] 'magit-diff-at-cursor)
+;; ffap amélioré
+(require 'my-open-at-point) ;; dans le fichier ~/.emacs.d/lisp/my-open-at-point.el
+(global-set-key [(control f1)] #'my/open-at-cursor-dwim)
 
 ; envoyer le buffer dans emacs client
 (defun auto-send-2-server(fileName)
@@ -244,15 +192,15 @@
 ;; permet de ne pas afficher les buffers non pertinents (comme *scratch* par exemple):
 (when (require 'tabbar nil t)
   (setq tabbar-buffer-groups-function
-	(lambda () (list "All Buffers")))
-   (setq tabbar-buffer-list-function
-	 (lambda ()
-           (remove-if
-            (lambda(buffer)
-              (or (string-equal "TAGS" (buffer-name buffer))
-                   (find (aref (buffer-name buffer) 0) " *" )))
-            (buffer-list))))
-   (tabbar-mode))
+	    (lambda () (list "All Buffers")))
+  (setq tabbar-buffer-list-function
+	    (lambda ()
+          (remove-if
+           (lambda(buffer)
+             (or (string-equal "TAGS" (buffer-name buffer))
+                 (find (aref (buffer-name buffer) 0) " *" )))
+           (buffer-list))))
+  (tabbar-mode))
 
 ;; raccourcis
 (global-set-key [C-next] 'tabbar-forward-tab)
@@ -331,7 +279,7 @@
   "Lance le terminal dans la fenetre courante nom 'Term #', donc il est possible de lancer plusieurs terminaux"
   (interactive)
   (command-execute 'multi-term)
-  ;;(text-scale-decrease 1)
+  (text-scale-decrease 1)
   ;;(setq-default truncate-lines nil)
   (if (not (boundp 'term-number))
       (defvar term-number 1 "term index in the current emacs session") )
@@ -341,9 +289,7 @@
 (global-set-key (kbd "C-S-t") 'my-run-term) ;; mappe sur C-T
 
 ;; fermer un terminal
-;;(global-set-key [(control f4)] 'kill-this-buffer);; mappe sur C-F4
 (bind-key "k" (lambda () (interactive) (kill-buffer (current-buffer))) ctl-x-map)
-
 
 ;; ssh
 (defun my-ssh-term (args)
@@ -389,19 +335,19 @@
   (yank)
   (term-char-mode))
 
-;; (defun getLastOutput ()
-;;   (interactive)
-;;   (term-line-mode)
-;;   (save-excursion
-;;     (beginning-of-line 1)
-;;     (setq prompt (substring (thing-at-point 'line) 0 4 ))
-;;     (message prompt)
-;;     (while (equal prompt (substring (thing-at-point 'line) 0 4 ))
-;;       (previous-line)
-;;       (beginning-of-line)
-;;       (copy-line)))
-;;   (yank)
-;;   (term-char-mode))
+(defun copyLastOutput ()
+  "Copie la dernière sortie du terminal."
+  (interactive)
+  (let ((start (save-excursion
+                 (term-previous-prompt 1)
+                 (forward-line 1)
+                 (point)))
+        (end (save-excursion
+               (term-next-prompt 1)
+               (beginning-of-line)
+               (point))))
+    (kill-ring-save start end)
+    (message "Terminal output copied")))
 
 ;; completion dans u terminal (C-/)
 (setq dabbrev-abbrev-skip-leading-regexp "[<>=\"/]")
@@ -452,10 +398,11 @@
 ;; exit term whit C-d
 (defun delete-char-or-kill-terminal-buffer (N &optional killflag)
   (interactive "p\nP")
-  (if (string-match "Term " (buffer-name))
-      (kill-buffer (current-buffer))
+  (if (eq major-mode 'term-mode)
+      (when (y-or-n-p (format "Fermer le terminal '%s' ? " (buffer-name)))
+        (kill-buffer (current-buffer)))
     (delete-char N killflag)))
-(global-set-key (kbd "C-d") 'delete-char-or-kill-terminal-buffer)
+(define-key term-raw-map (kbd "C-d") 'delete-char-or-kill-terminal-buffer)
 
 ;; deplacement
 ;; pour ces fonctions il faut ajouter dans le fichier .readline-bindings
@@ -522,49 +469,50 @@
         ("C-r" . term-send-raw)
         ("C-s" . term-send-raw)
         ("C-m" . term-send-raw)
-	("M-d" . term-send-forward-kill-word)
+	    ("M-d" . term-send-forward-kill-word)
         ("M-y" . term-yank-pop)
-	("C-x C-y" . term-yank-kill-ring)
-	("C-x M-y" . term-yank-pop-kill-ring)
+	    ("C-x C-y" . term-yank-kill-ring)
+	    ("C-x M-y" . term-yank-pop-kill-ring)
         ("C-_" . term-send-raw)
         ("C-M-h" . term-send-backward-kill-semi-word)
         ("M-f" . term-send-forward-word)
         ("M-b" . term-send-backward-word)
         ("M-K" . term-send-kill-line)
-	("C-." . getLastOutput)
-	("C-/" . term-dabbrev-expand)
-	("C-<right>" . term-send-forward-word)
-	("C-<left>" . term-send-backward-word)
-	("M-<right>" . term-send-forward-big-word)
-	("M-<left>" . term-send-backward-big-word)
-	("M-<backspace>" . term-send-backward-kill-word)
-	("C-<backspace>" . term-kill-word)
-	("C-%" . toggle-hard-newline)
-	("S-<up>" . previous-line)
-	("S-<down>" . next-line)
-	("S-<right>" . right-char)
-	("S-<left>" . left-char)
-	("S-<end>" . move-end-of-line)
-	("S-<home>" . move-beginning-of-line)
-	("M-:" . term-send-raw-meta)
-	("M-l" . term-send-raw-meta) ;; NEW
+	    ("C-." . getLastOutput)
+        ("C-?" . copyLastOutput)
+	    ("C-/" . term-dabbrev-expand)
+	    ("C-<right>" . term-send-forward-word)
+	    ("C-<left>" . term-send-backward-word)
+	    ("M-<right>" . term-send-forward-big-word)
+	    ("M-<left>" . term-send-backward-big-word)
+	    ("M-<backspace>" . term-send-backward-kill-word)
+	    ("C-<backspace>" . term-kill-word)
+	    ("C-%" . toggle-hard-newline)
+	    ("S-<up>" . previous-line)
+	    ("S-<down>" . next-line)
+	    ("S-<right>" . right-char)
+	    ("S-<left>" . left-char)
+	    ("S-<end>" . move-end-of-line)
+	    ("S-<home>" . move-beginning-of-line)
+	    ("M-:" . term-send-raw-meta)
+	    ("M-l" . term-send-raw-meta) ;; NEW
         ("M-u" . term-send-raw-meta)
         ("M-c" . term-send-raw-meta)
         ("M-." . term-send-raw-meta)
-	("C-<up>" . term-previous-prompt)
-	("C-<down>" . term-next-prompt)
-	))
+        ("C-x <up>" . term-previous-prompt)
+	    ;;("C-<down>" . term-next-prompt)
+	    ))
 (define-key term-raw-map (kbd "C-S-y") 'term-paste)
 
 ;; compile-shell-minor-mode
 (global-set-key (kbd "s-c") 'compilation-shell-minor-mode)
 
 (add-hook 'term-mode-hook
-              '(lambda ()
-	      (term-set-escape-char ?\C-x)
-          (goto-address-mode)
-	      (global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
-	      ))
+          '(lambda ()
+	         (term-set-escape-char ?\C-x)
+             (goto-address-mode)
+	         (global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
+	         ))
 
 (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
   "Prevent annoying \"Active processes exist\" query when you quit Emacs."
@@ -592,7 +540,7 @@
      (mapc
       (lambda (func)
         (eval `(define-key term-raw-map [remap ,func]
-                 (lambda () (interactive) (ding)))))
+                           (lambda () (interactive) (ding)))))
       '(backward-kill-paragraph
         backward-kill-sentence backward-kill-sexp backward-kill-word
         bookmark-kill-line kill-backward-chars kill-backward-up-list
