@@ -1,9 +1,9 @@
+;;; custom.el --- Custom-set variables and faces  -*- lexical-binding: t; -*-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ede-project-directories '("/home/ogiorgis/workspaces/Mosaic/mosaic-board"))
  '(logview-additional-level-mappings
    '(("kubeLevels"
       (error "E")
@@ -51,4 +51,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
+;;(load-file "~/.emacs.d/lisp/recentf.el")

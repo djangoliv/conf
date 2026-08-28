@@ -1,6 +1,5 @@
-(require 'cl)
-(setq byte-compile-warnings '(not obsolete))
-;;(setq byte-compile-warnings 'silent)
+;;; -*- lexical-binding: t -*-
+(require 'cl-lib)
 (setq native-comp-async-report-warnings-errors 'silent)
 ;; path
 (add-to-list 'load-path "~/.emacs.d/lisp")
@@ -39,7 +38,7 @@
 
 ;; pwd
 ;;(setq default-directory (concat (getenv "HOME") "/"))
-(setq default-directory "/home/djangoliv")
+(setq default-directory (expand-file-name "~/"))
 
 ;; encoding
 (prefer-coding-system 'utf-8)
@@ -51,7 +50,7 @@
 (cond (window-system
        (set-cursor-color "lightblue")
        (set-mouse-color "lightblue")
-))
+       ))
 (custom-set-faces
  '(term-color-black ((t (:foreground "#3F3F3F" :background "#2B2B2B"))))
  '(term-color-red ((t (:foreground "#af0000" :background "#8C5353"))))
@@ -73,7 +72,7 @@
 (set-face-background 'mode-line "#2B2B2B")
 
 ;; font
-(set-frame-font "Monospace-12")
+(set-frame-font "Monospace-13")
 
 ;; Colorisation syntaxique maximale dans tous les modes
 (global-font-lock-mode t)
@@ -131,11 +130,9 @@
 (set-register ?i '(file . "~/.emacs-terms"))
 
 ;; copier-coller application externe
-(setq x-select-enable-clipboard nil)
-(setq x-select-enable-primary t)
 ;; pour que le colle de la souris soit de la kill-ring
-(setq x-select-enable-clipboard nil)
-(setq x-select-enable-primary t)
+(setq select-enable-clipboard nil)
+(setq select-enable-primary t)
 (setq select-active-regions nil)
 (setq mouse-drag-copy-region t)
 (global-set-key [mouse-2] 'mouse-yank-at-click)
@@ -156,26 +153,25 @@
 (require 'my-open-at-point) ;; dans le fichier ~/.emacs.d/lisp/my-open-at-point.el
 (global-set-key [(control f1)] #'my/open-at-cursor-dwim)
 
-; envoyer le buffer dans emacs client
+;; envoyer le buffer dans emacs client
 (defun auto-send-2-server(fileName)
   (shell-command
-   (concat "/usr/bin/emacsclient -n " fileName))
-)
+   (concat "emacsclient -n " fileName))
+  )
 (defun send-2-server()
   (interactive)
   (message buffer-file-name)
-  (setq lineNb (count-lines 1 (point)))
-  (shell-command
-   (concat "/usr/bin/emacsclient -n +" (int-to-string (+ lineNb 1)) " " buffer-file-name))
-)
+  (let ((lineNb (count-lines 1 (point))))
+    (shell-command
+     (concat "emacsclient -n +" (int-to-string (+ lineNb 1)) " " buffer-file-name))))
 (global-set-key (kbd "C-<f5>") 'send-2-server)
 
 (defun open-in-server(filename)
   (interactive "fOpen To Client: ")
-  (setq bufferName (buffer-name))
-  (switch-to-buffer "*Messages*")
-  (auto-send-2-server filename)
-  (switch-to-buffer bufferName))
+  (let ((bufferName (buffer-name)))
+    (switch-to-buffer "*Messages*")
+    (auto-send-2-server filename)
+    (switch-to-buffer bufferName)))
 (global-set-key (kbd "C-x C-f") 'open-in-server)
 (global-set-key (kbd "C-x f") 'find-file)
 
@@ -187,7 +183,8 @@
 (setq tabbar-use-images nil)
 (require 'tabbar-ruler)
 
-(assq-delete-all 'tabbar-mode minor-mode-map-alist) ;; pour que le C-c fonctionne
+(setq minor-mode-map-alist
+      (assq-delete-all 'tabbar-mode minor-mode-map-alist)) ;; pour que le C-c fonctionne
 
 ;; permet de ne pas afficher les buffers non pertinents (comme *scratch* par exemple):
 (when (require 'tabbar nil t)
@@ -195,10 +192,10 @@
 	    (lambda () (list "All Buffers")))
   (setq tabbar-buffer-list-function
 	    (lambda ()
-          (remove-if
+          (cl-remove-if
            (lambda(buffer)
              (or (string-equal "TAGS" (buffer-name buffer))
-                 (find (aref (buffer-name buffer) 0) " *" )))
+                 (cl-find (aref (buffer-name buffer) 0) " *" )))
            (buffer-list))))
   (tabbar-mode))
 
@@ -208,19 +205,19 @@
 
 ;; tabbar group
 (defun tabbar-buffer-groups ()
-    (list
-     (cond
-      ((eq major-mode 'dired-mode)
-       "Dired"
-       )
-      ((eq major-mode 'org-mode)
-       "Dired"
-       )
-      ((string-equal "." (substring (buffer-name) 0 1)) "Conf Buffer")
-      (t
-       "User Buffer"
-       )
-      )))
+  (list
+   (cond
+    ((eq major-mode 'dired-mode)
+     "Dired"
+     )
+    ((eq major-mode 'org-mode)
+     "Dired"
+     )
+    ((string-equal "." (substring (buffer-name) 0 1)) "Conf Buffer")
+    (t
+     "User Buffer"
+     )
+    )))
 (setq tabbar-buffer-groups-function 'tabbar-buffer-groups)
 
 (global-set-key "\M-+" 'tabbar-backward-group)
@@ -241,24 +238,21 @@
  '(tabbar-scroll-left-button (quote (("") "")))
  '(tabbar-scroll-right-button (quote (("") ""))))
 ;; space around the label to make it looks less crowd.
-(defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
-  (setq ad-return-value
-        (if (and (buffer-modified-p (tabbar-tab-value tab))
-                 (buffer-file-name (tabbar-tab-value tab)))
-            (concat " " (concat ad-return-value " "))
-          (concat " " (concat ad-return-value " ")))))
+(advice-add 'tabbar-buffer-tab-label :filter-return
+            (lambda (label) (concat " " label " "))
+            '((name . fixup-tab-label-space-and-flag)))
 
 ;; paste du clipboard
 (global-set-key (kbd "C-M-y") 'x-clipboard-yank)
 
 ;; tramp completion
 (require 'tramp)
-(setq my-tramp-ssh-completions
-      '((tramp-parse-sconfig "~/.ssh/config")
-        (tramp-parse-shosts "~/.ssh/known_hosts")))
-(mapc (lambda (method)
-        (tramp-set-completion-function method my-tramp-ssh-completions))
-      '("fcp" "rsync" "scp" "scpc" "scpx" "sftp" "ssh"))
+(let ((my-tramp-ssh-completions
+       '((tramp-parse-sconfig "~/.ssh/config")
+         (tramp-parse-shosts "~/.ssh/known_hosts"))))
+  (mapc (lambda (method)
+          (tramp-set-completion-function method my-tramp-ssh-completions))
+        '("fcp" "rsync" "scp" "scpc" "scpx" "sftp" "ssh")))
 
 (defun term-toggle-mode ()
   (interactive)
@@ -269,69 +263,50 @@
 
 (global-set-key (kbd "C-x l") 'comint-clear-buffer)
 
-(setq term-buffer-maximum-size 100000)
+;;(setq term-buffer-maximum-size 100000)
 (setq term-program "/bin/bash")
 (setq multi-term-dedicated-close-back-to-open-buffer-p t)
 
 (require 'multi-term)
 ;; Permet d'avoir un term dans une tab de tabbar
+(defvar term-number 1 "Term index in the current Emacs session.")
 (defun my-run-term ()
   "Lance le terminal dans la fenetre courante nom 'Term #', donc il est possible de lancer plusieurs terminaux"
   (interactive)
   (command-execute 'multi-term)
   (text-scale-decrease 1)
   ;;(setq-default truncate-lines nil)
-  (if (not (boundp 'term-number))
-      (defvar term-number 1 "term index in the current emacs session") )
   (rename-buffer (concat "Term " (int-to-string term-number)))
   (setq term-number (+ 1 term-number)))
 (global-set-key "\M-&" 'my-run-term) ;; mappe sur M-&
 (global-set-key (kbd "C-S-t") 'my-run-term) ;; mappe sur C-T
 
 ;; fermer un terminal
-(bind-key "k" (lambda () (interactive) (kill-buffer (current-buffer))) ctl-x-map)
-
-;; ssh
-(defun my-ssh-term (args)
-  "Connect to a remote host by SSH."
-  (interactive (list
-    (completing-read "sssh " '("testing@silu.logilab.priv" "root@localhost")))
-	       (insert args))
-  (let ((switches (split-string-and-unquote args)))
-    (set-buffer (apply 'make-term "ssh" "ssh" nil "-X" switches))
-    ;;(setq-default truncate-lines nil)
-    (if (not (boundp 'term-ssh-number))
-      (defvar term-ssh-number 1 "term index in the current emacs session") )
-    (rename-buffer (concat "Term " args " " (int-to-string term-ssh-number)))
-    (term-mode)
-    (term-char-mode)
-    (switch-to-buffer (concat "Term " args " " (int-to-string term-ssh-number)) )
-    (setq term-ssh-number (+ 1 term-ssh-number))))
-(global-set-key (kbd "C-M-&") 'my-ssh-term) ;; mappe sur M-&
+(global-set-key [(control f4)] 'kill-this-buffer);; mappe sur C-F4
 
 ;; Permet de recuperer la derniere sortie
 ;; si arg => avant derniere
 (defun getLastOutput (arg)
   (interactive "P")
   (term-line-mode)
-  (save-excursion
-    (beginning-of-line 1)
-    (setq prompt (substring (thing-at-point 'line) 0 4 ))
-    (message prompt)
-    (while (equal prompt (substring (thing-at-point 'line) 0 4 ))
-      (forward-line -1)
-      (beginning-of-line)
-      (copy-line))
-    (if (not (equal arg nil))
-	(progn
-	  (forward-line -1)
-	  (beginning-of-line)
-	  (copy-line)
-	  (while (equal prompt (substring (thing-at-point 'line) 0 4 ))
-	    (message "ppp")
-	    (forward-line -1)
-	    (beginning-of-line)
-	    (copy-line)))))
+  (let (prompt)
+    (save-excursion
+      (beginning-of-line 1)
+      (setq prompt (substring (thing-at-point 'line) 0 4))
+      (message prompt)
+      (while (equal prompt (substring (thing-at-point 'line) 0 4))
+        (forward-line -1)
+        (beginning-of-line)
+        (copy-line))
+      (when arg
+        (forward-line -1)
+        (beginning-of-line)
+        (copy-line)
+        (while (equal prompt (substring (thing-at-point 'line) 0 4))
+          (message "ppp")
+          (forward-line -1)
+          (beginning-of-line)
+          (copy-line)))))
   (yank)
   (term-char-mode))
 
@@ -355,20 +330,21 @@
   (interactive "*P")
   (if (equal major-mode 'term-mode)
       (progn
-	(let ((beg (point)))
-	  (dabbrev-expand nil)
-	  (kill-region beg (point)))
-	(term-send-raw-string (substring-no-properties (current-kill 0))))
+	    (let ((beg (point)))
+	      (dabbrev-expand nil)
+	      (kill-region beg (point)))
+	    (term-send-raw-string (substring-no-properties (current-kill 0))))
     (dabbrev-expand arg)))
 ;; yank in term (kill-ing)
 (defun term-yank-kill-ring ()
   (interactive)
-  (flet ((insert-for-yank (string) (term-send-raw-string string)))
+  (cl-letf (((symbol-function 'insert-for-yank)
+             (lambda (string) (term-send-raw-string string))))
     (yank)))
 ;; yank-pop un term (kill-ring)
 (defun term-yank-pop-kill-ring ()
   (interactive)
-  (dotimes (i (- (point) (mark t)))
+  (dotimes (_i (- (point) (mark t)))
     (term-send-backspace)
     )
   (process-send-string
@@ -396,13 +372,39 @@
 (set-default 'tramp-default-proxies-alist (quote (("agile02" "djangoliv" "/ssh:%h:"))))
 
 ;; exit term whit C-d
-(defun delete-char-or-kill-terminal-buffer (N &optional killflag)
-  (interactive "p\nP")
+;; (defun delete-char-or-kill-terminal-buffer (N &optional killflag)
+;;   (interactive "p\nP")
+;;   (if (eq major-mode 'term-mode)
+;;       (when (y-or-n-p (format "Fermer le terminal '%s' ? " (buffer-name)))
+;;         (kill-buffer (current-buffer)))
+;;     (delete-char N killflag)))
+;; (define-key term-raw-map (kbd "C-d") 'delete-char-or-kill-terminal-buffer)
+(defun my-term-c-d ()
+  (interactive)
   (if (eq major-mode 'term-mode)
-      (when (y-or-n-p (format "Fermer le terminal '%s' ? " (buffer-name)))
-        (kill-buffer (current-buffer)))
-    (delete-char N killflag)))
-(define-key term-raw-map (kbd "C-d") 'delete-char-or-kill-terminal-buffer)
+      (let ((proc (get-buffer-process (current-buffer))))
+        (cond
+         ;; pas de process → fermer
+         ((not (and proc (process-live-p proc)))
+          (when (y-or-n-p (format "Fermer le terminal '%s' ? " (buffer-name)))
+            (kill-buffer (current-buffer))))
+
+         ;; ligne contenant @ → prompt shell
+         ((save-excursion
+            (beginning-of-line)
+            (search-forward "@d" (line-end-position) t))
+          (if (y-or-n-p "Fermer le terminal ? ")
+              ;; on envoie C-d pour fermer le shell proprement
+              (term-send-raw-string "\C-d")
+            (message "Annulé")))
+
+         ;; sinon → programme interactif (python, etc.)
+         (t
+          (term-send-raw-string "\C-d"))))
+    ;; hors term
+    (delete-char 1)))
+
+(define-key term-raw-map (kbd "C-d") 'my-term-c-d)
 
 ;; deplacement
 ;; pour ces fonctions il faut ajouter dans le fichier .readline-bindings
@@ -442,12 +444,27 @@
     (setq term-suppress-hard-newline nil)))
 ;;(toggle-hard-newline)
 (defun backward-kill-to-slash ()
-  "Delete / to /"
+  "Kill backward to the previous slash or whitespace on the line.
+The delimiter itself is killed, and delimiters sitting right before
+point are skipped first, so repeated calls walk up a path one
+component at a time.  In `term-mode' char mode the line belongs to
+the inferior shell, so send it that many DEL characters instead of
+editing the buffer behind its back."
   (interactive)
-   (set-mark-command t)
-  (search-backward "/")
-  (kill-region)
- )
+  (let* ((end (point))
+         (bol (line-beginning-position))
+         (beg (save-excursion
+                (skip-chars-backward "/ \t" bol)
+                (skip-chars-backward "^/ \t" bol)
+                (when (and (> (point) bol)
+                           (memq (char-before) '(?/ ?\s ?\t)))
+                  (backward-char))
+                (point))))
+    (cond
+     ((>= beg end) (ding))
+     ((and (eq major-mode 'term-mode) (term-in-char-mode))
+      (term-send-raw-string (make-string (- end beg) ?\C-?)))
+     (t (kill-region beg end)))))
 (global-set-key [M-backspace] 'backward-kill-to-slash)
 
 "Change le nom du terminal"
@@ -479,13 +496,13 @@
         ("M-b" . term-send-backward-word)
         ("M-K" . term-send-kill-line)
 	    ("C-." . getLastOutput)
-        ("C-?" . copyLastOutput)
+	    ("C-?" . copyLastOutput)
 	    ("C-/" . term-dabbrev-expand)
 	    ("C-<right>" . term-send-forward-word)
 	    ("C-<left>" . term-send-backward-word)
 	    ("M-<right>" . term-send-forward-big-word)
 	    ("M-<left>" . term-send-backward-big-word)
-	    ("M-<backspace>" . term-send-backward-kill-word)
+	    ("M-<backspace>" . backward-kill-to-slash)
 	    ("C-<backspace>" . term-kill-word)
 	    ("C-%" . toggle-hard-newline)
 	    ("S-<up>" . previous-line)
@@ -499,25 +516,27 @@
         ("M-u" . term-send-raw-meta)
         ("M-c" . term-send-raw-meta)
         ("M-." . term-send-raw-meta)
-        ("C-x <up>" . term-previous-prompt)
-	    ;;("C-<down>" . term-next-prompt)
+	    ("C-x <up>" . term-previous-prompt)
+	    ;;("C-x <down>" . term-next-prompt)
 	    ))
 (define-key term-raw-map (kbd "C-S-y") 'term-paste)
 
 ;; compile-shell-minor-mode
 (global-set-key (kbd "s-c") 'compilation-shell-minor-mode)
 
-(add-hook 'term-mode-hook
-          '(lambda ()
-	         (term-set-escape-char ?\C-x)
-             (goto-address-mode)
-	         (global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
-	         ))
+(defun my-term-mode-setup ()
+  "Set up `term-mode' buffers."
+  (term-set-escape-char ?\C-x)
+  (goto-address-mode)
+  (global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal))
+(add-hook 'term-mode-hook #'my-term-mode-setup)
 
-(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
-  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+(defun my-no-query-kill-emacs (orig-fun &rest args)
+  "Prevent annoying \"Active processes exist\" query when you quit Emacs.
+ORIG-FUN is `save-buffers-kill-emacs', called with ARGS."
   (cl-letf (((symbol-function #'process-list) (lambda ())))
-    ad-do-it))
+    (apply orig-fun args)))
+(advice-add 'save-buffers-kill-emacs :around #'my-no-query-kill-emacs)
 
 ;; taille et position
 (set-frame-width (selected-frame) 240)
@@ -559,8 +578,8 @@
 
 (require 'tramp-term)
 
-;;(setq term-prompt-regexp "[[:ascii:]]*djangoliv@django:")
-(setq term-prompt-regexp "[[:ascii:]]*djangoliv@django:+")
+;;(setq term-prompt-regexp "[[:ascii:]]*@django:")
+(setq term-prompt-regexp "[[:ascii:]]*@django:+")
 
 ;; (defun ansi-term-debug-message (proc char)
 ;;   (message "ANSI escape in process %s char %c, param %d, remaining params %d"

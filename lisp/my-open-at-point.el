@@ -1,4 +1,4 @@
-;;; my-open-at-point.el --- DWIM open (file or git commit) via emacsclient
+;;; my-open-at-point.el --- DWIM open (file or git commit) via emacsclient  -*- lexical-binding: t; -*-
 
 (require 'thingatpt)
 (require 'seq)
@@ -43,7 +43,7 @@
   (replace-regexp-in-string "\\$i\\'" "0" path))
 
 (defun my/transform-workspace (path)
-  (concat "/home/ogiorgis/workspace/" path))
+  (concat "~/workspace/" path))
 
 (defun my/transform-trim-quotes (path)
   (replace-regexp-in-string "^['\"]\\|['\"]$" "" path))

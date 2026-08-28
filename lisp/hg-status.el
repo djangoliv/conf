@@ -1,5 +1,3 @@
-;; https://searchcode.com/file/116589788/lisp/scm/hg-status.el
-
 (eval-when-compile (require 'cl))
 (require 'vc-hg)
 (add-to-list 'vc-handled-backends 'Hg)
@@ -71,17 +69,17 @@ static char * data[] = {
 
 (defsubst hg-status-interprete-state-mode-color (stat)
   "Interpret vc-hg-state symbol to mode line color"
-  (case stat
-    ('edited "tomato")
-    ('up-to-date "GreenYellow")
-    ('unknown  "gray")
-    ('added    "blue")
-    ('deleted  "gray30")
-    ('missing  "gray30")
-    ('removed  "gray30")
-    ('ignored  "gray30")
-    ('unregistered  "gray30")
-    ('unmerged "purple")
+  (cl-case stat
+    (edited "tomato")
+    (up-to-date "GreenYellow")
+    (unknown  "gray")
+    (added    "blue")
+    (deleted  "gray30")
+    (missing  "gray30")
+    (removed  "gray30")
+    (ignored  "gray30")
+    (unregistered  "gray30")
+    (unmerged "purple")
     (t "red")))
 
 (defun vc-hg-branch-name ()

@@ -1,12 +1,4 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
-# If not running interactively, don't do anything
-# case $- in
-#     *i*) ;;
-#       *) return;;
-# esac
+# ~/.bashrc
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -35,16 +27,10 @@ if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-# export TERM=xterm-256color
-# # set a fancy prompt (non-color, unless we know we "want" color)
-# case "$TERM" in
-#     xterm-color) color_prompt=yes;;
-# esac
-
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-#force_color_prompt=yes
+# Emacs' term/multi-term sets TERM=eterm-color and points TERMINFO at its own
+# database; overriding it here makes ncurses emit ISO 2022 charset sequences
+# (\e(B) that term.el does not implement, and they show up literally.
+[ -n "$INSIDE_EMACS" ] || export TERM=xterm-256color
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
@@ -79,23 +65,6 @@ if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
 fi
 
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# some more ls aliases
-#alias ll='ls -l'
-#alias la='ls -A'
-#alias l='ls -CF'
-
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-# if [ -f ~/.bash_aliases ]; then
-#     . ~/.bash_aliases
-# fi
-
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
@@ -124,7 +93,6 @@ alias hgd='hgl -r . -vp'
 alias hgle='hg log -T gitextra -G '
 # Pour les gros doigts
 alias sl="ls"
-alias cd..='cd ..'
 alias xs='cd'
 alias grpe='grep'
 alias mroe='more'
@@ -146,12 +114,14 @@ alias e="echo"
 alias ffmpegstab="/usr/local/bin/ffmpeg-stab/ffmpeg"
 ##### magit
 alias magit='emacsclient -a emacs -e "(magit-status \"$(git rev-parse --show-toplevel)\")"'
+alias bluetooth='blueman-applet'
 
 function kps () {
     kubectl get secret ${1} --template='{{ range $key, $value := .data }}{{ printf "%s: %s\n" $key ($value | base64decode) }}{{ end }}'
 }
 
 complete -F __start_kubectl k
+source <(kubectl completion bash)
 
 alias bxterm="xterm -fg white -bg black"
 #setterm -blength 0
@@ -177,9 +147,8 @@ export SVN_EDITOR=/usr/bin/emacsclient
 export EDITOR=/usr/bin/emacsclient
 export HGEDITOR=/usr/bin/emacsclient
 export GIT_EDITOR=/usr/bin/emacsclient
-export PATH="/home/djangoliv/.cask/bin:$PATH"
-#export PATH=$PATH:$HOME/Tools/minio-binaries/
 export VISUAL=$EDITOR
+export SYSTEMD_EDITOR=vim
 
 # ANT en couleur
 export ANT_OPTS=-Xmx256m
@@ -192,27 +161,9 @@ if [ -f ~/.ssh/known_hosts ]; then
     complete -W "$(while IFS=' ,' read host t; do echo $host; done < ~/.ssh/known_hosts)" ping
 fi
 
-stty stop ^X # permet le C-s pendant un C-r
-
-# QT
-#PATH=/usr/local/Trolltech/Qt-4.8.5/bin/:$PATH
-#LD_LIBRARY_PATH=/usr/local/Trolltech/Qt-4.8.5/lib/:$LD_LIBRARY_PATH
-
-# tree_sitter
-export LD_LIBRARY_PATH=/usr/local/lib/
-
-# firefox
-export PATH=$PATH:/home/djangoliv/Tools/firefox/firefox
-
-# projman
-# export PYTHONPATH=/usr/local/lib/python2.7/dist-packages/:$PYTHONPATH
-# documentor
-export PATH=$PATH:/home/djangoliv/workspaces/logilab/documentor/bin/
-export PYTHONPATH=/home/djangoliv/workspaces/logilab/documentor/build/lib.linux-x86_64-2.7/:$PYTHONPATH
-
-# projets
-export PYTHONPATH=/home/djangoliv/workspaces/Tympan/tympan-blender/blender/addon/:$PYTHONPATH
-
+if [ -t 0 ]; then
+  stty stop ^X # permet le C-s pendant un C-r
+fi
 # cd qui ce rapelle des chemins
 function cd
 {
@@ -286,21 +237,18 @@ psgrep() {
 	fi
 }
 
-# permet de copier un fichier dans tous les sous repertoires du répertoire cible
+# permet de copier un fichier dans tous les sous repertoires du rÃ©pertoire cible
 copyInDirs () {
     for dir in $2/*/; do cp $1 "$dir"; done
 }
 alias dispatch=copyInDirs
 
-export PYTHONSTARTUP="/home/djangoliv/.pythonrc.py"
+export PYTHONSTARTUP="$HOME/.pythonrc.py"
 export PYTHONDONTWRITEBYTECODE=1
-export WORKON_HOME=/home/djangoliv/Tools/python/venv
+export WORKON_HOME=$HOME/Tools/python/venv
 export PROJECT_HOME=$HOME/workspaces
 source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 
-# virtualenvwrapper
-# export WORKON_HOME=~/.virtualenvs
-# export PROJECT_HOME=/home/djangoliv/workspaces/
 
 # PROMPT
 # variable/to/.../shorten/long_paths
@@ -308,15 +256,7 @@ PROMPT_COMMAND='DIR=`pwd|sed -e "s!$HOME!~!"`; if [ ${#DIR} -gt 28 ]; then CurDi
 
 PS1='\[\033[0;36m\]\u@\h\[\033[0;m\]:\[\e[1m\]${CurDir}\$ '
 
-# PATH
-export PATH=/home/djangoliv/.local/bin:$PATH
 export PAGER='less -FRXS'
-
-
-# cubicweb
-#export CW_MODE=user
-#export CW_CUBES_PATH=/home/djangoliv/workspaces/cubes
-export CW_INSTANCES_DIR=/home/djangoliv/workspaces/cw_instances/
 
 # An emacs 'alias' with the ability to read from stdin
 function e
@@ -335,28 +275,78 @@ function e
 }
 function kprompt
 {
-    source /home/djangoliv/.kube/prompt.sh
+    source $HOME/.kube/prompt.sh
+    #PS1='$(kube_ps1)'$PS1
     PS1='$(kube_ps1)${CurDir}\$ '
 }
 
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
-# pyautocompleteoptions
-# if [ -d "$HOME/.pyautocomplete" ]; then
-# 	for i in `find $HOME/.pyautocomplete -maxdepth 1 -type f -name "*sh"`; do source $i; done
-# fi
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 # typo in directory
 shopt -s cdspell
-alias ..='cd ..'
+#eval $(thefuck --alias)
+#alias ..='cd ..'
 
 # fix var completion with "\"
 shopt -s direxpand
 
-# kubeconfig
-#export KUBECONFIG=/home/djangoliv/.kube/ovh.yml
-#kns jupyterapps-dev
-# kubectl krew
-export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-# kustomize
-export PATH=/home/djangoliv/Tools/kustomize/:$PATH
+export CMAKE_C_COMPILER=clang-19
+export CMAKE_CXX_COMPILER=clang++-19
+
+# firefox
+export PATH=$HOME/Tools/firefox/firefox:$PATH
+export BROWSER=$HOME/Tools/firefox/firefox/firefox
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+# mamba
+export PATH=$HOME/Tools/miniforge3/bin:$PATH
+
+# >>> mamba initialize >>>
+# !! Contents within this block are managed by 'micromamba shell init' !!
+export MAMBA_EXE="$HOME/Tools/miniforge3/bin/micromamba";
+export MAMBA_ROOT_PREFIX="$HOME/Tools/miniforge3";
+__mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__mamba_setup"
+else
+    alias micromamba="$MAMBA_EXE"  # Fallback on help from micromamba activate
+fi
+unset __mamba_setup
+# <<< mamba initialize <<<
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$("$HOME/Tools/miniforge3/bin/conda" 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "$HOME/Tools/miniforge3/etc/profile.d/conda.sh" ]; then
+        . "$HOME/Tools/miniforge3/etc/profile.d/conda.sh"
+    else
+        export PATH="$HOME/Tools/miniforge3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+
+. "$HOME/.local/bin/env"
+
+# conda completion
+eval "$(register-python-argcomplete conda)"
+eval "$(register-python-argcomplete black)"
+
+# Scaleway CLI autocomplete initialization.
+eval "$(scw autocomplete script shell=bash)"
+
+export PYTHONPATH=$HOME/.config/py3status:$PYTHONPATH
+export PATH="$HOME/.pixi/bin:$PATH"
+
+# k3s-cnam kubectl tunnel alias
+alias ktunnel='ssh -N -f papay-tunnel 2>/dev/null || true'
+alias kc='KUBECONFIG=$HOME/.kube/config kubectl'

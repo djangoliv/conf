@@ -1,6 +1,6 @@
 # example user config (see 'hg help config' for more info)
 [ui]
-username = Djangoliv <olivier.giorgis@logilab.fr>
+username = Djangoliv <djangoliv@mailoo.org>
 
 ignore = ~/.hgignore
 

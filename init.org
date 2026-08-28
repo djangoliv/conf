@@ -18,9 +18,8 @@
 Configuration Minimal (sans librairies externes)
 #+BEGIN_SRC emacs-lisp
   ;;; -*- mode: emacs-lisp; lexical-binding: t -*-
-  ;;(setq native-comp-async-report-warnings-errors 'silent)
+  (setq native-comp-async-report-warnings-errors 'silent)
   (setq package-quickstart nil)
-  (setq redisplay-dont-pause t)
   ;; Garbage collector
   (setq gc-cons-threshold (* 50 1000 1000))
   (add-hook 'after-init-hook
@@ -125,7 +124,7 @@ Configuration Minimal (sans librairies externes)
   (defalias `line-number `display-line-numbers-mode)
   (defalias `number-line `display-line-numbers-mode)
   ;; By default, Emacs "updates" its ui more often than it needs to
-  (setq idle-update-delay 1.0)
+  (setq which-func-update-delay 1.0)
   ;; This prevents native compilation from leaving temporary files in /tmp.
   (setq native-comp-async-query-on-exit t)
   #+END_SRC
@@ -215,6 +214,35 @@ Configuration Minimal (sans librairies externes)
     :straight t
     :config
     (setq dimmer-fraction 0.18)
+    ;; Terminal emulator buffers must never be dimmed.  `dimmer-dim-buffer'
+    ;; pushes one `face-remap-add-relative' per face of `face-list' (~1500
+    ;; here) into the buffer's `face-remapping-alist'.  A term/eat buffer
+    ;; carries a face property on nearly every character and repaints its
+    ;; whole screen many times per second, so redisplay crawls -- and the
+    ;; already dim ANSI colors of a TUI become unreadable.
+    (defun my/dimmer-terminal-buffer-p (buffer)
+      "Return non-nil if BUFFER runs a terminal emulator."
+      (with-current-buffer buffer
+        (derived-mode-p 'term-mode 'eat-mode 'vterm-mode)))
+    (add-to-list 'dimmer-buffer-exclusion-predicates
+                 #'my/dimmer-terminal-buffer-p)
+    ;; Emacs 31.1 introduced `whitespace-page-delimiter', whose :underline
+    ;; spec is (:color foreground-color :style double-line).  The symbol
+    ;; `foreground-color' is a valid face color, but dimmer feeds it straight
+    ;; to `color-defined-p', which signals (wrong-type-argument stringp
+    ;; foreground-color) on every redisplay.  Skip attributes whose color is
+    ;; not a literal color string; they follow the foreground, already dimmed.
+    (defun my/dimmer-skip-symbolic-color (fn face attribute &rest args)
+      "Around advice for `dimmer--dim-face-attribute'.
+Return nil when FACE's ATTRIBUTE carries a symbolic rather than
+literal color, instead of letting dimmer signal an error."
+      (let ((value (face-attribute face attribute nil t)))
+        (unless (and (consp value)
+                     (plist-member value :color)
+                     (not (stringp (plist-get value :color))))
+          (apply fn face attribute args))))
+    (advice-add 'dimmer--dim-face-attribute :around
+                #'my/dimmer-skip-symbolic-color)
     (dimmer-mode)
     )
 #+END_SRC
@@ -224,7 +252,7 @@ Configuration Minimal (sans librairies externes)
     :straight t
     :init
     (setq exec-path-from-shell-variables '("PATH" "PYTHONPATH" "WORKON_HOME"))
-    (exec-path-from-shell-initialize)
+    (exec-path-from-shell-initialize))
 #+END_SRC
 ** Registres
   #+BEGIN_SRC emacs-lisp
@@ -236,6 +264,7 @@ Configuration Minimal (sans librairies externes)
     (set-register ?o '(file . "~/.emacs-org/memo.org"))
     (set-register ?t '(file . "~/.emacs-org/tel.org"))
     (set-register ?p '(file . "~/.emacs-org/perso.org"))
+    (set-register ?s '(file . "~/.emacs-org/song.org"))
     (set-register ?b '(file . "~/.bashrc"))
     (set-register ?k '(file . "~/.emacs-org/keys.org"))
     (set-register ?c '(file . "~/.config/i3/config"))
@@ -655,12 +684,15 @@ Configuration Minimal (sans librairies externes)
     (add-hook 'org-mode-hook (lambda ()
                                (turn-off-auto-fill)
                                (global-set-key (kbd "s-<escape>") 'hide-sublevels)   ;; tout plier
-                               (defadvice org-open-at-point (around org-open-at-point-choose-browser activate)
-                                 (let ((browse-url-browser-function 'browse-url-generic))
-                                   ad-do-it))
                                (setq indent-tabs-mode nil)
                                (setq-local line-spacing '0.1)
                                (setq-local company-minimum-prefix-length 5)))
+    (defun djangoliv--org-open-at-point-generic-browser (orig-fun &rest args)
+      "Open links with `browse-url-generic'."
+      (let ((browse-url-browser-function 'browse-url-generic))
+        (apply orig-fun args)))
+    (advice-add 'org-open-at-point :around
+                #'djangoliv--org-open-at-point-generic-browser)
     ;; keywords
     (setq org-todo-keyword-faces
           (quote
@@ -700,7 +732,7 @@ Configuration Minimal (sans librairies externes)
   ;; dita
   (setq org-ditaa-jar-path "~/Tools/ditaa/ditaa0_9.jar")
   ;; plantuml
-  (setq org-plantuml-jar-path "~/.emacs.d/plantuml/plantuml.jar")
+  (setq org-plantuml-jar-path "~/Tools/plantuml/plantuml.jar")
   ;; don't prompt me to confirm everytime I want to evaluate a block
   (setq org-confirm-babel-evaluate nil)
   ;; display/update images in the buffer after I evaluate
@@ -760,7 +792,7 @@ Configuration Minimal (sans librairies externes)
     :straight t
     :defer 2
     :config
-    (setq org-re-reveal-root "file:///home/djangoliv/Tools/revealjs/reveal.js/")
+    (setq org-re-reveal-root (concat "file://" (expand-file-name "~/Tools/revealjs/reveal.js/")))
     (setq org-re-reveal-title-slide nil)
     )
 #+END_SRC
@@ -827,7 +859,7 @@ Configuration Minimal (sans librairies externes)
   (defun calendar-show-week (arg)
     "Displaying week number in calendar-mode."
     (interactive "P")
-    (copy-face font-lock-constant-face 'calendar-iso-week-face)
+    (copy-face 'font-lock-constant-face 'calendar-iso-week-face)
     (set-face-attribute
      'calendar-iso-week-face nil :height 0.7)
     (setq calendar-intermonth-text
@@ -980,9 +1012,11 @@ Configuration Minimal (sans librairies externes)
     (yas-global-mode t)
     ;; pour avoir les snippet dans le minibuffer
     (autoload 'yas-insert-snippet "dropdown-list" nil t)
-    (defadvice yas-insert-snippet (around use-completing-prompt activate)
+    (defun djangoliv--yas-completing-prompt (orig-fun &rest args)
       "Use `yas/completing-prompt' for `yas/prompt-functions' but only here..."
-      (let ((yas-prompt-functions '(yas/completing-prompt))) ad-do-it))
+      (let ((yas-prompt-functions '(yas/completing-prompt)))
+        (apply orig-fun args)))
+    (advice-add 'yas-insert-snippet :around #'djangoliv--yas-completing-prompt)
     (define-key yas-minor-mode-map (kbd "<tab>") nil) ;; pas sur tab
     (define-key yas-minor-mode-map (kbd "TAB") nil) ;; pas sur tab
     )
@@ -1108,6 +1142,7 @@ Configuration Minimal (sans librairies externes)
   ;; pour le status dans la modeline
   (add-to-list 'load-path "~/.emacs.d/manual/git-modeline")
   (require 'git-modeline)
+  (git-modeline-mode 1)
 #+END_SRC
 *** mercurial
 #+BEGIN_SRC emacs-lisp
@@ -1255,7 +1290,7 @@ Configuration Minimal (sans librairies externes)
         (cons '("\\.\\(xml\\|XML\\|xsd\\|XSD\\|xsl\\|prj\\|rng\\|xhtml\\|qrc\\|CR\\)\\'" . nxml-mode)
               auto-mode-alist))
   (defun my-nxml-hook ()
-    (smart-tabs-insinuate 'nxml)
+    ;;(smart-tabs-insinuate 'nxml)
     (setq nxml-child-indent 4
           nxml-attribute-indent 4
           nxml-slash-auto-complete-flag t ;; auto completion
@@ -1421,13 +1456,13 @@ Configuration Minimal (sans librairies externes)
                       (setq flycheck-pycheckers-checkers '(pylint))
                       (flycheck-mode))))
                 )))
-  #+END_SRC
+#+END_SRC
 **** venv
 #+BEGIN_SRC emacs-lisp
   (use-package python-environment
     :straight t
     :config
-    (setq python-environment-directory "/home/djangoliv/Tools/python/venv/"))
+    (setq python-environment-directory "~/Tools/python/venv/"))
 #+END_SRC
 **** docstring
 #+BEGIN_SRC emacs-lisp
@@ -1455,11 +1490,11 @@ Configuration Minimal (sans librairies externes)
 #+END_SRC
 **** pyvenv
 #+BEGIN_SRC emacs-lisp
-  (setenv "WORKON_HOME" "/home/djangoliv/Tools/python/venv")
+  (setenv "WORKON_HOME" "~/Tools/python/venv")
   (use-package pyvenv
     :straight t
     :config
-    (pyvenv-activate "/home/djangoliv/Tools/python/venv/base")
+    (pyvenv-activate "~/Tools/python/venv/base")
     (defalias 'switch-virtualenv 'pyvenv-workon))
 #+END_SRC
 **** pip requirements
@@ -1518,41 +1553,41 @@ Configuration Minimal (sans librairies externes)
 **** lsp-mode (eglot)
 #+BEGIN_SRC emacs-lisp
   (use-package eglot :straight t)
-    (add-hook 'python-ts-mode-hook #'eglot-ensure)
-    (add-hook 'c-ts-mode-hook #'eglot-ensure)
-    (add-hook 'c++-ts-mode-hook #'eglot-ensure)
-    (add-hook 'typescript-ts-mode-hook #'eglot-ensure)
-    (add-hook 'tsx-ts-mode-hook #'eglot-ensure)
-    (add-hook 'web-mode-hook #'eglot-ensure)
-    (setq eglot-autoshutdown t)
-    (setq eglot-server-programs
-          '(((python-ts-mode python-mode) . ("pylsp"))
-            ((typescript-ts-mode tsx-ts-mode) . ("typescript-language-server" "--stdio"))
-            ((c++-ts-mode c-ts-mode) . ("clangd"))))
-    (global-set-key (kbd "C-.") 'xref-find-definitions)
-    (global-set-key (kbd "M-,") 'xref-pop-marker-stack)
+  (add-hook 'python-ts-mode-hook #'eglot-ensure)
+  (add-hook 'c-ts-mode-hook #'eglot-ensure)
+  (add-hook 'c++-ts-mode-hook #'eglot-ensure)
+  (add-hook 'typescript-ts-mode-hook #'eglot-ensure)
+  (add-hook 'tsx-ts-mode-hook #'eglot-ensure)
+  (add-hook 'web-mode-hook #'eglot-ensure)
+  (setq eglot-autoshutdown t)
+  (setq eglot-server-programs
+        '(((python-ts-mode python-mode) . ("pylsp"))
+          ((typescript-ts-mode tsx-ts-mode) . ("typescript-language-server" "--stdio"))
+          ((c++-ts-mode c-ts-mode) . ("clangd"))))
+  (global-set-key (kbd "C-.") 'xref-find-definitions)
+  (global-set-key (kbd "M-,") 'xref-pop-marker-stack)
 
-    (add-hook 'eglot-managed-mode-hook
-            (lambda ()
-              (flymake-mode -1)))
-  (setq eglot-workspace-configuration
-        '((:pylsp
-           (:plugins
-            (:pyflakes (:enabled :json-false)
-             :pycodestyle (:enabled :json-false)
-             :mccabe (:enabled :json-false)
-             :flake8 (:enabled :json-false)
-             :pylint (:enabled :json-false)))))) 
-    (context-menu-mode 1)
-    (add-hook 'context-menu-functions
-              (lambda (menu click)
-                (easy-menu-add-item menu nil
-                                    ["Rename" eglot-rename t])
-                (easy-menu-add-item menu nil
-                                    ["Find references" xref-find-references t])
-                (easy-menu-add-item menu nil
-                                    ["Code actions" eglot-code-actions t])
-                menu))
+  (add-hook 'eglot-managed-mode-hook
+          (lambda ()
+            (flymake-mode -1)))
+(setq eglot-workspace-configuration
+      '((:pylsp
+         (:plugins
+          (:pyflakes (:enabled :json-false)
+           :pycodestyle (:enabled :json-false)
+           :mccabe (:enabled :json-false)
+           :flake8 (:enabled :json-false)
+           :pylint (:enabled :json-false)))))) 
+  (context-menu-mode 1)
+  (add-hook 'context-menu-functions
+            (lambda (menu click)
+              (easy-menu-add-item menu nil
+                                  ["Rename" eglot-rename t])
+              (easy-menu-add-item menu nil
+                                  ["Find references" xref-find-references t])
+              (easy-menu-add-item menu nil
+                                  ["Code actions" eglot-code-actions t])
+              menu))
 #+END_SRC
 **** eassist/xcscope/function-args
 #+BEGIN_SRC emacs-lisp
@@ -1606,7 +1641,7 @@ Configuration Minimal (sans librairies externes)
 #+BEGIN_SRC emacs-lisp
   (use-package groovy-mode
     :straight t
-    :defer 1
+    :defer 2
     :config
     (add-to-list 'auto-mode-alist '("Jenkinsfile" . groovy-mode)))
 #+END_SRC
@@ -1904,6 +1939,7 @@ Configuration Minimal (sans librairies externes)
           ((derived-mode-p 'image-mode) "Image")
           ((derived-mode-p 'nxml-mode) "nXml")
           ((derived-mode-p 'logview-mode) "Logs")
+          ((derived-mode-p 'eat-mode) "Eat")
           ((memq major-mode '(org-mode
                               org-agenda-clockreport-mode
                               org-src-mode
@@ -1990,14 +2026,14 @@ Configuration Minimal (sans librairies externes)
                         (find-file (replace-regexp-in-string "a/" "" path ))
                       (if (file-exists-p (replace-regexp-in-string "b/" "" path ))
                           (find-file (replace-regexp-in-string "b/" "" path ))
-                        (if (file-exists-p (concat "/home/djangoliv/workspaces/jupyterlab-projects/jupyterhub-projects/jupyterApps/app" path))
-                            (find-file (concat "/home/djangoliv/workspaces/jupyterlab-projects/jupyterhub-projects/jupyterApps/app" path))
-                          (if (file-exists-p (concat "/home/djangoliv/workspaces/" path))
-                              (find-file (concat "/home/djangoliv/workspaces/" path))
-                            (if (file-exists-p (concat "/home/djangoliv/workspaces/Mosaic/mosaic-board/" path))
-                                (find-file (concat "/home/djangoliv/workspaces/Mosaic/mosaic-board/" path))
-                            (if (file-exists-p (concat "/home/djangoliv/workspaces/codeTympan/code_tympan/" path))
-                                (find-file (concat "/home/djangoliv/workspaces/codeTympan/code_tympan/" path))
+                        (if (file-exists-p (concat "~/workspaces/jupyterlab-projects/jupyterhub-projects/jupyterApps/app" path))
+                            (find-file (concat "~/workspaces/jupyterlab-projects/jupyterhub-projects/jupyterApps/app" path))
+                          (if (file-exists-p (concat "~/workspaces/" path))
+                              (find-file (concat "~/workspaces/" path))
+                            (if (file-exists-p (concat "~/workspaces/Mosaic/mosaic-board/" path))
+                                (find-file (concat "~/workspaces/Mosaic/mosaic-board/" path))
+                            (if (file-exists-p (concat "~/workspaces/codeTympan/code_tympan/" path))
+                                (find-file (concat "~/workspaces/codeTympan/code_tympan/" path))
                               (when (y-or-n-p (format "file doesn't exist: '%s'. Create?" path))
                                 (find-file path ))))))))))))))))
         (forward-line (- (string-to-number line-number) 1)))
@@ -2167,9 +2203,12 @@ Configuration Minimal (sans librairies externes)
       "Restore window configuration to `ediff-last-windows'."
       (set-window-configuration ediff-last-windows)
       (remove-hook 'ediff-after-quit-hook-internal 'ediff-restore-windows))
-    (defadvice ediff-buffers (around ediff-restore-windows activate)
+    (defun djangoliv--ediff-save-windows (orig-fun &rest args)
+      "Save the window configuration before calling ORIG-FUN."
       (setq ediff-last-windows (current-window-configuration))
-      (add-hook 'ediff-after-quit-hook-internal 'ediff-restore-windows) ad-do-it))
+      (add-hook 'ediff-after-quit-hook-internal 'ediff-restore-windows)
+      (apply orig-fun args))
+    (advice-add 'ediff-buffers :around #'djangoliv--ediff-save-windows))
 #+END_SRC
 *** ediff par caractere (pas par mot)
 #+BEGIN_SRC emacs-lisp
@@ -2548,15 +2587,6 @@ Configuration Minimal (sans librairies externes)
        fname size access mod change mode)))
 (global-set-key (kbd "C-x v i") 'show-file-info)
 #+END_SRC
-*** open-junk-file
-#+BEGIN_SRC emacs-lisp
-  (use-package open-junk-file
-    :straight t
-    :defer 2
-    :config
-    (setq open-junk-file-format "/tmp/%Y%m%d-%H%M%S.")
-    (global-set-key (kbd "C-x r f") 'open-junk-file))
-#+END_SRC
 ** Correcteurs
 *** Ispell
 #+BEGIN_SRC emacs-lisp
@@ -2625,7 +2655,7 @@ Configuration Minimal (sans librairies externes)
     (global-set-key (kbd "C-c l b") 'languagetool-correct-buffer)
     (global-set-key (kbd "C-c l l") 'languagetool-set-language)
     (setq languagetool-console-command
-          "/home/djangoliv/Tools/languageTool/languagetool-6.6/LanguageTool-6.6-stable/languagetool-commandline.jar")
+          "~/Tools/languageTool/languagetool-6.6/languagetool-commandline.jar")
     (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8"))
     (setq languagetool-correction-language "en-GB"))
 #+END_SRC
@@ -2633,7 +2663,7 @@ Configuration Minimal (sans librairies externes)
 *** Firefox
 #+BEGIN_SRC emacs-lisp
   ;; firefox comme navigateur web par defaut
-  (setq browse-url-generic-program "/home/djangoliv/Tools/firefox/firefox/firefox"
+  (setq browse-url-generic-program "~/Tools/firefox/firefox/firefox"
         browse-url-browser-function 'browse-url-generic)
  #+END_SRC
 ** Completion
@@ -2705,7 +2735,7 @@ Configuration Minimal (sans librairies externes)
     (set-buffer
      (find-file (concat "/sudo::" (expand-file-name file)))))
   ;;(global-set-key (kbd "s-r") 'sudo-find-file)
-  (set-default 'tramp-default-proxies-alist (quote (("giorgis" "sag" "djangoliv" "/ssh:%h:"))))
+  (set-default 'tramp-default-proxies-alist (quote (("django" "sag" "djangoliv" "/ssh:%h:"))))
   ;; ouvrir un fichier distant en sudo
   (defun sudo-remote-find-file (file)
     "Opens repote FILE with root privileges."
@@ -3077,43 +3107,25 @@ Configuration Minimal (sans librairies externes)
           (my-sort-lines-buffer)
           (message "Sorted buffer")))))
 #+END_SRC
-** flip bool at point
-#+BEGIN_SRC emacs-lisp
-  ;; A list of opposite boolean pairs.
-  (defvar bools '(("true" . "false") ("True" . "False") ("TRUE" . "FALSE") ("#t" . "#f") ("yes" . "no") ("Yes" . "No") ("YES" . "NO")))
-  (defun flip-bool-at-point ()
-    "Flips the boolean literal at point, changing true to false and vice-versa."
-    (interactive)
-    (let* ((true (cdr (assoc (current-word) bools)))
-           (false (car (rassoc (current-word) bools)))
-           (wrd (cond (true true)
-                      (false false)
-                      (t (current-word)))))
-      (save-excursion
-        (forward-word)
-        (backward-kill-word 1)
-        (insert wrd))))
-  (global-set-key (kbd "C-c b") 'flip-bool-at-point)
-#+END_SRC
 ** scratch perso
 #+BEGIN_SRC emacs-lisp
 (setq initial-scratch-message "
-      ;;                                                                                                     ,---,
-      ;;                                                                                                  ,`--,' |
-      ;;            ,---,                                                          ,--,                   |   :  :
-      ;;          ,'  ,' `.                                                      ,--,'|     ,--,          |   |  '
-      ;;        ,---,'     `.  ,--,                   ,---,               ,---,  |  | :   ,--,'|          '   :  |
-      ;;        |   |  /`.  |,--,/|               ,---, /  |  ,----,_,,  '   ,'` :  : '   |  |,      ,---,;   |,'
-      ;;        :   : |  :  ||  |/    ,--,--,    ,--,'|'   | /   /  ' / /   /   ||  ' |   '--'_    /,  ,/|'---'
-      ;;        |   : :  ;  :'--`_   /       `  |   |  ,-' ||   :     |,   ; ,, :'  | |   ,' ,'| ,-' , ' |
-      ;;        :   | ;  :  |,--,'| ,--,  ,-, | |   | /  | ||   | ,`  ,'   | |: :|  | :   '  | |/___/ `: |
-      ;;        |   | :  |  '|  | '  `__`/: , , |   | |  | |,   ; ';  |'   | ,; :'  : |__ |  | :,   `  ' ,
-      ;;        :   : | /  ; :  | |  ,' ,--,; | |   | |  |/ '   ,   , ||   :    ||  | ','|'  : |_`   `   '
-      ;;        |   | '` ,/__|  : ' /  /  ,,  | |   | |--'   `---`-'| | `   `  / ;  :    ;|  | ','`   `  |
-      ;;        ;   :  ,','__/-_: |;  :   ,'   `|   |/       ,'__/`_: |  '----'  |  ,   / ;  :    ;`   ` |
-      ;;        |   ,,'  |   :    :|  ,     ,-,/'---'        |   :    :           ---`-'  |  ,   /  '---'
-      ;;        '---'     `   :  /  '--*---'                  `   |  /                     ---`-'
-      ;;                   `--`-'                              `--`-'")
+                                                                                                ,---,
+                                                                                             ,`--,' |
+       ,---,                                                          ,--,                   |   :  :
+     ,'  ,' `.                                                      ,--,'|     ,--,          |   |  '
+   ,---,'     `.  ,--,                   ,---,               ,---,  |  | :   ,--,'|          '   :  |
+   |   |  /`.  |,--,/|               ,---, /  |  ,----,_,,  '   ,'` :  : '   |  |,      ,---,;   |,'
+   :   : |  :  ||  |/    ,--,--,    ,--,'|'   | /   /  ' / /   /   ||  ' |   '--'_    /,  ,/|'---'
+   |   : :  ;  :'--`_   /       `  |   |  ,-' ||   :     |,   ; ,, :'  | |   ,' ,'| ,-' , ' |
+   :   | ;  :  |,--,'| ,--,  ,-, | |   | /  | ||   | ,`  ,'   | |: :|  | :   '  | |/___/ `: |
+   |   | :  |  '|  | '  `__`/: , , |   | |  | |,   ; ';  |'   | ,; :'  : |__ |  | :,   `  ' ,
+   :   : | /  ; :  | |  ,' ,--,; | |   | |  |/ '   ,   , ||   :    ||  | ','|'  : |_`   `   '
+   |   | '` ,/__|  : ' /  /  ,,  | |   | |--'   `---`-'| | `   `  / ;  :    ;|  | ','`   `  |
+   ;   :  ,','__/-_: |;  :   ,'   `|   |/       ,'__/`_: |  '----'  |  ,   / ;  :    ;`   ` |
+   |   ,,'  |   :    :|  ,     ,-,/'---'        |   :    :           ---`-'  |  ,   /  '---'
+   '---'     `   :  /  '--*---'                  `   |  /                     ---`-'
+              `--`-'                              `--`-'")
 #+END_SRC
 ** time-tracker
 #+BEGIN_SRC emacs-lisp
@@ -3126,10 +3138,10 @@ Configuration Minimal (sans librairies externes)
 ** pyutils
 #+BEGIN_SRC emacs-lisp
   (autoload 'pyutils-mode "pyutils" "python extend" t)
-  (add-hook 'python-ts-mode-hook '(lambda ()
+  (add-hook 'python-mode-hook '(lambda ()
                                     (pyutils-mode)
-                                    (define-key python-ts-mode-map (kbd "<f8>") 'pyutils-shebang-insert)
-                                    (define-key python-ts-mode-map (kbd "s-w") 'pyutils-where)))
+                                    (define-key python-mode-map (kbd "<f8>") 'pyutils-shebang-insert)
+                                    (define-key python-mode-map (kbd "s-w") 'pyutils-where)))
 #+END_SRC
 ** new html
 #+BEGIN_SRC emacs-lisp
@@ -3185,7 +3197,7 @@ Configuration Minimal (sans librairies externes)
   (global-set-key [f8] 'neotree-toggle)
   (setq flycheck-python-flake8-args "--ignore=D100,D101,D102,D103,D104,D105,D106")
   (use-package just-mode :straight t)
- 
+  
   (setq inhibit-locking t)
  #+END_SRC
 * Claude
@@ -3219,6 +3231,30 @@ Configuration Minimal (sans librairies externes)
            (side . bottom)
            (window-height . 0.40))))
   (setq claude-code-display-window-fn #'my-claude-display-bottom)
+
+  ;; notif TEST
+  (defun my/claude-mark-busy ()
+      (with-temp-file "/tmp/claude_busy")
+      (when (file-exists-p "/tmp/claude_done")
+        (delete-file "/tmp/claude_done")))
+  (add-hook 'claude-code-request-start-hook #'my/claude-mark-busy)
+  (defun my/claude-mark-done ()
+      (with-temp-file "/tmp/claude_done")
+    (when (file-exists-p "/tmp/claude_busy")
+      (delete-file "/tmp/claude_busy")))
+  (add-hook 'claude-code-response-finished-hook #'my/claude-mark-done)
+  ;; desable click on eat
+  (with-eval-after-load 'eat
+    (dolist (map (list eat-semi-char-mode-map eat-char-mode-map))
+      (define-key map [mouse-1] #'mouse-select-window)
+      (define-key map [down-mouse-1] #'mouse-select-window)))
+  ;; (add-hook 'claude-code-start-hook
+  ;;         (lambda ()
+  ;;           (setq-local eat-enable-mouse nil)))
+  ;; (add-hook 'claude-code-start-hook
+  ;;         (lambda ()
+  ;;           (setq-local eat-enable-mouse nil)
+  ;;           (when (fboundp 'eat--set-cursor) (eat-reset))))
   #+END_SRC
 * ollama
 #+BEGIN_SRC emacs-lisp
@@ -3246,7 +3282,4 @@ Configuration Minimal (sans librairies externes)
     (ellama-change
      "Detect language. Translate English to French or French to English. Output ONLY translation. No explanations.")
     )
-  (use-package benchmark-init
-  :init (benchmark-init/activate)
-  :hook (after-init . benchmark-init/deactivate))
 #+END_SRC
