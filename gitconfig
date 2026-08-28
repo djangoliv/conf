@@ -1,0 +1,70 @@
+# Ceci est le fichier de configuration personnel de Git.
+# [user]
+# 	name = djangoliv
+#     username = djangoliv
+#     email = djangoliv@mailoo.org
+[user]
+	name = Djangoliv
+	email = djangoliv@mailoo.org
+[color]
+	ui = true
+[color "branch"]
+	current = yellow bold
+	local = green bold
+    remote = cyan bold
+[alias]
+    st = status
+    ci = commit
+    co = checkout
+    dd = diff --staged
+    dh = diff HEAD^ HEAD
+	bb = for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
+	ll = log --all --oneline --graph -42
+    pushf = push --force-with-lease
+    histedit = "!f() { git rebase -i \"$1\"^; }; f"
+[credential]
+	helper = store
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[commit]
+	verbose = true
+[pull]
+	rebase = false
+
+# [core]
+#     pager = delta
+
+# [interactive]
+#     diffFilter = delta --color-only
+
+# [delta]
+#     navigate = true  # use n and N to move between diff sections
+#     line-numbers = true
+
+# [merge]
+#     conflictstyle = diff3
+
+# [diff]
+#     colorMoved = default
+# [core]
+# 	pager = diff-so-fancy | less --tabs=4 -RFX
+# [interactive]
+# 	diffFilter = diff-so-fancy --patch
+# [color "diff-highlight"]
+# 	oldNormal = red bold
+# 	oldHighlight = red bold 52
+# 	newNormal = green bold
+# 	newHighlight = green bold 22
+# [color "diff"]
+# 	meta = 11
+# 	frag = magenta bold
+# 	func = 146 bold
+# 	commit = yellow bold
+# 	old = red bold
+# 	new = green bold
+# 	whitespace = red reverse
+[init]
+	defaultBranch = main

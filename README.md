@@ -5,6 +5,7 @@
 * inputrc
 * prompt.sh: kube-ps1 prompt (sourced from `~/.kube/prompt.sh`)
 * pythonrc.py
+* gitconfig: git aliases and defaults
 * hgrc: mercurial configuration (kept for reference, mercurial is no longer installed)
 
 ## emacs files:
