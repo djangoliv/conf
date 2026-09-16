@@ -1,9 +1,26 @@
-(eval-when-compile (require 'cl))
+;;; hg-status.el --- mercurial status in the modeline  -*- lexical-binding: t; -*-
+
+(require 'cl-lib)
 (require 'vc-hg)
 (add-to-list 'vc-handled-backends 'Hg)
 
 (defvar hg-status-state-mark-modeline t
   "modeline mark display or not")
+
+(defsubst hg-status-interprete-state-mode-color (stat)
+  "Interpret vc-hg-state symbol to mode line color"
+  (cl-case stat
+    (edited "tomato")
+    (up-to-date "GreenYellow")
+    (unknown  "gray")
+    (added    "blue")
+    (deleted  "gray30")
+    (missing  "gray30")
+    (removed  "gray30")
+    (ignored  "gray30")
+    (unregistered  "gray30")
+    (unmerged "purple")
+    (t "red")))
 
 (defun hg-status-update-modeline ()
   "Update modeline state dot mark properly"
@@ -18,7 +35,7 @@
 
 (defun hg-status-uninstall-state-mark-modeline ()
   (setq mode-line-format
-        (remove-if #'(lambda (mode) (eq (car-safe mode)
+        (cl-remove-if #'(lambda (mode) (eq (car-safe mode)
                                         'hg-status-state-mark-modeline))
                    mode-line-format))
   (force-mode-line-update t))
@@ -67,21 +84,6 @@ static char * data[] = {
                                      color)
                       :ascent center)))
 
-(defsubst hg-status-interprete-state-mode-color (stat)
-  "Interpret vc-hg-state symbol to mode line color"
-  (cl-case stat
-    (edited "tomato")
-    (up-to-date "GreenYellow")
-    (unknown  "gray")
-    (added    "blue")
-    (deleted  "gray30")
-    (missing  "gray30")
-    (removed  "gray30")
-    (ignored  "gray30")
-    (unregistered  "gray30")
-    (unmerged "purple")
-    (t "red")))
-
 (defun vc-hg-branch-name ()
   "get branch name."
   (let ((default-directory (file-name-directory (buffer-file-name))))
@@ -89,10 +91,11 @@ static char * data[] = {
      (vc-hg-dir-extra-header "" "id" "-b")
      )))
 
-(defadvice vc-after-save (after hg-status-vc-hg-after-save activate)
-    (when (hg-status-in-vc-mode?) (hg-status-update-modeline)))
+(defun hg-status--refresh (&rest _)
+  "Refresh the modeline mark after vc updates the file state."
+  (when (hg-status-in-vc-mode?) (hg-status-update-modeline)))
 
-(defadvice vc-find-file-hook (after hg-status-vc-hg-find-file-hook activate)
-    (when (hg-status-in-vc-mode?) (hg-status-update-modeline)))
+(advice-add 'vc-after-save :after #'hg-status--refresh)
+(advice-add 'vc-refresh-state :after #'hg-status--refresh)
 
 (provide 'hg-status)

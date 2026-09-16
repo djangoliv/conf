@@ -83,6 +83,9 @@
 
 ;; baisser la frequence du garbage collector
 (setq gc-cons-threshold 20000000)
+;; Read subprocess output in 1 MiB chunks (default 64 KiB): fewer reads and
+;; redisplays when a command floods the terminal
+(setq read-process-output-max (* 1024 1024))
 ;; Allow font-lock-mode to do background parsing
 (setq jit-lock-stealth-time 1
       jit-lock-stealth-load 100
@@ -175,8 +178,8 @@
 (global-set-key (kbd "C-x C-f") 'open-in-server)
 (global-set-key (kbd "C-x f") 'find-file)
 
-;; term buffer (illimite)
-(setq term-buffer-maximum-size 0)
+;; term buffer: keep the last 50000 lines (0 = unlimited, grows without bound)
+(setq term-buffer-maximum-size 50000)
 
 ;;;;;;;;; tabbar
 (add-to-list 'load-path "~/.emacs.d/mode-icons/")
@@ -524,6 +527,10 @@ editing the buffer behind its back."
   "Set up `term-mode' buffers."
   (term-set-escape-char ?\C-x)
   (goto-address-mode)
+  ;; Lighter redisplay: no bidi analysis, no highlighting of nbsp/soft hyphens
+  (setq-local bidi-paragraph-direction 'left-to-right
+              bidi-inhibit-bpa t
+              nobreak-char-display nil)
   (global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal))
 (add-hook 'term-mode-hook #'my-term-mode-setup)
 

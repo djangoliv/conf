@@ -25,6 +25,9 @@ Configuration Minimal (sans librairies externes)
   (add-hook 'after-init-hook
             (lambda ()
               (setq gc-cons-threshold (car (get 'gc-cons-threshold 'standard-value)))))
+  ;; Read subprocess output in 1 MiB chunks (default 64 KiB): terminals such as
+  ;; eat emit large bursts, fewer reads means fewer redisplays
+  (setq read-process-output-max (* 1024 1024))
   ;; Enlever le temps d'attente au demarage
   (modify-frame-parameters nil '((wait-for-wm . nil)) )
   ;; Bip en mode visuel
@@ -207,6 +210,9 @@ Configuration Minimal (sans librairies externes)
     (setq beacon-blink-when-focused t)
     (setq beacon-size 3)
     (setq beacon-color "lightblue")
+    ;; eat moves point on every chunk of output: the blink overlay would be
+    ;; re-created endlessly and can get stuck as a blue highlight
+    (add-to-list 'beacon-dont-blink-major-modes 'eat-mode)
   )
 #+END_SRC
 ** dimmer (contraste)
@@ -3267,6 +3273,14 @@ literal color, instead of letting dimmer signal an error."
       ;; eat sends almost every key to the terminal: keep group navigation
       (define-key map (kbd "M-+") #'centaur-tabs-backward-group)
       (define-key map (kbd "M--") #'centaur-tabs-forward-group)))
+  ;; Lighter redisplay in eat buffers: no bidi analysis, no completion popup
+  (defun my-eat-mode-setup ()
+    "Buffer-local settings for `eat-mode' buffers."
+    (setq-local bidi-paragraph-direction 'left-to-right
+                bidi-inhibit-bpa t)
+    (when (bound-and-true-p company-mode)
+      (company-mode -1)))
+  (add-hook 'eat-mode-hook #'my-eat-mode-setup)
   ;; (add-hook 'claude-code-start-hook
   ;;         (lambda ()
   ;;           (setq-local eat-enable-mouse nil)))
