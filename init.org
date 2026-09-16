@@ -179,7 +179,8 @@ Configuration Minimal (sans librairies externes)
 #+BEGIN_SRC emacs-lisp
   (defun tangle-init-async ()
     "If the current buffer is 'emacs-init.org' the code-blocks are tangled."
-    (when (equal (buffer-file-name) (expand-file-name (concat user-emacs-directory "init.org")))
+    (when (equal (file-truename (buffer-file-name))
+                 (file-truename (expand-file-name (concat user-emacs-directory "init.org"))))
       (async-start
        `(lambda ()
           (require 'org)
@@ -739,6 +740,22 @@ literal color, instead of letting dimmer signal an error."
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
   ;; for elisp
   (define-key org-mode-map (kbd "C-.") 'find-function)
+#+END_SRC
+*** jupyter
+#+BEGIN_SRC emacs-lisp
+  (use-package jupyter
+    :straight t
+    :after org
+    :config
+    ;; jupyter must come last in org-babel-load-languages
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     (append org-babel-load-languages '((jupyter . t))))
+    ;; blocks are #+BEGIN_SRC jupyter-python, not ipython
+    (setq org-babel-default-header-args:jupyter-python
+          '((:async . "yes")
+            (:session . "py")
+            (:kernel . "python3"))))
 #+END_SRC
 *** export
 #+BEGIN_SRC emacs-lisp
@@ -1490,11 +1507,12 @@ literal color, instead of letting dimmer signal an error."
 #+END_SRC
 **** pyvenv
 #+BEGIN_SRC emacs-lisp
-  (setenv "WORKON_HOME" "~/Tools/python/venv")
+  (setenv "WORKON_HOME" (expand-file-name "~/Tools/python/venv"))
   (use-package pyvenv
     :straight t
     :config
-    (pyvenv-activate "~/Tools/python/venv/base")
+    ;; conda base: same environment as the interactive shell
+    (pyvenv-activate (expand-file-name "~/Tools/miniforge3"))
     (defalias 'switch-virtualenv 'pyvenv-workon))
 #+END_SRC
 **** pip requirements
@@ -1925,11 +1943,14 @@ literal color, instead of letting dimmer signal an error."
       ;; exclude
       (defun centaur-tabs-hide-tab (x)
         (let ((name (format "%s" x)))
-          (or
-           (string-prefix-p "*" name)
-           (and (string-prefix-p "magit" name)
-                (not (file-name-extension name)))
-           )))
+          (and
+           ;; keep the claude buffers, despite their leading star
+           (not (string-prefix-p "*claude" name))
+           (or
+            (string-prefix-p "*" name)
+            (and (string-prefix-p "magit" name)
+                 (not (file-name-extension name)))
+            ))))
       ;; groups
       (defun centaur-tabs-buffer-groups ()
         (list
@@ -2030,12 +2051,8 @@ literal color, instead of letting dimmer signal an error."
                             (find-file (concat "~/workspaces/jupyterlab-projects/jupyterhub-projects/jupyterApps/app" path))
                           (if (file-exists-p (concat "~/workspaces/" path))
                               (find-file (concat "~/workspaces/" path))
-                            (if (file-exists-p (concat "~/workspaces/Mosaic/mosaic-board/" path))
-                                (find-file (concat "~/workspaces/Mosaic/mosaic-board/" path))
-                            (if (file-exists-p (concat "~/workspaces/codeTympan/code_tympan/" path))
-                                (find-file (concat "~/workspaces/codeTympan/code_tympan/" path))
                               (when (y-or-n-p (format "file doesn't exist: '%s'. Create?" path))
-                                (find-file path ))))))))))))))))
+                                (find-file path ))))))))))))))
         (forward-line (- (string-to-number line-number) 1)))
   (global-set-key (kbd "C-<f1>") 'find-file-at-cursor-replace)
   ;; ffap avec la sourie (Ctrl click-droit)
@@ -2655,7 +2672,7 @@ literal color, instead of letting dimmer signal an error."
     (global-set-key (kbd "C-c l b") 'languagetool-correct-buffer)
     (global-set-key (kbd "C-c l l") 'languagetool-set-language)
     (setq languagetool-console-command
-          "~/Tools/languageTool/languagetool-6.6/languagetool-commandline.jar")
+          (expand-file-name "~/Tools/languageTool/languagetool-6.6/languagetool-commandline.jar"))
     (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8"))
     (setq languagetool-correction-language "en-GB"))
 #+END_SRC
@@ -2663,7 +2680,7 @@ literal color, instead of letting dimmer signal an error."
 *** Firefox
 #+BEGIN_SRC emacs-lisp
   ;; firefox comme navigateur web par defaut
-  (setq browse-url-generic-program "~/Tools/firefox/firefox/firefox"
+  (setq browse-url-generic-program (expand-file-name "~/Tools/firefox/firefox/firefox")
         browse-url-browser-function 'browse-url-generic)
  #+END_SRC
 ** Completion
@@ -2735,7 +2752,6 @@ literal color, instead of letting dimmer signal an error."
     (set-buffer
      (find-file (concat "/sudo::" (expand-file-name file)))))
   ;;(global-set-key (kbd "s-r") 'sudo-find-file)
-  (set-default 'tramp-default-proxies-alist (quote (("django" "sag" "djangoliv" "/ssh:%h:"))))
   ;; ouvrir un fichier distant en sudo
   (defun sudo-remote-find-file (file)
     "Opens repote FILE with root privileges."
@@ -3247,7 +3263,10 @@ literal color, instead of letting dimmer signal an error."
   (with-eval-after-load 'eat
     (dolist (map (list eat-semi-char-mode-map eat-char-mode-map))
       (define-key map [mouse-1] #'mouse-select-window)
-      (define-key map [down-mouse-1] #'mouse-select-window)))
+      (define-key map [down-mouse-1] #'mouse-select-window)
+      ;; eat sends almost every key to the terminal: keep group navigation
+      (define-key map (kbd "M-+") #'centaur-tabs-backward-group)
+      (define-key map (kbd "M--") #'centaur-tabs-forward-group)))
   ;; (add-hook 'claude-code-start-hook
   ;;         (lambda ()
   ;;           (setq-local eat-enable-mouse nil)))

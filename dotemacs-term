@@ -367,10 +367,6 @@
 (modify-syntax-entry ?\[ "w" term-mode-syntax-table)
 (modify-syntax-entry ?\] "w" term-mode-syntax-table)
 
-;; sudo + ssh
-;; C-x C-f /sudo:djangoliv@agile02:/COTS/torque/
-(set-default 'tramp-default-proxies-alist (quote (("agile02" "djangoliv" "/ssh:%h:"))))
-
 ;; exit term whit C-d
 ;; (defun delete-char-or-kill-terminal-buffer (N &optional killflag)
 ;;   (interactive "p\nP")
@@ -578,8 +574,7 @@ ORIG-FUN is `save-buffers-kill-emacs', called with ARGS."
 
 (require 'tramp-term)
 
-;;(setq term-prompt-regexp "[[:ascii:]]*@django:")
-(setq term-prompt-regexp "[[:ascii:]]*@django:+")
+(setq term-prompt-regexp (format "[[:ascii:]]*%s@%s:+" (user-login-name) (system-name)))
 
 ;; (defun ansi-term-debug-message (proc char)
 ;;   (message "ANSI escape in process %s char %c, param %d, remaining params %d"
@@ -592,3 +587,13 @@ ORIG-FUN is `save-buffers-kill-emacs', called with ARGS."
 (setq-default ispell-program-name "aspell")
 (setq ispell-local-dictionary "english")
 (ispell-change-dictionary "english")
+
+;; (add-hook 'window-configuration-change-hook
+;;           (lambda ()
+;;             (when (and (derived-mode-p 'term-mode)
+;;                        (get-buffer-process (current-buffer)))
+;;               (let ((width (window-max-chars-per-line))
+;;                     (height (window-screen-lines)))
+;;                 (set-process-window-size
+;;                  (get-buffer-process (current-buffer))
+;;                  height width)))))
